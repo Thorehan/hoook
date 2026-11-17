@@ -1,6 +1,6 @@
 # Kuyu
 
-**Funday Morning Games** · 2D mobil oyun · prototip v0.55
+**Funday Morning Games** · 2D mobil oyun · prototip v0.56
 
 Derin bir kuyunun dibindesin. Telefonu tek elle tut: ekranın soluna ya da sağına dokun, kanca o taraftaki hedefe fırlasın; basılı tut, ipe sarıl; bırak, savrul. Halkadan halkaya, ahşaptan ahşaba tırmanıp kuyudan çık.
 
@@ -92,6 +92,14 @@ Yolun üstünde, bir halkadan sıradakine giden hatta duran yatay şerit (112 bi
 En iyi koşunun soluk bir kopyası seninle aynı zamanlamayla tırmanır: bölümde en kısa süreli geçişin, Sonsuz Kuyu'da rekor koşun, Günlük Kuyu'da günün en iyisi. Sonsuz her koşuda farklı olduğundan orada bir yükseklik yarışıdır. Hayalet ekranın dışındaysa üst ya da alt kenarda küçük bir işaret görünür. Yalnızca görüntüdür; nişan, puan ve fizik etkilenmez. Ayarlar → Hayalet ile kapatılır.
 
 Kayıt `js/hayalet.js`: kahramanın yeri sim zamanına göre saniyede 15 kez alınır, farklarla yazılır (~60 bayt/sn) ve ana kayıttan ayrı `kuyu.hayalet` anahtarında durur. Test: `node tools/hayalet-test.js`.
+
+## Görsel akıcılık (v0.56, İstişare 2)
+Yalnız çizim; fizik, nişan ve botlar etkilenmez. Hareket azaltma açıksa ileri bakış, paralaks, toz ve su süsleri kapanır.
+- **Kamera:** Hıza göre ileri bakar (hızla yükselirken ekranın üstü daha çok görünür, en çok ekranın %16'sı). Kritik sönümlü yayla izler; ani duruş ve sarsıntı olmaz. Koşu başında aşağıdan hafifçe süzülerek yerine oturur (`game.js` → `kameraIlerlet`).
+- **Derinlik:** Arka duvar (tuğla ve bölge dekoru) halkalardan %12 yavaş kayar (`PARALAKS` 0,88); bölge dokusu paralaks uzayında sabittir. İki katman toz zerresi var: uzakta yavaş, önde hızlı (bölgenin ışık renginde). Kuyunun iki kenarı gölgede (`drawKenarGolge`).
+- **Işık:** Çıra duvara titreyen sıcak bir ışık saçar; alevlenince büyür (`drawKorIsigi`).
+- **Su:** Arkada koyu ikinci bir dalga, yüzeyde pırıltılar, içinde yükselen kabarcıklar. Çıra suya yaklaşınca yüzeye sıcak yansıması düşer.
+- **Geçişler:** Koşu başında, kalkan ve devam hakkında kısa kararma ve açılma (perde). Bölümde ölünce ekran kararır, sonra yeniden açılır. Menü ekranları arasında yumuşak geçiş var (CSS `ekranGir`).
 
 ## Güçlendirmeler (v0.50, İstişare 2)
 Sonsuz ve Günlük Kuyu'da (Günlük'te herkes için aynı yerde); yolun üstünde, bir halkadan sıradakine giden kanca hattında süzülen küreler (~her 22 halkada bir, sırayla kalkan → fener → kanat; 2 km'de ~9 tane). Az ve öngörülebilir; tanıtım kartı ilk alışta çıkar.

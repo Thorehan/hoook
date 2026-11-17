@@ -133,6 +133,7 @@ Kullanıcı hikâyeye online'dan önce geçti; online (5) sonra.
 - [?] Bekçinin adı.
 
 ## Yapılanlar
+- 2026-11-18 · v0.56 · Görsel akıcılık (İstişare 2, adım 5): kamera ileri bakışı + kritik sönümlü yay, arka duvar paralaksı (0,88), iki katman toz, kenar gölgesi, kor ışığı, su ikinci dalga + pırıltı + kabarcık + yansıma, perde geçişleri, ekranlar arası yumuşak geçiş. Yalnız çizim.
 - 2026-11-11 · v0.55 · Meydan okuma ve online hazırlığı (Mustafa): paylaşılan bağlantıyla aynı kuyuda puan karşılaştırma; skor tablosu istemcisi (kapalı, Supabase biçimi), yerel sahte sunucu ve test; yedek kodu; koleksiyon sayacı ve başarımı; pazar araştırması belgesi.
 - 2026-11-11 · v0.54 · Haftalık Kuyu ve lig (Mustafa): haftalık sabit tohum, devam hakkı yok, su erken sıkışır (26 → 18 m, 800 m'de); beş lig kademesi kendi en iyi puanına göre, ödül hafta bitince; ana menüde şerit, `?mod=haftalik`.
 - 2026-11-11 · v0.53 · Ekonomi dengesi (Mustafa): ölçüm hata yapan oyuncularla (ortalama gün ~115); Dolap 2080 → 6860 (40 ürün, yeni tür Alev rengi, Hilal ve Elmas kanca); ışık yolu 20 seviye ve 7 ışık ödülü; görev hedefleri ve başarım eşikleri yeni koşu uzunluklarına göre.

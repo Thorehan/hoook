@@ -530,3 +530,8 @@ button:active { filter: brightness(.94); }
 .skor-tablo li.ben { color: var(--atesbocegi); font-weight: 700; }
 .koleksiyon-say { margin-left: auto; margin-right: 8px; font-size: 12px; color: var(--soluk); font-variant-numeric: tabular-nums; white-space: nowrap; }
 .buyuk-yazi .skor-tablo, .buyuk-yazi .koleksiyon-say { font-size: 15px; }
+
+/* Görsel akıcılık (v0.56): ekranlar arasında yumuşak geçiş */
+.ekran:not([hidden]) { animation: ekranGir .24s ease-out; }
+@keyframes ekranGir { from { opacity: 0; } }
+@media (prefers-reduced-motion: reduce) { .ekran:not([hidden]) { animation: none; } }

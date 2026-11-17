@@ -112,6 +112,8 @@
 
   // ---------- durum ----------
   var mode = 'level', levelNo = 1, def, sim = null, paused = true, deaths = 0, cam = 0, shake = 0, parts = [], floaters = [], trail = [];
+  // Görsel akıcılık (v0.56): kamera hızı ve ileri bakışı, perde (koşu başı / yeniden doğuş kararması), arka duvar paralaksı
+  var camV = 0, camBak = 0, perde = 0, PARALAKS = 0.88;
   var winT = null, deadT = null, resultShown = false, finalT = null, finalBi = 0;
   var aim = { x: 0, y: -1 };
   var canvas = $('oyun'), ctx = canvas.getContext('2d');
@@ -362,7 +364,9 @@
     paused = false; acc = 0; lastT = 0;
     if (window.KuyuScreens) window.KuyuScreens.showGame();
     layout();
-    cam = camTarget();
+    camBak = 0; camV = 0;
+    cam = camTarget() + (reduceMotion ? 0 : 60); // koşu başında kamera hafifçe süzülerek yerine oturur
+    perde = reduceMotion ? 0.6 : 1;
     updateHud(true);
     notGoster(); // önceki denemede bulunup su yetişen notun metni
   }
@@ -479,7 +483,7 @@
 
   function camTarget() {
     var vh = viewH / K;
-    var t = sim.p.y - vh * (mode === 'endless' ? 0.58 : 0.62);
+    var t = sim.p.y - vh * (mode === 'endless' ? 0.58 : 0.62) + camBak;
     if (winT !== null) t = sim.p.y - vh * 0.5;
     if (mode === 'endless') return Math.min(sim.startY + 80 - vh, t);
     return Math.max(-170, Math.min(sim.H + 30 - vh, t));
@@ -540,7 +544,7 @@
         floatText(e.x, e.y - 28, GG.ad.toUpperCase() + '!', 'rgb(' + GG.renk + ')', 17);
       }
       else if (e.type === 'gucBitti') tone(440, 0.15, 'sine', 0.04, 330);
-      else if (e.type === 'kalkan') { tone(523, 0.15, 'triangle', 0.06, 1047); burst(e.x, e.y, 22, 'rgb(127,214,255)', 220, 0.6, -40); floatText(e.x, e.y - 34, 'kalkan kurtardı!', 'rgb(127,214,255)', 15); buzz([20, 40, 20]); }
+      else if (e.type === 'kalkan') { perde = Math.max(perde, 0.55); tone(523, 0.15, 'triangle', 0.06, 1047); burst(e.x, e.y, 22, 'rgb(127,214,255)', 220, 0.6, -40); floatText(e.x, e.y - 34, 'kalkan kurtardı!', 'rgb(127,214,255)', 15); buzz([20, 40, 20]); }
       else if (e.type === 'cekildi') burst(e.x, e.y, 4, COL.atesbocegi, 80, 0.25, 0);
       else if (e.type === 'zincirAdim') { tone(e.bozuk ? 440 : 523 + e.n * 110, 0.09, 'sine', 0.05); burst(e.x, e.y, 6, e.bozuk ? '#8fa09c' : '#ffd36a', 120, 0.35, -20); floatText(e.x + 14, e.y - 16, e.n + '/' + CFG.ZINCIR_N, e.bozuk ? '#8fa09c' : '#ffd36a', 12); }
       else if (e.type === 'zincir') {
@@ -613,7 +617,7 @@
       }
       else if (e.type === 'gateOpen') { SFX.gate(); buzz(35); shake = Math.max(shake, 5); }
       else if (e.type === 'waterStart') { wantIntro('su'); if (!sim.def.suTakip) floatText(sim.p.x, sim.p.y + 40, 'su yükseliyor', COL.suAcik, 14); }
-      else if (e.type === 'devam') { tone(523, 0.12, 'triangle', 0.06, 784); burst(e.x, e.y, 18, '#ffd36a', 180, 0.5, -40); floatText(e.x, e.y - 34, 'devam!', '#ffd36a', 16); }
+      else if (e.type === 'devam') { perde = Math.max(perde, 0.7); tone(523, 0.12, 'triangle', 0.06, 784); burst(e.x, e.y, 18, '#ffd36a', 180, 0.5, -40); floatText(e.x, e.y - 34, 'devam!', '#ffd36a', 16); }
       else if (e.type === 'dead') {
         SFX.dead(); shake = 8; buzz(80);
         burst(sim.p.x, sim.p.y, 22, e.why === 'su' ? COL.suAcik : (look().govde || COL.kahraman), 260, 0.7);
@@ -624,12 +628,16 @@
 
   // ---------- çizim ----------
   function drawBackground(t) {
-    var tileH = 240, start = Math.floor(cam / tileH) * tileH, vh = viewH / K;
+    // arka duvar (tuğla + dekor) halkalardan biraz yavaş kayar: derinlik. Bölge dokusu paralaks uzayında sabit (kayarken dokular değişmez)
+    var tileH = 240, vh = viewH / K, pf = reduceMotion ? 1 : PARALAKS, pc = cam * pf, start = Math.floor(pc / tileH) * tileH;
     ctx.save();
     ctx.setTransform(1, 0, 0, 1, 0, 0);
-    for (var y = start; y < cam + vh + tileH; y += tileH) ctx.drawImage(bricks[bolgeY(y + tileH / 2)] || brick, 0, Math.round((y - cam) * K * DPR));
+    for (var y = start; y < pc + vh + tileH; y += tileH) ctx.drawImage(bricks[bolgeY((y + tileH / 2) / pf)] || brick, 0, Math.round((y - pc) * K * DPR));
     ctx.restore();
-    for (var y2 = start; y2 < cam + vh + tileH; y2 += tileH) { var bi = bolgeY(y2 + tileH / 2); if (bi) drawDecor(bi, Math.round(y2 / tileH), y2, t); }
+    ctx.save(); ctx.translate(0, cam - pc);
+    for (var y2 = start; y2 < pc + vh + tileH; y2 += tileH) { var bi = bolgeY((y2 + tileH / 2) / pf); if (bi) drawDecor(bi, Math.round(y2 / tileH), y2, t); }
+    ctx.restore();
+    drawKenarGolge(vh);
     // bölgenin ortam ışığı (taş kuyuda yok)
     var ob = BOLGELER[bolgeY(cam + vh / 2)];
     if (ob.id !== 'tas') { ctx.fillStyle = 'rgba(' + ob.isik + ',0.07)'; ctx.fillRect(0, cam, CFG.W, vh); }
@@ -948,6 +956,11 @@
       if (!sim.surunuyor) surunmeDuyuruldu = false;
     }
     if (wy > alt + 20) return;
+    // arka dalga (koyu, başka evrede): suya derinlik
+    ctx.fillStyle = 'rgba(22,84,92,0.55)';
+    ctx.beginPath(); ctx.moveTo(0, wy + 60);
+    for (var xb = 0; xb <= CFG.W; xb += 12) ctx.lineTo(xb, wy - 4 + Math.sin(xb / 41 - t / 420) * 4);
+    ctx.lineTo(CFG.W, wy + 60); ctx.closePath(); ctx.fill();
     var g = ctx.createLinearGradient(0, wy, 0, wy + 300);
     g.addColorStop(0, 'rgba(28,106,114,0.88)'); g.addColorStop(1, 'rgba(8,30,34,0.97)');
     ctx.fillStyle = g;
@@ -958,6 +971,24 @@
     ctx.beginPath();
     for (var x2 = 0; x2 <= CFG.W; x2 += 12) { var yy = wy + Math.sin(x2 / 26 + t / 300) * 3; if (x2 === 0) ctx.moveTo(x2, yy); else ctx.lineTo(x2, yy); }
     ctx.stroke();
+    // Çıra yaklaşınca yüzeye sıcak yansıma düşer (tehlike hissi, ışık)
+    if (sim.status !== 'dead') {
+      var yk = Math.max(0, Math.min(1, 1 - (wy - sim.p.y) / 260));
+      if (yk > 0.02) { ctx.save(); ctx.translate(sim.p.x, wy); ctx.scale(1, 0.28); parilti(0, 0, 90, '255,170,90', 0.5 * yk); ctx.restore(); }
+    }
+    if (reduceMotion) return;
+    // yüzey pırıltıları ve yükselen kabarcıklar
+    ctx.fillStyle = 'rgba(200,240,240,0.55)';
+    for (var j = 0; j < 7; j++) {
+      var gx = (j * 53 + t / 40 * (j % 2 ? 1 : -1)) % CFG.W; if (gx < 0) gx += CFG.W;
+      var ga = 0.5 + 0.5 * Math.sin(t / 260 + j * 2.1); if (ga < 0.3) continue;
+      ctx.fillRect(gx, wy + Math.sin(gx / 26 + t / 300) * 3 + 3, 7 * ga, 1.4);
+    }
+    for (var q = 0; q < 6; q++) {
+      var ph = ((t / 2600 + q * 0.37) % 1), bx = (q * 67 + 23) % CFG.W + Math.sin(t / 500 + q) * 4, by = wy + 150 - ph * 140;
+      ctx.strokeStyle = 'rgba(150,220,225,' + (0.35 * (1 - ph)).toFixed(3) + ')'; ctx.lineWidth = 1;
+      ctx.beginPath(); ctx.arc(bx, by, 1.5 + q % 3, 0, Math.PI * 2); ctx.stroke();
+    }
   }
 
   function drawRange() {
@@ -1317,6 +1348,8 @@
     shake = Math.max(0, shake - dt * 30);
     ctx.setTransform(K * DPR, 0, 0, K * DPR, sx * DPR, (-cam * K + sy) * DPR);
     drawBackground(t);
+    drawToz(t, 0.55, 12, 0.9, 0.10);
+    drawKorIsigi(t);
     drawGoal(t);
     var vh = viewH / K;
     for (var i = 0; i < sim.rects.length; i++) drawRect(sim.rects[i]);
@@ -1331,10 +1364,66 @@
     if (sim.status !== 'dead') { drawHero(t); drawGrip(); }
     drawParticles(dt);
     drawWater(t);
+    drawToz(t, 1.25, 6, 1.5, 0.13);
     drawFloaters(dt);
     drawTouchHint(dt);
     drawGucHud();
     if (finalT !== null) drawFinal();
+    drawPerde(dt);
+  }
+
+  // ---------- görsel akıcılık (v0.56) ----------
+  // Kamera: hızla ileri bakış (yükselirken üstü daha çok görünür) + kritik sönümlü yay (ani duruş ve sarsıntı yok).
+  // Yalnız görüntü: fizik, nişan ve botlar etkilenmez.
+  function kameraIlerlet(dt) {
+    var vh = viewH / K;
+    if (sim.status === 'play' && !reduceMotion) {
+      var vy = (sim.p.y - sim.p.py) / CFG.DT, bak = Math.max(-0.16, Math.min(0.05, vy / 2600)) * vh;
+      camBak += (bak - camBak) * Math.min(1, dt * 2.2);
+    } else camBak += -camBak * Math.min(1, dt * 2);
+    var target = camTarget();
+    if (reduceMotion || sim.status === 'dead') { cam += (target - cam) * Math.min(1, dt * (sim.status === 'dead' ? 2 : 7)); camV = 0; return; }
+    var w = 11; camV += ((target - cam) * w * w - 2 * w * camV) * dt; cam += camV * dt;
+  }
+  // Perde: koşu başında ve bölümde yeniden doğuşta kısa kararma; bölümde ölünce yeniden başlamadan önce kararır
+  function drawPerde(dt) {
+    perde = Math.max(0, perde - dt * (reduceMotion ? 4 : 2.6));
+    var a = perde;
+    if (mode === 'level' && sim.status === 'dead' && deadT !== null) a = Math.max(a, Math.min(1, (deadT - 0.4) / 0.35));
+    if (a <= 0.01) return;
+    ctx.save(); ctx.setTransform(1, 0, 0, 1, 0, 0);
+    ctx.fillStyle = 'rgba(8,12,13,' + (a * a * (3 - 2 * a)).toFixed(3) + ')'; ctx.fillRect(0, 0, canvas.width, canvas.height);
+    ctx.restore();
+  }
+  // Kuyunun kenarları gölgede: silindir derinliği
+  function drawKenarGolge(vh) {
+    var kg = ctx.createLinearGradient(0, 0, 60, 0);
+    kg.addColorStop(0, 'rgba(4,7,8,0.42)'); kg.addColorStop(1, 'rgba(4,7,8,0)');
+    ctx.fillStyle = kg; ctx.fillRect(0, cam, 60, vh);
+    var sg = ctx.createLinearGradient(CFG.W, 0, CFG.W - 60, 0);
+    sg.addColorStop(0, 'rgba(4,7,8,0.42)'); sg.addColorStop(1, 'rgba(4,7,8,0)');
+    ctx.fillStyle = sg; ctx.fillRect(CFG.W - 60, cam, 60, vh);
+  }
+  // Toz zerreleri: f < 1 uzak katman (yavaş), f > 1 yakın katman (hızlı); yere göre sabit, hafifçe salınır
+  function tozHash(n) { n = Math.imul(n ^ (n >>> 15), 2246822519) >>> 0; n = Math.imul(n ^ (n >>> 13), 3266489917) >>> 0; return ((n ^ (n >>> 16)) >>> 0) / 4294967296; }
+  function drawToz(t, f, n, r, a) {
+    if (reduceMotion) return;
+    var vh = viewH / K, tile = 420, sc = cam * f, k0 = Math.floor(sc / tile), k1 = Math.floor((sc + vh) / tile), rgb = BOLGELER[bolgeY(cam + vh / 2)].isik || '255,226,180';
+    for (var k = k0; k <= k1; k++) {
+      for (var i = 0; i < n; i++) {
+        var s = (k * 131 + i * 17 + Math.round(f * 100)) | 0, ys = k * tile + tozHash(s + 7) * tile - sc;
+        if (ys < -4 || ys > vh + 4) continue;
+        var x = tozHash(s) * CFG.W + Math.sin(t / 1900 + i * 1.3 + k) * 9, al = a * (0.55 + 0.45 * Math.sin(t / 700 + s));
+        ctx.fillStyle = 'rgba(' + rgb + ',' + al.toFixed(3) + ')';
+        ctx.beginPath(); ctx.arc(x, cam + ys, r * (0.7 + tozHash(s + 3) * 0.6), 0, Math.PI * 2); ctx.fill();
+      }
+    }
+  }
+  // Çıra'nın duvara düşen ışığı: kor titrer, alevlenince büyür
+  function drawKorIsigi(t) {
+    if (!sim || sim.status === 'dead') return;
+    var p = sim.p, al = sim.alev || 0, fl = reduceMotion ? 1 : 0.9 + 0.06 * Math.sin(t / 90) + 0.04 * Math.sin(t / 37);
+    parilti(p.x, p.y, (130 + al * 25) * fl, '255,168,90', 0.13 + al * 0.03);
   }
 
   // ---------- bölge finalleri (docs/hikaye.md) ----------
@@ -1508,8 +1597,7 @@
     if (window.KuyuMuzik) window.KuyuMuzik.yogunluk(sim.status === 'play' && sim.combo >= 2 ? (sim.combo - 1) / 6 : 0);
     if (mode === 'endless' && sim.status === 'play') { var nb = bolgeY(sim.topY); if (nb !== sonsuzBolge) { /* en yüksek noktaya göre: sınırda inip çıkınca tekrar etmez */ sonsuzBolge = nb; MZ.sahne(BOLGELER[nb].id); floatText(sim.p.x, sim.p.y - 40, BOLGELER[nb].ad, 'rgb(' + BOLGELER[nb].isik + ')', 18); bolgeDuyur(nb, E.meters(sim) + ' m'); } }
     if (sim.status === 'play' && !paused) maybeIntro();
-    var target = camTarget();
-    cam += (target - cam) * Math.min(1, dt * (sim.status === 'dead' ? 2 : 7));
+    kameraIlerlet(dt);
     render(t, dt);
     updateHud();
   }
