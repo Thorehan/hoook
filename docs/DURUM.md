@@ -25,7 +25,7 @@
 - ✅ 18/11: Törehan v0.52–v0.55 kararlarını gözden geçirdi, hepsi kalıyor (bölge suyu, ekonomi, Haftalık + lig, Supabase istemcisi kapalı).
 1. **Telefonda deneme**, özellikle bölge suyu mesafeleri ve Haftalık Kuyu.
 2. **Skor tablosunu açmak:** Supabase seçildi, şimdilik kapalı. Açma kararı ve hesap sonra (`docs/online-kurulum.md`).
-3. İstişare 2'nin kalanı: ✅ görsel akıcılık (v0.56) → 24 uzun bölüm (Törehan ile planlanır).
+3. İstişare 2'nin kalanı: ✅ görsel akıcılık (v0.56) → **24 uzun bölüm: plan hazır (18/11), `docs/hikaye-bolumleri-plan.md`**. Tarifli üretim, fener kontrol noktası, ikinci yolculuk, bölgeye göre taşıma. Sıradaki: Aşama 1 (altyapı + bölüm 1–3, sonra telefonda deneme).
 
 ## Açık sorular (Törehan'a)
 
