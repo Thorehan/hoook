@@ -104,6 +104,7 @@
         if (r[2] === 'gecit') o.gecitId = r[3];  // geçit girişi; çıkışı aynı numaralı 'cikis'
         if (r[2] === 'cikis') o.cikisId = r[3];
         if (r[2] === 'sarkac') { o.sarkac = true; makeSwing(o); }
+        if (r[2] === 'fener') o.fener = true; // Hikâye kontrol noktası (v0.57)
         return o;
       }),
       goal: def.goal ? { x: def.goal[0], y: def.goal[1] } : null,
@@ -528,6 +529,7 @@
           onAttach(s, ax, ay, hit.kind);
           if (hit.ring && hit.ring.sw) s.swings++;
           if (hit.ring && hit.ring.ff) collectRing(s, hit.ring);
+          if (hit.ring && hit.ring.fener) fenerYak(s, hit.ring);
           if (hit.kind === 'goal') { s.status = 'won'; s.events.push({ type: 'won' }); return; }
         } else if (hit.kind === 'box') {
           s.rope = { kind: 'box', box: hit.box, len: dist(p.x, p.y, hit.box.x, hit.box.y) };
@@ -689,6 +691,11 @@
         else return die(s, 'su');
       }
     }
+    // Hikâye (v0.57): tutunulan en yüksek yerin def.dusus birim altına düşmek ölümdür (su olmayan bölmelerde de karar önemli)
+    if (s.def.dusus) {
+      if (s.rope && s.rope.kind === 'anchor') { var hy = s.rope.y + CFG.MIN_LEN; if (s.dusTop == null || hy < s.dusTop) s.dusTop = hy; }
+      if (s.dusTop != null && p.y > s.dusTop + s.def.dusus) return die(s, 'düşüş');
+    }
     if (!s.endless && p.y > s.H + 220) return die(s, 'düşüş');
   }
 
@@ -810,6 +817,26 @@
     s.events.push({ type: 'devam', x: ax, y: ay + CFG.MIN_LEN, n: s.devam });
     return true;
   }
+  // Fener (Hikâye kontrol noktası, v0.57): tutununca yanar; ölünce son yanan fenerden dönülür
+  function fenerYak(s, g) {
+    if (g.yandi) return;
+    g.yandi = true; s.kontrol = { x: g.x, y: g.y, ref: g }; s.fenerSay = (s.fenerSay || 0) + 1;
+    s.events.push({ type: 'fener', x: g.x, y: g.y, n: s.fenerSay });
+  }
+  function fenerDon(s) {
+    var k = s.kontrol;
+    if (!k || s.status !== 'dead') return false;
+    s.status = 'play'; s.pressed = false;
+    s.p.x = s.p.px = k.x; s.p.y = s.p.py = k.y + CFG.MIN_LEN;
+    s.rope = { kind: 'anchor', x: k.x, y: k.y, len: CFG.MIN_LEN, target: 'ring', ref: k.ref };
+    s.hook = null; s.hang = 0; s.air = 0; s.combo = 0; s.chain = false; s.alevPuan = 0; s.alev = 0; s.tamSeri = 0; s.kilitSon = 0; s.lastAnchor = null;
+    s.dusTop = k.y + CFG.MIN_LEN; s.tutTop = k.y + CFG.MIN_LEN; s.ilerlemeT = s.t;
+    if (s.def.suTakip) s.water = Math.max(s.water, k.y + CFG.MIN_LEN + s.def.suTakip.bas * 20);
+    else if (s.water != null) s.water = Math.max(s.water, k.y + 400);
+    s.donus = (s.donus || 0) + 1;
+    s.events.push({ type: 'fenerDon', x: k.x, y: k.y + CFG.MIN_LEN, n: s.donus });
+    return true;
+  }
   function die(s, why) { s.status = 'dead'; s.rope = null; s.hook = null; s.events.push({ type: 'dead', why: why }); }
   function dist(ax, ay, bx, by) { var x = ax - bx, y = ay - by; return Math.sqrt(x * x + y * y); }
   // Toplanan ateşböceği sayısı. Liste sayılmaz: Sonsuz kuyu suyun altında kalanları listeden siler.
@@ -821,7 +848,7 @@
 
   var api = {
     CFG: CFG, createSim: createSim, step: step, press: press, release: release,
-    fireflyCount: fireflyCount, akista: akista, dirilt: dirilt, hookRay: hookRay, meters: meters, score: score, segRect: segRect, aim: aim,
+    fireflyCount: fireflyCount, akista: akista, dirilt: dirilt, fenerDon: fenerDon, hookRay: hookRay, meters: meters, score: score, segRect: segRect, aim: aim,
     candidates: candidates, reachable: reachable, currentIgnore: currentIgnore, makeSwing: makeSwing,
     speedMult: speedMult, hizPay: hizPay, ustalikPay: ustalikPay, speedMs: speedMs, finalScore: finalScore
   };

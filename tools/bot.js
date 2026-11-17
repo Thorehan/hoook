@@ -282,6 +282,20 @@ if (!only) {
   if (akisOk < top || asiliYok < top) allOk = false;
 }
 
+// 1b) Hikâye bölümleri (v0.57, tarifli: js/bolumler.js → gen.createBolum): rahat, akış ve ateşböceği rotasıyla geçilmeli
+if (!only && G.createBolum) {
+  console.log('\n== Hikâye bölümleri (tarifli) ==');
+  const T = require('../js/bolumler.js');
+  for (const tf of T.BOLUMLER) {
+    const def = G.createBolum(tf.no);
+    const a = play(def, 'rahat'), b = play(def, 'akis'), c = play(def, 'rahat', def.ffRoute);
+    const ff = E.fireflyCount(c.s), ffT = c.s.fireflies.length;
+    const fener = a.s.fenerSay || 0;
+    if (!a.ok || !b.ok || !c.ok || ff < ffT || fener < def.fenerler.length) allOk = false;
+    console.log(`${tf.no} ${def.name.padEnd(14)} rahat ${a.ok ? 'GEÇTİ' : 'KALDI ' + a.why} ${a.s.t.toFixed(0)} sn · akış ${b.ok ? 'GEÇTİ' : 'KALDI ' + b.why} ${b.s.t.toFixed(0)} sn x${b.s.maxCombo} (hedef x${def.flow}) · ateşböceği ${ff}/${ffT} · fener ${fener}/${def.fenerler.length} · par ${def.par}`);
+  }
+}
+
 // 2) Üretilen bölümler
 if (!only) {
   console.log(`\n== Üretilen bölümler 7..${genMax} ==`);

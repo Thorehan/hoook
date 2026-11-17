@@ -737,7 +737,110 @@
     return def;
   }
 
-  var api = { HAFTALIK_SU: HAFTALIK_SU, createHaftalik: createHaftalik, ENDLESS_WATER: { base: 38, perM: 0.3, perS: 0, cap: 300 }, createLevel: createLevel, bolumSuyu: bolumSuyu, createEndless: createEndless, KURALLAR: KURALLAR, gunKurali: gunKurali, target: target, hangOf: hangOf, ffAlternative: ffAlternative, rng: rng };
+
+  // ---------- Hikâye bölümleri (v0.57, docs/hikaye-bolumleri-plan.md) ----------
+  // Tarif (js/bolumler.js) bölmelerden oluşur; her bölmenin ana yolu sırayla kurulur, aralarına fener (kontrol noktası)
+  // konur. Ateşböceği ve hız halkaları bölmenin karar noktalarında ana yolun alternatifidir (ffAlternative: her zaman
+  // ulaşılır, sonraki düğüme bağlanır). Her bölümün kendi tohumu var: aynı numara hep aynı bölümü verir.
+  function tarifler() { return (typeof root !== 'undefined' && root.KuyuBolumler) || (typeof require === 'function' ? require('./bolumler.js') : null); }
+  function bolmeDugum(r, hp, B, prevKind) {
+    var dyA = B.dy ? B.dy[0] : 165, dyB = B.dy ? B.dy[1] : 210, pp = B.panel || 0;
+    for (var tries = 0; tries < 80; tries++) {
+      var dy = lerp(dyA, dyB, r()), roll = r(), kind = 'ring', tx;
+      // panel yakın duvarda (aynı duvara art arda değil)
+      var solP = hp.x < 200 && prevKind !== 'panelL', sagP = hp.x > 160 && prevKind !== 'panelR';
+      if (roll < pp && (solP || sagP)) { kind = solP && (!sagP || hp.x < 180) ? 'panelL' : 'panelR'; tx = kind === 'panelL' ? WL + 10 : WR - 10; }
+      else {
+        // panelden sonra karşı yana; zikzakta sırayla iki yana
+        var dir = prevKind === 'panelL' ? 1 : prevKind === 'panelR' ? -1 : B.duzen === 'zikzak' ? (hp.x < 180 ? 1 : -1) : hp.x < 110 ? 1 : hp.x > 250 ? -1 : (r() < 0.5 ? -1 : 1);
+        tx = clamp(hp.x + dir * (70 + r() * 110), 56, 304);
+      }
+      var ty = hp.y - dy, d = dist(hp, { x: tx, y: ty });
+      if (d >= 150 && d <= REACH - 6) return { kind: kind, x: Math.round(tx), y: Math.round(ty) };
+    }
+    return { kind: 'ring', x: Math.round(clamp(hp.x + (hp.x < 180 ? 80 : -80), 60, 300)), y: Math.round(hp.y - 180) };
+  }
+  // Fener: bölme sonunda kuyunun ortasına yakın, rahat ulaşılan bir halka
+  function fenerDugum(r, hp) {
+    for (var tries = 0; tries < 60; tries++) {
+      var tx = clamp(180 + (r() - 0.5) * 90, 120, 240), ty = hp.y - lerp(165, 195, r()), d = dist(hp, { x: tx, y: ty });
+      if (d >= 150 && d <= REACH - 20) return { kind: 'ring', x: Math.round(tx), y: Math.round(ty), fener: true };
+    }
+    return { kind: 'ring', x: 180, y: Math.round(hp.y - 175), fener: true };
+  }
+  function createBolum(no) {
+    var T = tarifler(), tarif = T && T.bul(no);
+    if (!tarif) return null;
+    var r = rng(no * 104729 + 31);
+    var nodes = [], hp = { x: 180, y: 0 }, prevKind = null, bolmeler = [];
+    tarif.bolmeler.forEach(function (B, bi) {
+      var bas = nodes.length;
+      for (var k = 0; k < B.n; k++) { var n = bolmeDugum(r, hp, B, prevKind); nodes.push(n); prevKind = n.kind; hp = hangOf(n); }
+      var fen = -1;
+      if (bi < tarif.bolmeler.length - 1) { var f = fenerDugum(r, hp); nodes.push(f); prevKind = 'ring'; hp = hangOf(f); fen = nodes.length - 1; }
+      bolmeler.push({ B: B, bas: bas, son: bas + B.n - 1, fener: fen });
+    });
+    var goal = { x: clamp(lerp(hp.x, 180, 0.6), 90, 270), y: hp.y - 175 };
+    var start = { x: 180, y: 0 }, allPts = [start].concat(nodes.map(hangOf));
+    var out = { rects: [], rings: [], panels: [] };
+    nodes.forEach(function (nn) { placeNode(out, nn); });
+    var fenerHalka = {};
+    nodes.forEach(function (nn) { if (nn.fener) fenerHalka[nn.x + ',' + nn.y] = true; });
+    // ateşböceği ve hız halkaları: her bölmede, bölmenin içindeki karar noktalarında (ilk düğüm ve fenerin yanı değil)
+    var ffRings = [], hizRings = [], altAt = {};
+    function alternatifKoy(bm, adet, liste) {
+      if (!adet) return;
+      var ic = [];
+      for (var i = bm.bas + 1; i <= bm.son - 1; i++) ic.push(i);
+      for (var q = 0; q < adet; q++) {
+        var hedef = Math.round((q + 1) * ic.length / (adet + 1)) - 1;
+        for (var tr = 0; tr < ic.length; tr++) {
+          var j = ic[clamp(hedef + (tr % 2 ? -1 : 1) * Math.ceil(tr / 2), 0, ic.length - 1)];
+          if (altAt[j] || altAt[j - 1] || altAt[j + 1] || nodes[j].fener || (nodes[j + 1] && nodes[j + 1].fener)) continue;
+          var al = ffAlternative(r, allPts[j], target(nodes[j]), target(nodes[j + 1]), out.rings.concat(ffRings, hizRings));
+          if (al) { liste.push(al); altAt[j] = al; break; }
+        }
+      }
+    }
+    bolmeler.forEach(function (bm) { alternatifKoy(bm, bm.B.ff || 0, ffRings); });
+    bolmeler.forEach(function (bm) { alternatifKoy(bm, bm.B.hiz || 0, hizRings); });
+    // duvar ipuçları (bekçinin tebeşiri): düğümle sıradaki arasında, hedefin karşı yanında
+    var yazilar = [];
+    bolmeler.forEach(function (bm) {
+      (bm.B.yazilar || []).forEach(function (yz) {
+        var gi, y, x;
+        if (yz[0] === 'fener') { if (bm.fener < 0) return; gi = bm.fener; }
+        else if (yz[0] === 'kova') { y = goal.y + 70; x = goal.x < 180 ? 262 : 98; yazilar.push({ x: x, y: y, m: yz[1] }); return; }
+        else gi = bm.bas + yz[0];
+        if (!nodes[gi]) return;
+        var t = target(nodes[gi]);
+        y = Math.round((allPts[gi].y + t.y) / 2); x = t.x < 180 ? 262 : 98;
+        yazilar.push({ x: x, y: y, m: yz[1] });
+      });
+    });
+    var off = 50 - goal.y;
+    function sh(p) { return [Math.round(p.x), Math.round(p.y + off)]; }
+    var H = Math.round(start.y + off + 60);
+    var rects = [[WL, H - 40, W - 2 * WL, 40, 's']].concat(out.rects.map(function (rc) { return [Math.round(rc.x), Math.round(rc.y + off), rc.w, rc.h, rc.type, rc.dir]; }));
+    var route = nodes.map(function (nn) { var t = target(nn); return ['hook', Math.round(t.x), Math.round(t.y + off)]; });
+    route.push(['hook', Math.round(goal.x), Math.round(goal.y + off)]);
+    var ffRoute = route.map(function (st, k) { var a = altAt[k]; return a && ffRings.indexOf(a) >= 0 ? ['hook', a.x, Math.round(a.y + off)] : st; });
+    var hizRoute = route.map(function (st, k) { var a = altAt[k]; return a ? ['hook', a.x, Math.round(a.y + off)] : st; });
+    return {
+      id: no, name: tarif.ad, hikaye: no, bolge: tarif.bolge, H: H, generated: true, fenerli: true, dusus: 520,
+      hint: tarif.ipucu, start: [180, Math.round(off - 20)], goal: sh(goal), water: tarif.su || 0,
+      rects: rects,
+      rings: out.rings.map(function (p) { var a = sh(p); if (fenerHalka[p.x + ',' + p.y]) a.push('fener'); return a; })
+        .concat(ffRings.map(function (a) { return [a.x, Math.round(a.y + off), 'ff']; }))
+        .concat(hizRings.map(function (a) { return [a.x, Math.round(a.y + off), 'hiz']; })),
+      yazilar: yazilar.map(function (yz) { return { x: yz.x, y: Math.round(yz.y + off), m: yz.m }; }),
+      fenerler: bolmeler.filter(function (bm) { return bm.fener >= 0; }).map(function (bm) { return sh(target(nodes[bm.fener])); }),
+      route: route, ffRoute: ffRoute, hizRoute: hizRoute, dalRoute: null,
+      par: route.length + tarif.bolmeler.length, flow: tarif.akis
+    };
+  }
+
+  var api = { createBolum: createBolum, HAFTALIK_SU: HAFTALIK_SU, createHaftalik: createHaftalik, ENDLESS_WATER: { base: 38, perM: 0.3, perS: 0, cap: 300 }, createLevel: createLevel, bolumSuyu: bolumSuyu, createEndless: createEndless, KURALLAR: KURALLAR, gunKurali: gunKurali, target: target, hangOf: hangOf, ffAlternative: ffAlternative, rng: rng };
   if (typeof module !== 'undefined' && module.exports) module.exports = api;
   else root.KuyuGen = api;
 })(typeof window !== 'undefined' ? window : this);
