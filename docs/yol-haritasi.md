@@ -30,7 +30,7 @@ Tek elle, dikey, çevrimdışı oynanan; zorla reklamı, enerjisi ve satılan g�
 8. **Mağaza:** Unity'ye taşıma ya da PWA sarmalayıcı; bildirimler; gelir modeli (reklam kaldırma ya da destekçi paketi + yalnız isteğe bağlı video).
 
 ## Törehan'ın gözden geçirmesi için (bu dönemde alınan, oyunun hissine dokunan kararlar)
-Her biri ayrı commit; beğenilmezse `git revert` ile tek tek geri alınır.
+**18/11/2026 · Törehan gözden geçirdi: hepsi kalıyor.** Supabase seçildi ama skor tablosu kapalı kalıyor; hesap açma kararı sonra.
 | Karar | Commit | Geri alınırsa |
 |---|---|---|
 | 17+ bölümlerde izleyen su ve yanlış tarafta ipin bırakılması | v0.52 | Bölümler yine herkesçe geçilir |

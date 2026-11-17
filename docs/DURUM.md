@@ -21,15 +21,14 @@
 
 ## Sıradaki iş
 
-0. **Törehan'ın gözden geçirmesi:** v0.52–v0.55 Mustafa'nın tam yetkisiyle, Törehan'a sorulmadan yapıldı. Önce `docs/yol-haritasi.md` → "Törehan'ın gözden geçirmesi için" tablosu okunur; istenmeyen karar ilgili commit'in `git revert`'iyle geri alınır.
+- ✅ 18/11: Törehan v0.52–v0.55 kararlarını gözden geçirdi, hepsi kalıyor (bölge suyu, ekonomi, Haftalık + lig, Supabase istemcisi kapalı).
 1. **Telefonda deneme**, özellikle bölge suyu mesafeleri ve Haftalık Kuyu.
-2. **Skor tablosunu açmak:** Supabase hesabı + iki değer (`docs/online-kurulum.md`).
+2. **Skor tablosunu açmak:** Supabase seçildi, şimdilik kapalı. Açma kararı ve hesap sonra (`docs/online-kurulum.md`).
 3. İstişare 2'nin kalanı: görsel akıcılık → 24 uzun bölüm (Törehan ile planlanır).
 
 ## Açık sorular (Törehan'a)
 
-- Bu dönemde alınan ve oyunun hissine dokunan kararların gözden geçirilmesi: `docs/yol-haritasi.md` → "Törehan'ın gözden geçirmesi için".
-- Online için arka uç: öneri Supabase (istemci bu biçimde yazıldı); hesap kimde açılacak?
+- Supabase hesabı ne zaman, kimde açılacak (arka uç Supabase, 18/11).
 - Ölçüm (analitik) eklensin mi, hangi hizmet?
 - Bekçinin adı. İki para birimi mi, tek mi. Müzik parçaları (Mustafa'dan).
 
