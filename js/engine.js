@@ -493,7 +493,12 @@
     if (d < 4) { dx = 0; dy = -1; d = 1; }
     var rescue = !!(opts && opts.rescue);
     // Boş atışın bedeli: kanca geri dönene kadar yeni atış yok, akış biter (yanlış tarafa basmak bedava olmasın)
-    if ((s.hook && s.hook.keep) || (s.kilitSon && s.t < s.kilitSon)) { s.events.push({ type: 'kilit' }); return; }
+    if (kilitli(s)) {
+      // Giriş tamponu (v0.58): kilitliyken basılan dokunuşun tarafı saklanır; kilit bitince parmak hâlâ basılıysa kanca o yana atılır
+      s.tampon = { f: tx < s.p.x ? 0.25 : 0.75, t: s.t };
+      s.events.push({ type: 'kilit' }); return;
+    }
+    s.tampon = null;
     if (keep && !rescue) {
       s.tamSeri = 0; breakCombo(s, 'boş atış');
       // Sonsuz (İstişare 2): yanlış taraf ipi bırakır; düşüş gerçek. Bölümlerde ip kalır (öğretici).
@@ -508,8 +513,21 @@
     s.events.push({ type: rescue ? 'rescue' : keep ? 'missShot' : 'fire' });
   }
 
+  function kilitli(s) { return !!((s.hook && s.hook.keep) || (s.kilitSon && s.t < s.kilitSon)); }
+  // Tampondaki dokunuşu at: parmak kalktıysa silinir; yukarı hedef birazdan menzile girecekse (nişan beklemesi) kısa süre beklenir
+  function tamponAt(s) {
+    var tp = s.tampon;
+    if (!s.pressed || s.status !== 'play') { s.tampon = null; return; }
+    if (kilitli(s)) { tp.acik = s.t; return; }
+    var a = aim(s, tp.f), vy = (s.p.y - s.p.py) / CFG.DT;
+    if (a.bekle && vy < 0 && s.t - (tp.acik || s.t) < CFG.BEKLE_SN) return;
+    s.tampon = null;
+    s.tamponla = (s.tamponla || 0) + 1;
+    press(s, a.x, a.y, { keep: !!a.miss, rescue: !!a.rescue });
+    s.events.push({ type: 'tampon' });
+  }
   function release(s) {
-    s.pressed = false;
+    s.pressed = false; s.tampon = null;
     detach(s, 'release');
     if (s.hook && s.hook.state !== 'back') s.hook.state = 'back';
   }
@@ -528,6 +546,7 @@
     }
     if (s.rope && s.rope.kind === 'anchor' && s.rope.ref && s.rope.ref.sw) { s.rope.x = s.rope.ref.x; s.rope.y = s.rope.ref.y; }
 
+    if (s.tampon) tamponAt(s);
     // kanca uçuşu
     var hk = s.hook;
     if (hk && hk.state === 'fly') {
@@ -870,7 +889,7 @@
 
   var api = {
     CFG: CFG, createSim: createSim, step: step, press: press, release: release,
-    fireflyCount: fireflyCount, akista: akista, dirilt: dirilt, fenerDon: fenerDon, hookRay: hookRay, meters: meters, score: score, segRect: segRect, aim: aim,
+    fireflyCount: fireflyCount, kilitli: kilitli, akista: akista, dirilt: dirilt, fenerDon: fenerDon, hookRay: hookRay, meters: meters, score: score, segRect: segRect, aim: aim,
     candidates: candidates, reachable: reachable, currentIgnore: currentIgnore, makeSwing: makeSwing,
     speedMult: speedMult, hizPay: hizPay, ustalikPay: ustalikPay, speedMs: speedMs, finalScore: finalScore
   };

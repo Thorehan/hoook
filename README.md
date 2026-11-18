@@ -1,6 +1,6 @@
 # Kuyu
 
-**Funday Morning Games** · 2D mobil oyun · prototip v0.57
+**Funday Morning Games** · 2D mobil oyun · prototip v0.58
 
 Derin bir kuyunun dibindesin. Telefonu tek elle tut: ekranın soluna ya da sağına dokun, kanca o taraftaki hedefe fırlasın; basılı tut, ipe sarıl; bırak, savrul. Halkadan halkaya, ahşaptan ahşaba tırmanıp kuyudan çık.
 
@@ -161,6 +161,8 @@ v0.42'deki itişler ve v0.44'teki fırlatma yolu uçuşları uzattı; havadayken
 Sonuç: havada basan oyuncuda aşağı atış %0,4–0,6, bölümler 60/60; nişan testinde kurala aykırı 0, bütün tarzlarda 80/80. Ortalama tempo aynı (1:17). Spam de aşağıya atılmadığı için Sonsuz'da ~1,1'den ~2,2 km'ye çıktı (düşünen 16 km).
 
 **Geç basma payı (v0.57, "geriye kanca" geri bildirimi):** İpi bırakıp havadayken tepe noktasını geçince yukarıdaki halka menzilden (300) birkaç birim taşıyordu ve kanca az önce bırakılan halkaya ya da altına (geriye) gidiyordu. Artık havada, bırakılan halkanın hâlâ üstündeyken ve düşüş henüz hızlanmamışken (`GEC_VY` 450 birim/sn, tepe noktasının ~0,3 sn ardı) bastığın taraftaki dik yukarı hedef menzilin `GEC_EK` (70) kadar ötesindeyse kanca ona uzanır (`engine.js` → `gecHedef`). Daha derine düştüysen eski davranış: yakındaki halka kurtarır (uzun ipin sarkacı suya indirmesin). Kanca hızı ve ip çekme hızı aynı.
+
+**Giriş tamponu (v0.58):** Yanlış tarafa basınca kanca kilitlenir (boş kanca dönene kadar, Sonsuz'da ayrıca 0,4 sn). Önceden bu sürede basılan dokunuş yutuluyordu. Artık tarafı saklanır; kilit bitince parmak hâlâ basılıysa kanca o yana atılır (yukarı hedef birazdan menzile girecekse nişan beklemesi uygulanır). Parmak kalktıysa tampon silinir: hızlı tıklayan spam kazanmaz (`engine.js` → `tamponAt`, `kilitli`). Ölçüm (`hata.js`, 24 koşu): %5 hata yapan temkinli oyuncu 17/24 → 11/24 koşuda yanar, akış oyuncusu 17/24 → 10/24; %10 hatada yanma 2:20 → 3:07 ve 1:23 → 1:45. Sıralı spam 1,0 → 1,4 km (yine 1 dk içinde yanar), uzun basan spam aynı. Ortalama gün ~114 → ~125 ateşböceği.
 Ölçüm `node tools/geri.js` (insan gibi bırakıştan 0,05–0,75 sn sonra basan oyuncu, 16 koşu): geriye kanca %5,8 → %4,1, boş atış %7,1 → %6,0. `hata.js` 24 koşu: akış oyuncusu %5 hatada 2:02 → 3:11, %10 hatada 1:06 → 1:23; temkinli aynı. Nişan kurala aykırı 0, tek taraf 0/74.
 
 ## Fırlatma yolu (v0.44)
