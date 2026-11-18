@@ -18,6 +18,32 @@
   try { var raw = localStorage.getItem(KEY); if (raw) save = Object.assign(save, JSON.parse(raw)); } catch (e) {}
   if (!save.stats) save.stats = { maxSpeed: 0, bestReward: 0 };
   if (!save.seen) save.seen = {};
+  // Hikâye geçişi (v0.62): 24 uzun bölüm + ikinci yolculuk (25–48) asıl Hikâye oldu. Eski bölüm kayıtları save.eskiBest'e
+  // arşivlenir; geçilen eski bölümler bölgeye göre oranla yeni bölümlere çevrilir (geçildi, madalyasız: yeniden kazanılır).
+  // Deneme kayıtları (save.yeniHikaye) gerçek oyundur, korunur. Toplam ödül puanı odulEk'e taşınır; notlar, finaller, cüzdan kalır.
+  (function hikayeGecisi() {
+    if (save.hikayeV >= 2) return;
+    var eski = save.best || {}, deneme = save.yeniHikaye || {}, nb = {}, odul = 0;
+    var ARALIK = [[1, 16, 1], [17, 36, 7], [37, 56, 13], [57, 76, 19], [77, 96, 25], [97, 116, 31], [117, 136, 37], [137, 156, 43]];
+    Object.keys(eski).forEach(function (k) { odul += eski[k].reward || 0; });
+    ARALIK.forEach(function (a) {
+      var say = 0; for (var n = a[0]; n <= a[1]; n++) if (eski[n] && eski[n].done) say++;
+      var k = Math.floor(say * 6 / (a[1] - a[0] + 1));
+      for (var i = 0; i < k; i++) nb[a[2] + i] = { done: true, ff: 0, perfect: false, flow: false, reward: 0, speed: 0, tasindi: true };
+    });
+    Object.keys(deneme).forEach(function (k) { nb[k] = Object.assign({}, deneme[k]); });
+    if (Object.keys(eski).length) save.eskiBest = eski;
+    save.best = nb; delete save.yeniHikaye;
+    save.odulEk = (save.odulEk || 0) + odul;
+    var sira = 1; while (nb[sira] && nb[sira].done && sira < 48) sira++;
+    save.last = sira; save.maxLevel = sira;
+    try { // bölüm hayaletleri: eski numaralar silinir, deneme hayaletleri ('y1') yeni numaraya geçer
+      var hk = JSON.parse(localStorage.getItem('kuyu.hayalet') || 'null');
+      if (hk && hk.bolum) { var yb = {}; Object.keys(hk.bolum).forEach(function (k) { if (k.charAt(0) === 'y') yb[k.slice(1)] = hk.bolum[k]; }); hk.bolum = yb; localStorage.setItem('kuyu.hayalet', JSON.stringify(hk)); }
+    } catch (e) {}
+    save.hikayeV = 2;
+    try { localStorage.setItem(KEY, JSON.stringify(save)); } catch (e) {}
+  })();
   GOREV.ensure(save);
   EKO.ensure(save);
   IST.ensure(save);
@@ -57,9 +83,11 @@
 
   // ---------- bölümler ----------
   var genCache = {};
+  // Hikâye (v0.62): 24 tarifli bölüm + ikinci yolculuk 25–48 (gen.createBolum). Eski el yapımı ve üretilen bölümler oyundan kalktı.
+  var BOLUM_SAYI = 48;
   function levelDef(n) {
-    if (n <= HAND.length) return HAND[n - 1];
-    if (!genCache[n]) genCache[n] = GEN.createLevel(n);
+    n = Math.max(1, Math.min(BOLUM_SAYI, Math.floor(n) || 1));
+    if (!genCache[n]) genCache[n] = GEN.createBolum(n);
     return genCache[n];
   }
 
@@ -158,7 +186,7 @@
       ikinci: 'Kulenin penceresinde artık iki ışık var: biri fener, biri bekçinin lambası. Ateşböcekleri eve dönüyor.',
       final: { baslik: 'Fener yeniden yandı', metin: 'Çıra fenerine kavuştu. Bekçinin penceresinde ışık var; kuyunun her köşesi aydınlandı.' } }
   ];
-  var BOLGE_ILK = [1, 17, 37, 57]; // her bölgenin açıldığı bölüm
+  var BOLGE_ILK = [1, 7, 13, 19]; // her bölgenin açıldığı bölüm (v0.62: 24 bölümlük Hikâye)
   // Bölüm numarasından bölge: 1–16 Taş Kuyu, 17–36 Maden, 37–56 Kristal Mağara, 57–76 Eski Kule, sonra baştan (20'şer).
   function bolgeBolum(n) { return n <= 16 ? 0 : (1 + Math.floor((n - 17) / 20)) % BOLGELER.length; }
   // Kaçıncı yolculuk: 1–76 ilk (0), 77–156 ikinci (1), sonra her 80 bölümde bir
@@ -288,7 +316,7 @@
     if (mode === 'level') {
       var top = sim.goal ? sim.startY - sim.goal.y : 0;
       c.ilerleme = top > 0 ? Math.max(0, Math.min(1, (sim.startY - sim.p.y) / top)) : 0;
-      if (!yeni) IST.bolum(save, levelNo, tur, c);
+      IST.bolum(save, levelNo, tur, c);
     } else {
       c.metre = E.meters(sim); c.akis = sim.maxCombo;
       IST.kosu(save, dailyKey ? 'gunluk' : 'sonsuz', c); // Haftalık Kuyu koşuları Sonsuz hanesine yazılır
@@ -299,41 +327,26 @@
   function startLevel(n) {
     istatBitir('terk');
     dailyKey = null; weekKey = null; meydan = null;
-    mode = 'level'; yeni = false;
-    levelNo = Math.max(1, Math.floor(n) || 1);
+    mode = 'level'; yeni = true;
+    levelNo = Math.max(1, Math.min(BOLUM_SAYI, Math.floor(n) || 1));
     def = levelDef(levelNo);
     save.last = levelNo; if (levelNo > save.maxLevel) save.maxLevel = levelNo; persist();
     deaths = 0;
     $('ipucu').textContent = def.hint;
     $('puan').hidden = true;
-    $('baslik').textContent = levelNo + '. ' + def.name;
-    levelBolge = bolgeBolum(levelNo);
+    $('baslik').textContent = levelNo + '. ' + def.name + (def.ikinci ? ' · ikinci yolculuk' : '');
+    levelBolge = def.bolge || 0;
     reset();
-    if (dongu(levelNo) > 0) ikinciDuyur(levelBolge); else bolgeDuyur(levelBolge);
+    if (def.ikinci) ikinciDuyur(levelBolge); else bolgeDuyur(levelBolge);
     MZ.sahne(BOLGELER[levelBolge].id);
   }
   // ---------- Hikâye bölümleri (deneme, v0.59; docs/hikaye-bolumleri-plan.md) ----------
-  // Tarifli uzun bölümler (js/bolumler.js → gen.createBolum) eski bölümlerden ayrı kaydedilir (save.yeniHikaye).
+  // Tarifli uzun bölümler (js/bolumler.js → gen.createBolum); v0.62'den beri asıl Hikâye (save.best).
   // Bölmeler arasında fener: ölünce son yanan fenerden dönülür (engine.fenerDon); duvarda bekçinin tebeşir ipuçları.
   var yeni = false, BOL = window.KuyuBolumler;
-  function yeniBest() { return save.yeniHikaye || (save.yeniHikaye = {}); }
-  function bestKayit() { return yeni ? yeniBest() : save.best; }
-  function startHikaye(n) {
-    istatBitir('terk');
-    dailyKey = null; weekKey = null; meydan = null;
-    mode = 'level'; yeni = true;
-    levelNo = Math.max(1, Math.min(BOL.sayi, Math.floor(n) || 1));
-    def = GEN.createBolum(levelNo);
-    deaths = 0;
-    $('ipucu').textContent = def.hint;
-    $('puan').hidden = true;
-    $('baslik').textContent = 'Yeni · ' + levelNo + '. ' + def.name;
-    levelBolge = def.bolge || 0;
-    reset();
-    bolgeDuyur(levelBolge);
-    MZ.sahne(BOLGELER[levelBolge].id);
-  }
-  function sonrakiBolum() { if (yeni) { if (levelNo < BOL.sayi) startHikaye(levelNo + 1); else goLevels(); } else startLevel(levelNo + 1); }
+  function bestKayit() { return save.best; }
+  function startHikaye(n) { startLevel(n); }
+  function sonrakiBolum() { if (levelNo < BOLUM_SAYI) startLevel(levelNo + 1); else goLevels(); }
   // Yeni bir bölgeye ilk girişte oyunu durdurmayan kısa duyuru (bölge başına bir kez)
   function bolgeDuyur(bi, ek) {
     if (!save.bolgeler) save.bolgeler = {};
@@ -399,7 +412,7 @@
   var hayaletKayit = null, hayaletIz = null;
   function hayaletAcik() { return save.hayalet !== false; }
   function hayaletYeri() {
-    if (mode === 'level') return { tur: 'bolum', n: yeni ? 'y' + levelNo : levelNo };
+    if (mode === 'level') return { tur: 'bolum', n: levelNo };
     return dailyKey ? { tur: 'gunluk', gun: dailyKey } : weekKey ? { tur: 'haftalik', hafta: weekKey } : { tur: 'sonsuz' };
   }
   function hayaletKur() {
@@ -474,7 +487,7 @@
     notAktif = null; notHalka = null;
     if (mode !== 'level' || !NOT) return;
     // yeni Hikâye: not tarifte (def.not, 1–12); eski bölümlerde bölüm numarasından
-    var n = yeni ? (def.not ? NOT.NOTLAR[def.not - 1] : null) : NOT.bolumde(levelNo), h = n && NOT.halka(def);
+    var n = def.ikinci ? null : NOT.bolumde(levelNo), h = n && NOT.halka(def); // notlar ilk yolculukta (notlar.js, bölüm 2, 4, …, 24)
     if (!h || notBulundu(n.no)) return;
     notAktif = n;
     notHalka = sim.rings.find(function (r) { return r.ff && r.x === h[0] && r.y === h[1]; }) || null;
@@ -1487,7 +1500,7 @@
   var FINAL = { 16: 0, 36: 1, 56: 2, 76: 3 }, FINAL_SURE = 7.5, finalCalan = {};
   function finalGoruldu(bi) { return !!(save.finaller && save.finaller[BOLGELER[bi].id]); }
   var FINAL_YENI = { 6: 0, 12: 1, 18: 2, 24: 3 }; // yeni Hikâye: her bölgenin 6. bölümü
-  function finalNo() { return yeni ? FINAL_YENI[levelNo] : FINAL[levelNo]; }
+  function finalNo() { return FINAL_YENI[levelNo]; }
   function finalBekliyor() { return mode === 'level' && finalNo() != null && !finalGoruldu(finalNo()); }
   function finalBasla() { finalBi = finalNo(); finalT = 0; finalCalan = {}; MZ.kis(true); }
   function finalBitir() {
@@ -1756,7 +1769,7 @@
     var mult = E.speedMult(sim), reward = Math.round(base * mult);
     var speed = E.speedMs(sim.maxSpeed);
     // bu oyunda kırılan rekorlar ve ilk kez kazanılan madalyalar
-    var first = !b.done;
+    var first = !b.done || !!b.tasindi; // taşınan (eski ilerlemeden) bölümde ilk gerçek geçiş
     var newFF = ff > (b.ff || 0) && ff >= ffT && ffT > 0, newPerfect = perfect && !b.perfect, newFlow = flow && !b.flow;
     var recTime = !first && time < (b.time || Infinity), recReward = !first && reward > (b.reward || 0), recSpeed = !first && speed > (b.speed || 0) + 0.05;
     if (HY && (first || recTime || !b.time)) HY.sakla(hayaletYeri(), hayaletKayit, time); // en kısa süreli koşu hayalet olur
@@ -1766,13 +1779,13 @@
       reward: Math.max(b.reward || 0, reward), speed: Math.max(b.speed || 0, speed)
     };
     noteStats(speed, reward);
-    if (!yeni && levelNo + 1 > save.maxLevel) save.maxLevel = levelNo + 1;
+    if (levelNo + 1 > save.maxLevel) save.maxLevel = Math.min(BOLUM_SAYI, levelNo + 1);
     persist();
     var odenen = EKO.bolumOde(save, b.ff || 0, Math.max(b.ff || 0, ff)); // yalnızca ilk kez alınan ateşböcekleri
     var kaz = recordRun({ mode: 'level', won: true, ff: ff, boosts: sim.boosts, gates: sim.gates, maxCombo: sim.maxCombo, speed: speed, perfect: perfect });
     $('kart').className = 'kart sonuc';
     $('kart').innerHTML =
-      '<div class="sonuc-bas"><h2>Gün ışığı!</h2><span>' + (yeni ? 'Yeni · ' : '') + levelNo + '. ' + def.name + (first ? ' · ilk kez geçildi' : deaths ? ' · ' + (deaths + 1) + '. deneme' : '') + '</span></div>' +
+      '<div class="sonuc-bas"><h2>Gün ışığı!</h2><span>' + levelNo + '. ' + def.name + (def.ikinci ? ' · ikinci yolculuk' : '') + (first ? ' · ilk kez geçildi' : deaths ? ' · ' + (deaths + 1) + '. deneme' : '') + '</span></div>' +
       '<div class="odul-satir"><i class="ikon-odul" aria-hidden="true"></i><b id="odulSayi">0</b>' + (recReward ? '<em class="rekor-etiket">REKOR</em>' : '') + '</div>' +
       '<p class="odul-hesap">' + (mult > 1 ? base + ' × x' + fmt(mult, 2) + ' çarpan' + (E.ustalikPay(sim) > 0 ? ' (hız x' + fmt(E.hizPay(sim), 2) + ' + ustalık ' + fmt(E.ustalikPay(sim), 2) + ')' : '') : 'Bölüm ödülü · hızlanırsan ve TAM bırakırsan çarpan artar') + '</p>' +
       '<div class="madalyalar">' +
@@ -1787,7 +1800,7 @@
       (sim.tamKova ? stat(IK.tam, 'TAM kova +50', 'kovaya akışla ve TAM bırakışla girdin, ödüle 50 eklendi', false) : '') +
       '</div>' + kazanimHtml(kaz, odenen) +
       dolapKisaYol(cuzdanOnce) +
-      '<button type="button" class="ana buyuk genis" id="sonrakiBtn">' + (yeni && levelNo >= BOL.sayi ? 'Hikâye ›' : 'Bölüm ' + (levelNo + 1) + ' ›') + '</button>' +
+      '<button type="button" class="ana buyuk genis" id="sonrakiBtn">' + (levelNo >= BOLUM_SAYI ? 'Hikâye ›' : 'Bölüm ' + (levelNo + 1) + ' ›') + '</button>' +
       '<div class="dur-iki"><button type="button" id="tekrarBtn">Tekrar</button><button type="button" id="bolumlerDonBtn">Bölümler</button></div>';
     showSheet();
     countUp($('odulSayi'), reward);
@@ -2001,7 +2014,7 @@
   // kalanı sonraki bölümlerde gelir. 7. bölümde yay, sarkaç ve şerit birlikte ilk kez çıkıyordu (art arda 3 kart).
   // Acil kartlar (boş atış, kurtarma, su, akış, el yorulması) sınırsız.
   var OGE_KARTLARI = ['ff', 'hiz', 'ahsap', 'kutu', 'kapi', 'yay', 'gecit', 'sarkac', 'firlat', 'zincir'], introOgeSayisi = 0;
-  function ogeSiniri() { return !(mode === 'level' && (yeni || levelNo <= HAND.length)) && introOgeSayisi >= 1; }
+  function ogeSiniri() { return mode !== 'level' && introOgeSayisi >= 1; } // Hikâye bölümleri öğreticidir: kart sınırı yok
   function maybeIntro() {
     if (introOpen || pauseOpen || sim.t < 0.6) return;
     // ekranda ilk kez görünenler
@@ -2212,7 +2225,7 @@
     save: function () { return save; },
     persist: persist,
     levelDef: levelDef,
-    handCount: HAND.length,
+    bolumSayi: BOLUM_SAYI,
     toggleMuzik: function () { return muzikDegis(); },
     muzikAcik: muzikAcik,
     muzikSahne: function (s) { MZ.sahne(s); MZ.kis(false); },
@@ -2228,7 +2241,7 @@
           son: finalGoruldu(i) ? B.final : null, ikinci: save.ikinci && save.ikinci[B.id] ? B.ikinci : null };
       });
     },
-    bolgeAdi: function (n) { var d = dongu(n); return BOLGELER[bolgeBolum(n)].ad + (d ? ' · ' + yolculukAdi(d) : ''); },
+    bolgeAdi: function (n) { var d = levelDef(n); return BOLGELER[d.bolge || 0].ad + (d.ikinci ? ' · ikinci yolculuk' : ''); },
     istatOzet: function () { return IST.ozet(save); },
     istatSifirla: function () { IST.sifirla(save); persist(); },
     toggleBuyukYazi: function () { save.buyukYazi = !save.buyukYazi; persist(); return save.buyukYazi; },

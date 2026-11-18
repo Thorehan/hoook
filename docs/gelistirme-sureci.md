@@ -133,6 +133,7 @@ Kullanıcı hikâyeye online'dan önce geçti; online (5) sonra.
 - [?] Bekçinin adı.
 
 ## Yapılanlar
+- 2026-11-19 · v0.62 · Hikâye geçişi (Aşama 4): 24 bölüm + ikinci yolculuk 25–48 asıl Hikâye; eski bölümler kalktı, kayıt bölgeye göre taşındı (save.eskiBest), notlar yeni numaralarda, görev ve başarım eşikleri küçüldü. Geri dönüş etiketi `geri-donus-v0.61`.
 - 2026-11-19 · v0.61 · Yeni Hikâye Aşama 3: bölüm 13–24 (Kristal ve Kule), geçit, fırlatma yolu, zincir, güçlendirmeler ve izleyen su bölümlerde; notlar 7–12, Kristal ve Kule finalleri. 24 bölüm deneme olarak tamam.
 - 2026-11-19 · v0.60 · Yeni Hikâye Aşama 2: bölüm 4–12 (Taş Kuyu ve Maden), bölme başına yay/sarkaç/rüzgâr, kutu bulmacası (asılıyken alttaki kutu seçilir), bölme suyu (ilk fenerle başlar), notlar 1–6 ve iki final.
 - 2026-11-19 · v0.59 · Yeni Hikâye deneme (Aşama 1): bölüm 1–3 tarifli, fener kontrol noktası ve fenerden devam, duvar tebeşir ipuçları, Hikâye ekranında deneme kartları, `?hikaye=N`; eski bölümler değişmedi.

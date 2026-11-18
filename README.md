@@ -1,6 +1,6 @@
 # Kuyu
 
-**Funday Morning Games** · 2D mobil oyun · prototip v0.61
+**Funday Morning Games** · 2D mobil oyun · prototip v0.62
 
 Derin bir kuyunun dibindesin. Telefonu tek elle tut: ekranın soluna ya da sağına dokun, kanca o taraftaki hedefe fırlasın; basılı tut, ipe sarıl; bırak, savrul. Halkadan halkaya, ahşaptan ahşaba tırmanıp kuyudan çık.
 
@@ -93,8 +93,12 @@ En iyi koşunun soluk bir kopyası seninle aynı zamanlamayla tırmanır: bölü
 
 Kayıt `js/hayalet.js`: kahramanın yeri sim zamanına göre saniyede 15 kez alınır, farklarla yazılır (~60 bayt/sn) ve ana kayıttan ayrı `kuyu.hayalet` anahtarında durur. Test: `node tools/hayalet-test.js`.
 
-## Yeni Hikâye · deneme (v0.59–v0.61, Aşama 1–3)
-24 uzun ve öğretici bölümün hepsi (Taş Kuyu 1–6, Maden 7–12, Kristal Mağara 13–18, Eski Kule 19–24) (plan: `docs/hikaye-bolumleri-plan.md`). Hikâye ekranının üstündeki "Yeni Hikâye · deneme" kartlarından ya da `?hikaye=1` bağlantısıyla açılır. Eski bölümler değişmedi; yeni bölümler ayrı kaydedilir (`save.yeniHikaye`), istatistiğe, notlara ve finallere karışmaz.
+## Hikâye: 24 uzun bölüm + ikinci yolculuk (v0.59–v0.62)
+**v0.62'den beri asıl Hikâye:** 24 uzun ve öğretici bölüm (Taş Kuyu 1–6, Maden 7–12, Kristal Mağara 13–18, Eski Kule 19–24) ve ikinci yolculuk 25–48 (plan: `docs/hikaye-bolumleri-plan.md`). Eski el yapımı (1–6) ve sınırsız üretilen bölümler oyundan kalktı (kodları `levels.js` ve `gen.createLevel`, botlar için duruyor). `?bolum=N` ya da `?hikaye=N` (1–48) doğrudan açar.
+- **Kayıt taşıma (v0.62, `game.js` → `hikayeGecisi`, bir kez):** Eski bölüm kayıtları `save.eskiBest`'e arşivlenir. Geçilen eski bölümler bölgeye göre oranla yeni bölümlere çevrilir (Taş 1–16 → 1–6, Maden 17–36 → 7–12, Kristal 37–56 → 13–18, Kule 57–76 → 19–24, 77–156 → 25–48; ör. 20 bölümün 10'u geçildiyse bölgenin ilk 3 bölümü). Çevrilen bölümler geçildi sayılır, madalyalar yeniden kazanılır. Deneme kayıtları (`save.yeniHikaye`) madalyalarıyla korunur. Toplam ödül puanı `odulEk`'e taşınır; notlar, finaller, cüzdan, Dolap ve başarım kademeleri aynen kalır. Bölüm hayaletleri yeni numaralara geçer (eskiler silinir).
+- **İkinci yolculuk (25–48):** Aynı tarif; öğret bölmesi, duvar yazısı ve kutu yok; su baştan izler (Taş 26, Maden 22, Kristal 18, Kule 15 m); halkalar biraz seyrek; yerleşim kendi tohumundan. Bölgeye ilk girişte ikinci yolculuk kartı.
+- **Hikâye ekranı:** 8 grup (dört bölge, sonra ikinci yolculukta dört bölge), 48 kart; özet, "Eksik hedefler" filtresi, sıradaki bölüm.
+- **Görev ve başarım eşikleri (v0.62):** "bölüm geç" 2/4/7 → 1/2/3, "Kusursuz geç" 1/2/4 → 1/1/2; Kâşif 10/30/100 → 6/24/48, Kusursuz 5/20/60 → 3/12/30. Kazanılmış kademe geri alınmaz.
 - **Tarif:** `js/bolumler.js`. Taş Kuyu: 1 İlk Halka, 2 Savrul, 3 Ahşap ve Taş, 4 Hız Halkası, 5 Akış, 6 Kutu ve Kapak. Maden: 7 Yükselen Su, 8 Yay, 9 Rüzgâr, 10 Sarkaç, 11 Alev, 12 Maden Ağzı. Her bölüm üç bölme: öğret, uygula, sına; her bölüm yeni mekaniğini öğret bölmesinde tek başına gösterir. Üretici `gen.js` → `createBolum` (bölme başına yay, sarkaç, rüzgâr şeridi, hız, ateşböceği sayısı; 6. bölümde kutu-düğme-kapak).
 - **Kristal ve Kule (v0.61):** 13 Geçit, 14 Fırlatma Yolu, 15 Su Seni İzliyor, 16 Zincir, 17 Güçlendirmeler, 18 Kristal Kalbi; 19 Dar Merdiven, 20 Yaylar ve Geçitler, 21 Uzun Akış, 22 İki Yol, 23 Fırtına, 24 Fener (hikâyenin sonu). Dört bölme (Fırtına üç, fener az). Üretici bölme başına geçit, fırlatma yolu (Sonsuz'daki gibi `dalMini` ile doğrulanır), altın ateşböceği zinciri ve güçlendirme (kalkan, fener, kanat; kanadın üstündeki 9 halkada başka öğe yok) koyar. 15'ten sonra su izler (Kristal 22 m, Kule 18 m, Fırtına 15 m) ve yanlış taraf ipi bırakır.
 - **Su (Maden):** Zamanla yükselir, bölümden bölüme hızlanır (45 → 66 birim/sn). 8–12'de öğret bölmesi susuzdur; su ilk fener yanınca son fenerin altından başlar (`def.suFener`). Su yakalarsa son fenerden dönülür.
@@ -125,7 +129,7 @@ Sonsuz ve Günlük Kuyu'da (Günlük'te herkes için aynı yerde); yolun üstün
 ## Devam hakkı (v0.49, İstişare 2)
 Yalnız Sonsuz Kuyu'da (Günlük Kuyu'da yok, herkes için eşit). Su yakalayınca ortada 5 saniyelik bir teklif çıkar: geri sayım halkası, **▶ Video izle** (yalnız ilk devamda, oyuncu seçerse), **ateşböceği ile devam** ve **Geç**. Bir koşuda en çok 3 devam; bedel 25 → 50 → 100 ateşböceği (`ekonomi.js` → `DEVAM_BEDEL`, `devamOde`). Bakiye yetmezse düğmede kaç eksik olduğu yazar. Süre dolarsa ya da menü düğmesine basılırsa "Geç" sayılır, koşu kaydedilir. Devam edince Çıra en yüksek güvenli halkaya (yay ve geçit değil) asılı döner, su güvenli mesafeye çekilir, akış sıfırlanır (`engine.js` → `dirilt`). Sonuç kartında devam sayısı görünür. Web sürümünde video 3 sn'lik yer tutucu; Unity'de ödüllü reklam bağlanacak.
 
-## Bölge suyu: Hikâye'de zorluk eğrisi (v0.52)
+## Bölge suyu: Hikâye'de zorluk eğrisi (v0.52; v0.62'de yerini 24 bölümün su kuralları aldı)
 Ölçüm (`node tools/denge.js`): v0.51'de her bölüm, dört dokunuştan birinde hata yapan oyuncuyla bile ilk denemede geçiliyordu ve sıralı sol-sağ basan 74/76 bölümü geçiyordu. Bölümlerde zorluk eğrisi yoktu.
 
 Artık Hikâye, Sonsuz Kuyu'nun kurallarını bölge bölge öğretir (`js/gen.js` → `bolumSuyu`):
@@ -239,12 +243,12 @@ Yalnızca görünüm değişir; oynanış, halkalar, işaretler ve oyun renkleri
 
 | Bölge | Bölümler | Sonsuz Kuyu | Görünüm |
 |---|---|---|---|
-| Taş Kuyu | 1–16, 77–96, … | 0–500 m, 2000–2500 m, … | yosunlu yeşil-gri taş |
-| Maden | 17–36, 97–116, … | 500–1000 m, … | sıcak kahverengi taş, altın damar benekleri, zincirle asılı fenerler |
-| Kristal Mağara | 37–56, … | 1000–1500 m, … | mor-mavi taş, duvar diplerinde parlayan kristaller |
-| Eski Kule | 57–76, … | 1500–2000 m, … | açık gri taş, kemerli pencereler ve ay ışığı |
+| Taş Kuyu | 1–6, 25–30 | 0–500 m, 2000–2500 m, … | yosunlu yeşil-gri taş |
+| Maden | 7–12, 31–36 | 500–1000 m, … | sıcak kahverengi taş, altın damar benekleri, zincirle asılı fenerler |
+| Kristal Mağara | 13–18, 37–42 | 1000–1500 m, … | mor-mavi taş, duvar diplerinde parlayan kristaller |
+| Eski Kule | 19–24, 43–48 | 1500–2000 m, … | açık gri taş, kemerli pencereler ve ay ışığı |
 
-- Bölümlerde bölge bölüm numarasından gelir (`bolgeBolum`), Sonsuz ve Günlük Kuyu'da kuyunun yüksekliğinden (`SONSUZ_BOLGE_M` 500): sınır kuyunun içinde görünür, ekran birden değişmez.
+- Bölümlerde bölge tariften gelir (`def.bolge`; v0.62 öncesi `bolgeBolum`), Sonsuz ve Günlük Kuyu'da kuyunun yüksekliğinden (`SONSUZ_BOLGE_M` 500): sınır kuyunun içinde görünür, ekran birden değişmez.
 - Duvar dokusu her bölge için ayrı karo olarak bir kez çizilir; süsler arka planda, soluk ve duvara yakın (halkaya ya da ahşaba benzemesin diye).
 - Yeni bölgeye ilk girişte oyunu durdurmayan kısa duyuru ("Yeni bölge: Maden", Sonsuz'da "· 504 m"); Sonsuz'da bölge adı kahramanın üstünde de yazar (en yüksek noktaya göre, sınırda inip çıkınca tekrar etmez).
 - Bölümler ekranında 10'arlı grupların adı bölge adıdır.
@@ -353,14 +357,13 @@ Ana menüde "Merhaba, {ad}" düğmesi açar: en yüksek hız; en yüksek ve geç
 - **Tehlike:** Bazı bölümlerde ve sonsuz modda su aşağıdan yükselir.
 
 ## Modlar
-### Bölümler
-- İlk 6 bölüm elle tasarlandı ve her biri bir şey öğretir: halka, ahşap duvarlar, zikzak, kutu ve düğme, yükselen su, hepsi bir arada.
-- 7. bölümden sonrası **sınırsız**: `js/gen.js` her bölümü numarasından üretir; aynı numara her zaman aynı bölümü verir.
-- **Bütün bölümler açık.** Bölümler ekranında üstte özet ve ilerleme çubuğu, "Tümü / Eksik hedefler" filtresi var. Bölümler 1–6 "Öğrenme" ve ardından 10'arlı gruplar hâlinde; her grubun ilerleme çubuğu var. Geçilen bölümde onay, tüm hedefleri tamamlanmışta yıldız görünür. Geçilmemiş ilk bölüm "Sıradaki" etiketiyle işaretlenir ve ekran açılınca oraya kaydırılır. İstediğin bölüme dokun ya da numarasını yaz. Oyun sırasında **Atla** düğmesi sınırsız ve ücretsizdir.
-- Doğrudan bağlantı: adresin sonuna `?bolum=25` ekle.
+### Bölümler (Hikâye)
+- v0.62'den beri 24 uzun, öğretici bölüm ve ikinci yolculuk (25–48); ayrıntı yukarıda "Hikâye: 24 uzun bölüm + ikinci yolculuk". (Eski düzen: 6 el yapımı bölüm ve sınırsız üretilen bölümler; v0.61'e kadar.)
+- **Bütün bölümler açık.** Hikâye ekranında üstte özet ve ilerleme çubuğu, "Tümü / Eksik hedefler" filtresi var. Bölümler bölge bölge 6'lı gruplar hâlinde; her grubun ilerleme çubuğu var. Geçilen bölümde onay, tüm hedefleri tamamlanmışta yıldız görünür. Geçilmemiş ilk bölüm "Sıradaki" etiketiyle işaretlenir ve ekran açılınca oraya kaydırılır. İstediğin bölüme dokun ya da numarasını yaz. Oyun sırasında **Atla** düğmesi sınırsız ve ücretsizdir.
+- Doğrudan bağlantı: adresin sonuna `?bolum=25` ekle (1–48).
 - Her bölümde üç hedef:
-  - **Ateşböceği:** üçünü de topla. Biri genelde ipi erken bırakıp fırlayarak alınır.
-  - **Kusursuz:** bölümü en fazla `par` atışla bitir. Hedef olmayan tarafa basılan boş atışlar sayılmaz; kurtarma kancası sayılır.
+  - **Ateşböceği:** hepsini topla (4–9). Fırlatma yolu ve zincir ateşböcekleri akış ister.
+  - **Kusursuz:** fenere dönmeden ve en fazla `par` atışla bitir. Hedef olmayan tarafa basılan boş atışlar sayılmaz; kurtarma kancası sayılır.
   - **Akış:** bölümde en az `flow` uzunluğunda bir akış zinciri kur.
 
 ### Sonsuz Kuyu

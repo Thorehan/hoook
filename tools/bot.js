@@ -176,7 +176,7 @@ if (!args.includes('--gen') || only) {
 if (!only) {
   let notOk = 0;
   for (const n of NOT.NOTLAR) {
-    const def = n.bolum <= LEVELS.length ? LEVELS[n.bolum - 1] : G.createLevel(n.bolum);
+    const def = G.createBolum(n.bolum); // v0.62: notlar Hikâye'nin 24 bölümünde
     const h = NOT.halka(def);
     const c = h ? play(def, 'rahat', def.ffRoute) : null;
     const rg = c && c.s.rings.find(r => r.ff && r.x === h[0] && r.y === h[1]);
@@ -290,14 +290,17 @@ if (!only) {
 if (!only && G.createBolum) {
   console.log('\n== Hikâye bölümleri (tarifli) ==');
   const T = require('../js/bolumler.js');
-  for (const tf of T.BOLUMLER) {
-    const def = G.createBolum(tf.no);
+  for (let no = 1; no <= T.sayi * 2; no++) { // v0.62: 24 bölüm + ikinci yolculuk 25–48
+    const def = G.createBolum(no), tf = { no, ad: def.name };
     const a = play(def, 'rahat'), b = play(def, 'akis'), c = play(def, 'rahat', def.ffRoute);
     // akış isteyen ateşböcekleri (fırlatma yolu, zincir) asılarak alınmaz; rotada sayılmaz. Zincir tamamlanınca ffGot'a bonus ekler.
     const ff = c.s.fireflies.filter(f => f.got && f.zincir == null).length, akisli = (def.dalSay || 0), ffT = c.s.fireflies.filter(f => f.zincir == null).length;
     const fener = a.s.fenerSay || 0;
-    if (!a.ok || !b.ok || !c.ok || ff < ffT - akisli || fener < def.fenerler.length) allOk = false;
-    console.log(`${tf.no} ${def.name.padEnd(14)} rahat ${a.ok ? 'GEÇTİ' : 'KALDI ' + a.why} ${a.s.t.toFixed(0)} sn · akış ${b.ok ? 'GEÇTİ' : 'KALDI ' + b.why} ${b.s.t.toFixed(0)} sn x${b.s.maxCombo} (hedef x${def.flow}) · ateşböceği ${ff}/${ffT}${akisli ? ' (' + akisli + ' akışla)' : ''}${def.zincirSay ? ' · zincir ' + def.zincirSay : ''} · fener ${fener}/${def.fenerler.length} · par ${def.par}`);
+    // akış botu hedefe düz çizgide atar, yoldaki başka halkaya takılabilir: o zaman nişanla oynayan akış botu dener (eski bölümlerdeki gibi)
+    let akisYedek = '';
+    if (!b.ok) { const y = akisNisanla(def); akisYedek = y.won && y.max >= def.flow ? ` (nişanla akış: GEÇTİ x${y.max})` : ' (nişanla akış da KALDI)'; if (!(y.won && y.max >= def.flow)) allOk = false; }
+    if (!a.ok || !c.ok || ff < ffT - akisli || fener < def.fenerler.length) allOk = false;
+    console.log(`${tf.no} ${def.name.padEnd(14)} rahat ${a.ok ? 'GEÇTİ' : 'KALDI ' + a.why} ${a.s.t.toFixed(0)} sn · akış ${b.ok ? 'GEÇTİ' : 'KALDI ' + b.why} ${b.s.t.toFixed(0)} sn x${b.s.maxCombo} (hedef x${def.flow})${akisYedek} · ateşböceği ${ff}/${ffT}${akisli ? ' (' + akisli + ' akışla)' : ''}${def.zincirSay ? ' · zincir ' + def.zincirSay : ''} · fener ${fener}/${def.fenerler.length} · par ${def.par}`);
   }
 }
 

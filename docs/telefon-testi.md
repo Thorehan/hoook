@@ -75,6 +75,12 @@ Yayına çıkmadan yerelde denemek için: bilgisayarda `python3 -m http.server 8
 - [ ] **19–23 (Kule):** zorluk yavaş yavaş artıyor mu, bir yerde sıçrıyor mu? Fırtına'da (23) fener az; sinir bozucu mu?
 - [ ] Bölüm uzunlukları: Kristal ~2 dk, Kule ~2–2,5 dk. Uzun mu?
 
+## 10. Hikâye geçişi (v0.62, 5 dk)
+- [ ] Eski kaydınla aç: Hikâye ekranında 8 grup, ilerlemen bölgeye göre taşınmış mı (ör. eskiden Maden'deydiysen Maden'in bir kısmı geçilmiş)?
+- [ ] Toplam ödül puanı, ateşböceği bakiyesi, Dolap ve notların aynı mı?
+- [ ] Ana menüdeki Hikâye kartı doğru bölümü gösteriyor mu?
+- [ ] **25. bölüm (ikinci yolculuk):** su baştan izliyor, öğretici bölme yok; zorluk adil mi?
+
 ## 5. Genel izlenim (serbest)
 - En sevdiğim an:
 - En çok zorlandığım yer:

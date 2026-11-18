@@ -38,7 +38,8 @@ Kod: `js/engine.js` (deterministik fizik ve kurallar, DT 1/120), `js/gen.js` (b�
 - **Ekonomi:** Para birimi ateşböceği. Kozmetik ve devam hakkı için harcanır (25 / 50 / 100, koşuda en çok 3). Güçlendirmeler satın alınmaz, yolda bulunur. Video yalnız oyuncu kendisi seçerse oynar.
 - **Görsel tasarım korunur:** Yeni görseller bu yapının üstüne eklenir, baştan tasarım yapılmaz. Hikâye metninde ölüm yok, cümleler kısa.
 - **Zorluk yok:** Diken ve taş yok, tek tehlike su.
-- **Hikâye'de bölge suyu (v0.52, 18/11 onaylandı):** 17. bölümden itibaren su takip eder (Maden 26, Kristal 22, Kule 18, ikinci yolculuk 15 m), yanlış taraf ipi bırakır; 1–16 öğretici kalır.
+- **Hikâye (v0.62, Törehan'ın planı, 18–19/11):** 24 uzun öğretici bölüm (`js/bolumler.js` tarifleri, `gen.createBolum`) + ikinci yolculuk 25–48. Bölmeler arasında fener (kontrol noktası). Taş Kuyu susuz, Maden zamanla yükselen su (ilk fenerden sonra), Kristal 15'ten sonra ve Kule izleyen su (22/18/15 m, yanlış taraf ipi bırakır), ikinci yolculukta su baştan izler. Plan `docs/hikaye-bolumleri-plan.md`. Eski bölümler ve v0.52 bölge suyu oyundan kalktı; eski kayıtlar `save.eskiBest`.
+  - Test: `node tools/bot.js` 48 bölümü dener; süre ve fener `node tools/hikaye-olcum.js`.
 - **Ekonomi (v0.53, onaylı):** Tek para birimi; Dolap ~8 haftalık; ölçüm hata yapan oyuncuyla (`ekonomi-olcum.js`, ortalama gün ~119). **Haftalık Kuyu + lig (v0.54, onaylı):** sahte rakip yok. **Online (v0.55):** arka uç Supabase, skor tablosu kapalı (`js/online.js` → `AYAR` boş).
 
 ## 4 · Çalışma biçimi

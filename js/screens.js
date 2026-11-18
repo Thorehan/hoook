@@ -454,7 +454,8 @@
   // ---------- bölümler ----------
   // Gruplar: 1–6 Öğrenme (el yapımı), sonra 10'arlı. Sıradaki bölüm = geçilmemiş ilk bölüm.
   var listUpto = 0, filtre = 'tumu';
-  function groupOf(n) { if (n <= 6) return { a: 1, b: 6, ad: 'Öğrenme' }; var a = 7 + Math.floor((n - 7) / 10) * 10; return { a: a, b: a + 9, ad: G.bolgeAdi(a) }; }
+  // v0.62: Hikâye 4 bölge × 6 bölüm + ikinci yolculuk (25–48); her bölge bir grup
+  function groupOf(n) { var a = 1 + Math.floor((n - 1) / 6) * 6; return { a: a, b: a + 5, ad: G.bolgeAdi(a) }; }
   function goalsOf(n) {
     var d = G.levelDef(n), ff = (d.rings || []).filter(function (r) { return r[2] === 'ff'; }).length;
     var b = (save().best || {})[n] || {};
@@ -464,29 +465,14 @@
   function nextLevel() { var best = save().best || {}, n = 1; while (best[n] && best[n].done) n++; return n; }
   function openLevels() {
     var s = save(), nx = nextLevel();
-    listUpto = Math.max(16, groupOf(Math.max(nx, s.maxLevel || 1)).b);
+    listUpto = G.bolumSayi;
     renderLevels();
-    renderYeniHikaye();
     show('ekBolumler');
     // sıradaki bölüme kaydır
     var el = $('liste').querySelector('[data-siradaki]');
     var ek = $('ekBolumler');
     if (el) ek.scrollTop = Math.max(0, el.offsetTop - ek.clientHeight / 2 + el.offsetHeight / 2); else ek.scrollTop = 0;
   }
-  // Yeni Hikâye (deneme, v0.59): tarifli uzun bölümler; eski bölümler değişmedi
-  function renderYeniHikaye() {
-    var B = window.KuyuBolumler, el = $('yhKartlar');
-    if (!B || !el) return;
-    var y = save().yeniHikaye || {};
-    var BOLGE_AD = ['Taş Kuyu', 'Maden', 'Kristal Mağara', 'Eski Kule'], html = '', son = -1;
-    B.BOLUMLER.forEach(function (b) {
-      var k = y[b.no] || {};
-      if (b.bolge !== son) { son = b.bolge; html += '<h4 class="yh-bolge">' + (BOLGE_AD[b.bolge] || '') + '</h4>'; }
-      html += '<button type="button" data-yh="' + b.no + '"' + (k.done ? ' class="gecti"' : '') + ' aria-label="Yeni Hikâye ' + b.no + '. bölüm: ' + b.ad + (k.done ? ', geçildi' : '') + '"><b>' + b.no + '</b><span>' + b.ad + '</span>' + (k.done ? '<i aria-hidden="true">✓</i>' : '') + '</button>';
-    });
-    el.innerHTML = html;
-  }
-  if ($('yhKartlar')) $('yhKartlar').addEventListener('click', function (e) { var b = e.target.closest('[data-yh]'); if (b) G.startHikaye(+b.dataset.yh); });
   function renderLevels() {
     var s = save(), best = s.best || {}, nx = nextLevel(), h = '', shown = 0;
     var doneAll = 0, gotAll = 0, totAll = 0;
@@ -521,7 +507,7 @@
     }
     if (!shown) h = '<p class="bos">Eksik hedefi olan geçilmiş bölüm yok. Tümü sekmesinden yeni bölümlere geçebilirsin.</p>';
     $('liste').innerHTML = h;
-    $('dahaBtn').hidden = filtre === 'eksik';
+    $('dahaBtn').hidden = true; // v0.62: liste sınırlı (48 bölüm), hepsi görünür
   }
   $('liste').addEventListener('click', function (e) {
     var b = e.target.closest('button[data-n]'); if (!b) return;

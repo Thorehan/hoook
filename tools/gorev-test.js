@@ -22,7 +22,7 @@ save.missions = { date: 'X', list: Object.keys(G.MISSIONS).map(k => ({ k, tier: 
 let r = G.record(save, { mode: 'level', won: true, ff: 3, boosts: 1, maxCombo: 4, speed: 20.7, perfect: true }, 'X');
 const p = k => save.missions.list.find(m => m.k === k);
 ok(p('ff').prog === 3 && p('bolum').prog === 1 && p('kusursuz').prog === 1 && p('metre').prog === 0 && p('gunluk').prog === 0, 'bölüm koşusu ilerlemesi');
-ok(p('kusursuz').done && r.missions.length === 1, 'kusursuz görevi tamam');
+ok(p('kusursuz').done && p('bolum').done && r.missions.length === 2, 'kusursuz ve bölüm görevi tamam (v0.62: bölümler uzun, kolay hedef 1)');
 ok(Number.isInteger(p('hizMs').prog), 'hız ilerlemesi tam sayı');
 ok(r.ach.length === 4, 'eski kayıtla 4 başarım açılır');
 console.log('ilk koşuda açılan başarımlar:', r.ach.map(x => x.ad + ' ' + x.kademe).join(', '));
@@ -35,7 +35,7 @@ const i = save.missions.list.indexOf(p('ff'));
 ok(G.claim(save, i) === 5 && G.claim(save, i) === 0, 'ödül bir kez alınır (5 ateşböceği)');
 const j = save.missions.list.indexOf(p('hiz'));
 ok(G.claim(save, j, 2) === 10, 'video ile ikiye katlanır');
-ok(G.claim(save, save.missions.list.indexOf(p('bolum'))) === 0, 'bitmemiş görev alınmaz');
+ok(!p('serit').done && G.claim(save, save.missions.list.indexOf(p('serit'))) === 0, 'bitmemiş görev alınmaz');
 // kazanılmış kademe eşik yükselse de geri alınmaz
 const es = { best: {}, ach: { ates: 2 }, totals: { ff: 120, boosts: 0, maxCombo: 0, maxMeters: 0, missions: 0, runs: 0 } };
 ok(G.achList(es).find(a => a.id === 'ates').tier === 2 && G.newAch(es).length === 0, 'eski kademe korunur');

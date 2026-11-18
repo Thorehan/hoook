@@ -24,7 +24,9 @@ function taraf(s, ates) {
 // ates: ateşböceği gösteren işareti seçer
 function oyna(def, tarz, p, seed, maxT, ates) {
   const s = E.createSim(def), r = rng(seed * 977 + Math.round(p * 1000) + 5);
-  while (s.status === 'play' && s.t < maxT) {
+  while (s.t < maxT) {
+    if (s.status === 'dead' && def.fenerli && E.fenerDon(s)) { step(s, 1); continue; } // Hikâye: son fenerden devam (perde ~1 sn)
+    if (s.status !== 'play') break;
     let f = taraf(s, ates);
     if (f == null) { step(s, 0.1); continue; }
     const havada = !s.rope;
@@ -59,12 +61,12 @@ for (const [ad, tarz, p, ates] of PROFIL) {
   for (let sd = 1; sd <= N; sd++) { const s = oyna(G.createEndless(sd * 13), tarz, p, sd, 900, ates); sff += E.fireflyCount(s); ssn += s.t + 10; sm += E.meters(s); }
   if (G.createHaftalik) for (let sd = 1; sd <= N; sd++) puan.push(E.finalScore(oyna(G.createHaftalik(sd * 7), tarz, p, sd, 900, false)));
   puan.sort((a, b) => a - b);
-  // Bölümler 17–56: ilk geçişe kadar yeniden dene (en çok 6); deneme arası 6 sn, sonuç kartı 6 sn
+  // Hikâye bölümleri 7–18 (v0.62, tarifli uzun bölümler, fenerden devam): ilk geçişe kadar yeniden dene (en çok 3); deneme arası 6 sn, sonuç kartı 6 sn
   let lff = 0, lsn = 0, den = 0, gecilen = 0;
-  for (let k = 17; k <= 56; k++) {
+  for (let k = 7; k <= 18; k++) {
     let best = 0;
-    for (let d = 0; d < 6; d++) {
-      const s = oyna(G.createLevel(k), tarz, p, k * 10 + d, 90, ates); den++; lsn += s.t + 6; best = Math.max(best, E.fireflyCount(s));
+    for (let d = 0; d < 3; d++) {
+      const s = oyna(G.createBolum(k), tarz, p, k * 10 + d, 400, ates); den++; lsn += s.t + 6; best = Math.max(best, E.fireflyCount(s));
       if (s.status === 'won') { lff += best; lsn += 6; gecilen++; break; }
     }
   }
@@ -74,7 +76,7 @@ for (const [ad, tarz, p, ates] of PROFIL) {
   gunler.push(gun);
   console.log(`[${ad}]`);
   console.log(`  sonsuz:   koşu başına ${(sff / N).toFixed(1)} ateşböceği (${Math.round(sm / N)} m, ${Math.round(ssn / N - 10)} sn) → saatte ${Math.round(sonsuzSaat)}`);
-  console.log(`  bölümler: 17–56 arası ${gecilen}/40 bölüm, ${lff} ateşböceği, ${den} deneme, ${Math.round(lsn / 60)} dk → saatte ${Math.round(bolumSaat)}`);
+  console.log(`  bölümler: 7–18 arası ${gecilen}/12 bölüm, ${lff} ateşböceği, ${den} deneme, ${Math.round(lsn / 60)} dk → saatte ${Math.round(bolumSaat)}`);
   console.log(`  tipik gün (10 dk sonsuz + 10 dk bölüm, 3 görev ${gorev}, giriş ort. ${giris.toFixed(0)}${haftalik ? ', haftalık lig payı ' + haftalik.toFixed(0) : ''}): ~${gun} ateşböceği, videolarla ~${gun + gorev + Math.round(giris)}`);
   console.log(`  Dolap ${Math.ceil(Math.max(0, dolapToplam - basarimToplam) / gun)} günde biter (başarımların ${basarimToplam} ateşböceği düşülerek); ışık yolu ${EKO.ISIK.length - 1}. seviye ${Math.ceil(EKO.ISIK[EKO.ISIK.length - 1] / gun)} günde`);
 }

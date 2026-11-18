@@ -16,8 +16,8 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@600;800&family=Figtree:wght@400;600&display=swap">
-<link rel="stylesheet" href="css/kuyu.css?v=0.61">
-<link rel="stylesheet" href="css/ekranlar.css?v=0.61">
+<link rel="stylesheet" href="css/kuyu.css?v=0.62">
+<link rel="stylesheet" href="css/ekranlar.css?v=0.62">
 </head>
 <body>
 <div class="app" id="oyunEkrani" hidden>
@@ -72,7 +72,7 @@
   <img id="acilisLogo" class="marka-logo" src="assets/funday-morning-logo.webp" alt="Funday Morning Games">
   <div class="yukleme" aria-hidden="true"><div id="yuklemeDolgu"></div></div>
   <div class="yukleme-not" id="yuklemeNot">Yükleniyor…</div>
-  <div class="ek-surum">Kuyu v0.61</div>
+  <div class="ek-surum">Kuyu v0.62</div>
 </section>
 
 <!-- Giriş: yalnızca ilk açılışta -->
@@ -138,11 +138,6 @@
 <section class="ekran sayfa-ekran sekmeli" id="ekBolumler" hidden>
   <div class="sayfa-ust"><h2>Hikâye</h2></div>
   <div class="sayfa-ic">
-    <div class="yeni-hikaye" id="yeniHikaye">
-      <div class="yh-ust"><b>Yeni Hikâye</b><span class="yh-etiket">deneme</span></div>
-      <p>Uzun, öğretici 24 bölüm. Fenere tutun: düşersen oradan devam edersin. Eski bölümler değişmedi.</p>
-      <div class="yh-kartlar" id="yhKartlar"></div>
-    </div>
     <div class="bolum-ozet" id="bolumOzet">
       <div class="ozet-satir"><b id="ozetGecilen">0</b><span>bölüm geçildi</span><b id="ozetHedef">0/0</b><span>hedef</span></div>
       <div class="cubuk" aria-hidden="true"><i id="ozetCubuk"></i></div>
@@ -157,7 +152,7 @@
       <input id="gitNo" type="number" inputmode="numeric" min="1" step="1" placeholder="Bölüm numarasıyla git" aria-label="Bölüm numarası">
       <button type="submit" class="ana">Git</button>
     </form>
-    <p class="not">Bütün bölümler açık ve sonu yok: 6. bölümden sonrası numarasından üretilir. Her bölümde hedefler: ateşböceği, Kusursuz (en fazla par atış) ve Akış.</p>
+    <p class="not">24 bölüm, dört bölge: Taş Kuyu, Maden, Kristal Mağara, Eski Kule. Sonra ikinci yolculuk (25–48): öğretici bölme yok, su baştan izler. Bölümler arasında fener: düşersen son yanan fenerden devam edersin. Hedefler: ateşböceği, Kusursuz (fenere dönmeden, par atışla) ve Akış. Bütün bölümler açık.</p>
   </div>
 </section>
 
@@ -283,7 +278,7 @@
     <button type="button" id="istatBtn">Oyun istatistikleri</button>
     <button type="button" id="tanitimBtn">Tanıtımı yeniden izle</button>
     <button type="button" id="ipucuSifirBtn">Tanıtım kartlarını yeniden göster</button>
-    <p class="surum">Kuyu v0.61 · prototip · Funday Morning Games</p>
+    <p class="surum">Kuyu v0.62 · prototip · Funday Morning Games</p>
   </div>
 </section>
 
@@ -319,18 +314,18 @@
 <div class="hikaye-kart" id="hikayeKart" role="status" hidden><b id="hkBaslik"></b><span id="hkMetin"></span></div>
 <div class="bildirim" id="bildirim" role="status" hidden></div>
 
-<script src="js/engine.js?v=0.61"></script>
-<script src="js/levels.js?v=0.61"></script>
-<script src="js/bolumler.js?v=0.61"></script>
-<script src="js/gen.js?v=0.61"></script>
-<script src="js/gorevler.js?v=0.61"></script>
-<script src="js/ekonomi.js?v=0.61"></script>
-<script src="js/istatistik.js?v=0.61"></script>
-<script src="js/muzik.js?v=0.61"></script>
-<script src="js/notlar.js?v=0.61"></script>
-<script src="js/hayalet.js?v=0.61"></script>
-<script src="js/online.js?v=0.61"></script>
-<script src="js/game.js?v=0.61"></script>
-<script src="js/screens.js?v=0.61"></script>
+<script src="js/engine.js?v=0.62"></script>
+<script src="js/levels.js?v=0.62"></script>
+<script src="js/bolumler.js?v=0.62"></script>
+<script src="js/gen.js?v=0.62"></script>
+<script src="js/gorevler.js?v=0.62"></script>
+<script src="js/ekonomi.js?v=0.62"></script>
+<script src="js/istatistik.js?v=0.62"></script>
+<script src="js/muzik.js?v=0.62"></script>
+<script src="js/notlar.js?v=0.62"></script>
+<script src="js/hayalet.js?v=0.62"></script>
+<script src="js/online.js?v=0.62"></script>
+<script src="js/game.js?v=0.62"></script>
+<script src="js/screens.js?v=0.62"></script>
 </body>
 </html>
