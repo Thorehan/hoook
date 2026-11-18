@@ -124,6 +124,7 @@
         { tur: 'ogret', n: 12, dy: [170, 205], ff: 1, hiz: 1, yazilar: [
           [0, 'Su yükseliyor. Asılı bekleme, sıradakine atıl.'],
           [5, 'Acele et ama korkma: su yavaş.'],
+          [9, 'Madende yanlış tarafa basarsan ip bırakılır. Önce işarete bak.'],
           ['fener', 'Su yakalarsa buradan dönersin.']
         ] },
         { tur: 'uygula', n: 14, dy: [175, 215], ff: 2, hiz: 1, yazilar: [] },

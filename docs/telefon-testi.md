@@ -81,6 +81,11 @@ Yayına çıkmadan yerelde denemek için: bilgisayarda `python3 -m http.server 8
 - [ ] Ana menüdeki Hikâye kartı doğru bölümü gösteriyor mu?
 - [ ] **25. bölüm (ikinci yolculuk):** su baştan izliyor, öğretici bölme yok; zorluk adil mi?
 
+## 11. Denge (v0.63, 5 dk)
+- [ ] Maden'de (7+) yanlış tarafa basınca ip bırakılıyor: 7. bölümdeki duvar yazısı ve boş atış kartı bunu anlatıyor mu, adil mi?
+- [ ] Maden'den sonra halkalar bazen üst üste aynı yanda: işarete bakınca doğal mı, yoksa şaşırtıcı mı?
+- [ ] Yanlış tarafa basıp hemen doğru tarafa basılı tutunca kanca gecikmeyle atılıyor mu (giriş tamponu + 0,4 sn kilit)?
+
 ## 5. Genel izlenim (serbest)
 - En sevdiğim an:
 - En çok zorlandığım yer:

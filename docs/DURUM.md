@@ -8,9 +8,10 @@
 - Devir noktası: v0.55 (yayında). Bu dönemin başı: v0.51, etiket `geri-donus-v0.51`; v0.52–v0.55'in her biri ayrı commit, `git revert` ile tek tek geri alınabilir.
 - Devir Törehan'dayken Mustafa projede geliştirme yapmaz; devir `docs/DEVIR-MUSTAFA.md` §6'daki adımlarla yapılır.
 
-## Son durum (v0.62)
+## Son durum (v0.63)
 
-- **Yayında v0.62** (19/11/2026, Törehan): Hikâye geçişi. 24 bölüm + ikinci yolculuk (25–48) asıl Hikâye; eski bölümler kalktı, kayıt bölgeye göre taşındı. Geri dönüş: `geri-donus-v0.61`. Telefonda denenecek: `docs/telefon-testi.md` §10.
+- **Yayında v0.63** (19/11/2026, Törehan): Hikâye denge (Aşama 5): spam ortalama oyuncu düzeyine indi (boş atış kilidi, Maden'den sonra yanlış taraf ipi bırakır, halkalar %40 aynı yanda). 24 bölüm planı tamam. Telefonda denenecek: `docs/telefon-testi.md` §11.
+- v0.62: Hikâye geçişi. 24 bölüm + ikinci yolculuk (25–48) asıl Hikâye; eski bölümler kalktı, kayıt bölgeye göre taşındı. Geri dönüş: `geri-donus-v0.61`. Telefonda denenecek: `docs/telefon-testi.md` §10.
 - v0.61: Yeni Hikâye Aşama 3, bölüm 13–24 (Kristal ve Kule; notlar 7–12, finaller). 24 bölüm deneme olarak tamam. Telefonda denenecek: `docs/telefon-testi.md` §9.
 - v0.60: Yeni Hikâye Aşama 2, bölüm 4–12 (Taş Kuyu ve Maden; notlar 1–6, iki final). Telefonda denenecek: `docs/telefon-testi.md` §8.
 - v0.59: Yeni Hikâye deneme (Aşama 1, bölüm 1–3; Hikâye ekranının üstünde). Telefonda denenecek: `docs/telefon-testi.md` §7.
@@ -31,7 +32,7 @@
 - ✅ 18/11: Törehan v0.52–v0.55 kararlarını gözden geçirdi, hepsi kalıyor (bölge suyu, ekonomi, Haftalık + lig, Supabase istemcisi kapalı).
 1. **Telefonda deneme**, özellikle bölge suyu mesafeleri ve Haftalık Kuyu.
 2. **Skor tablosunu açmak:** Supabase seçildi, şimdilik kapalı. Açma kararı ve hesap sonra (`docs/online-kurulum.md`).
-3. İstişare 2'nin kalanı: ✅ görsel akıcılık (v0.56) → **24 uzun bölüm: plan hazır (18/11), `docs/hikaye-bolumleri-plan.md`**. Tarifli üretim, fener kontrol noktası, ikinci yolculuk, bölgeye göre taşıma. Aşama 1 ✅ (v0.59): bölüm 1–3 oynanır (deneme kartları), fener ve fenerden devam, duvar ipuçları. Telefonda onaylandı (19/11). Aşama 2 ✅ (v0.60): bölüm 4–12. Aşama 3 ✅ (v0.61): bölüm 13–24. Aşama 4 ✅ (v0.62): geçiş. **Sıradaki: telefonda deneme §10 → Aşama 5 (denge: botlarla ve telefon geri bildirimiyle süre, su ve fener ayarı; ikinci yolculuğun zorluğu).**
+3. İstişare 2'nin kalanı: ✅ görsel akıcılık (v0.56) → **24 uzun bölüm: plan hazır (18/11), `docs/hikaye-bolumleri-plan.md`**. Tarifli üretim, fener kontrol noktası, ikinci yolculuk, bölgeye göre taşıma. Aşama 1 ✅ (v0.59): bölüm 1–3 oynanır (deneme kartları), fener ve fenerden devam, duvar ipuçları. Telefonda onaylandı (19/11). Aşama 2 ✅ (v0.60): bölüm 4–12. Aşama 3 ✅ (v0.61): bölüm 13–24. Aşama 4 ✅ (v0.62): geçiş. Aşama 5 ✅ (v0.63): denge (`tools/hikaye-denge.js`). **Plan tamam.** Sıradaki: telefon geri bildirimiyle ince ayar (süre, su, fener sıklığı, ikinci yolculuğun zorluğu); sonra açık sorular (Supabase, analitik, bekçinin adı, müzik).
 
 ## Açık sorular (Törehan'a)
 

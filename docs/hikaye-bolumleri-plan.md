@@ -137,7 +137,7 @@ Diken, taş engel gibi yeni bir "zorluk" türü eklenmez; zorluk su, seçim ve z
 2. ✅ (v0.60, 19/11; telefonda deneme bekliyor) **Taş Kuyu ve Maden (1–12):** Notlar 1–6, finaller.
 3. ✅ (v0.61, 19/11; telefonda deneme bekliyor) **Kristal ve Kule (13–24):** Notlar 7–12, finaller, hikâye sonu.
 4. ✅ (v0.62, 19/11) **Geçiş:** Kayıt taşıma, görev ve başarım eşikleri, Hikâye ekranı, ikinci yolculuk. Eski üretilen bölümler kalkar.
-5. **Denge:** Botlarla süre ve geçme oranları, telefon denemesi, son ayarlar.
+5. ✅ (v0.63, 19/11; botlarla; telefon geri bildirimine göre ince ayar sürer) **Denge:** Botlarla süre ve geçme oranları, telefon denemesi, son ayarlar.
 
 ## Sonra konuşulacaklar (işi durdurmaz)
 - Bölüm adları (taslaktakiler değişebilir).

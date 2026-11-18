@@ -743,7 +743,8 @@
   // konur. Ateşböceği ve hız halkaları bölmenin karar noktalarında ana yolun alternatifidir (ffAlternative: her zaman
   // ulaşılır, sonraki düğüme bağlanır). Her bölümün kendi tohumu var: aynı numara hep aynı bölümü verir.
   function tarifler() { return (typeof root !== 'undefined' && root.KuyuBolumler) || (typeof require === 'function' ? require('./bolumler.js') : null); }
-  function bolmeDugum(r, hp, B, prevKind) {
+  // ayni: { yon, p } (v0.63): Maden'den sonra halka p olasılıkla öncekiyle aynı yanda (sırayla sol-sağ basan spam yanlış yana basar)
+  function bolmeDugum(r, hp, B, prevKind, ayni) {
     var dyA = B.dy ? B.dy[0] : 165, dyB = B.dy ? B.dy[1] : 210, pp = B.panel || 0;
     for (var tries = 0; tries < 80; tries++) {
       var dy = lerp(dyA, dyB, r()), roll = r(), kind = 'ring', tx;
@@ -753,7 +754,9 @@
       else {
         // panelden sonra karşı yana; zikzakta sırayla iki yana
         var dir = prevKind === 'panelL' ? 1 : prevKind === 'panelR' ? -1 : B.duzen === 'zikzak' ? (hp.x < 180 ? 1 : -1) : hp.x < 110 ? 1 : hp.x > 250 ? -1 : (r() < 0.5 ? -1 : 1);
-        tx = clamp(hp.x + dir * (70 + r() * 110), 56, 304);
+        var yan = 70 + r() * 110;
+        if (ayni && ayni.yon && B.duzen !== 'zikzak' && prevKind !== 'panelL' && prevKind !== 'panelR' && r() < ayni.p && (ayni.yon > 0 ? hp.x <= 240 : hp.x >= 120)) { dir = ayni.yon; yan = 60 + (yan - 70) * 0.4; }
+        tx = clamp(hp.x + dir * yan, 56, 304);
       }
       var ty = hp.y - dy, d = dist(hp, { x: tx, y: ty });
       if (d >= 150 && d <= REACH - 6) return { kind: kind, x: Math.round(tx), y: Math.round(ty) };
@@ -784,7 +787,7 @@
     if (!tarif) return null;
     var r = rng(no * 104729 + 31);
     var nodes = [], hp = { x: 180, y: 0 }, prevKind = null, bolmeler = [];
-    var kutu = null;
+    var kutu = null, ayniYan = tarif.bolge >= 1 || !!tarif.ikinci, sonYon = 0;
     tarif.bolmeler.forEach(function (B, bi) {
       var bas = nodes.length, k0 = 0;
       // Kutu ve kapak (eski 4. bölümün ölçüleri): halkaya çık, raftaki kutuyu kendine çek, düğmeye düşür, kapak açılır.
@@ -794,7 +797,7 @@
         hp = hangOf(nodes[nodes.length - 1]); prevKind = 'ring'; k0 = 2;
         kutu = { raf: [262, -100, 82, 16, 's'], kutu: [300, -114], dugme: [140, 12, 80], kapak: [WL, -360, W - 2 * WL, 20, 'g'] };
       }
-      for (var k = k0; k < B.n; k++) { var n = bolmeDugum(r, hp, B, prevKind); nodes.push(n); prevKind = n.kind; hp = hangOf(n); }
+      for (var k = k0; k < B.n; k++) { var n = bolmeDugum(r, hp, B, prevKind, ayniYan ? { yon: sonYon, p: 0.4 } : null); sonYon = n.kind === 'ring' ? (n.x > hp.x ? 1 : -1) : 0; nodes.push(n); prevKind = n.kind; hp = hangOf(n); }
       var fen = -1;
       if (bi < tarif.bolmeler.length - 1) { var f = fenerDugum(r, hp); nodes.push(f); prevKind = 'ring'; hp = hangOf(f); fen = nodes.length - 1; }
       bolmeler.push({ B: B, bas: bas, son: bas + B.n - 1, fener: fen });
@@ -938,7 +941,11 @@
     var hizRoute = route.map(function (st, k) { var a = altAt[k]; return a ? ['hook', a.x, Math.round(a.y + off)] : st; });
     var ek = {};
     // izleyen su (Kristal ve Kule, v0.61): tutunduğun en yüksek yerin tarif.takip m altında; yanlış taraf ipi bırakır (Sonsuz kuralı)
-    if (tarif.takip) { ek.suTakip = { bas: tarif.takip, son: tarif.takip, daralma: 1, bekle: 1e9, bekleSon: 1e9, surunme: 0, hiz: 220 }; ek.bosBirak = true; ek.bosKilit = 0.4; }
+    if (tarif.takip) ek.suTakip = { bas: tarif.takip, son: tarif.takip, daralma: 1, bekle: 1e9, bekleSon: 1e9, surunme: 0, hiz: 220 };
+    // Karar önemli (v0.63, Aşama 5 denge): boş atışa (yanlış taraf) her bölümde 0,4 sn kilit (Sonsuz gibi; giriş tamponu düşünen oyuncuyu korur);
+    // Maden'den sonra ve ikinci yolculukta yanlış taraf ipi bırakır (v0.52'de onaylanan bölge kuralı). Taş Kuyu öğretici: ip kalır.
+    ek.bosKilit = 0.4;
+    if (tarif.bolge >= 1 || tarif.ikinci || tarif.takip) ek.bosBirak = true;
     if (kutu) {
       // bot rotası: ilk halkaya tutun, kutuyu çek, düğmeye düşmesini bekle, halkaya yeniden tutun
       [route, ffRoute, hizRoute].forEach(function (rt) { rt.splice(1, 0, ['box', 0], ['wait', 0.8], rt[0].slice()); });
