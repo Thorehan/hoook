@@ -1,6 +1,6 @@
 # Kuyu
 
-**Funday Morning Games** · 2D mobil oyun · prototip v0.60
+**Funday Morning Games** · 2D mobil oyun · prototip v0.61
 
 Derin bir kuyunun dibindesin. Telefonu tek elle tut: ekranın soluna ya da sağına dokun, kanca o taraftaki hedefe fırlasın; basılı tut, ipe sarıl; bırak, savrul. Halkadan halkaya, ahşaptan ahşaba tırmanıp kuyudan çık.
 
@@ -93,16 +93,17 @@ En iyi koşunun soluk bir kopyası seninle aynı zamanlamayla tırmanır: bölü
 
 Kayıt `js/hayalet.js`: kahramanın yeri sim zamanına göre saniyede 15 kez alınır, farklarla yazılır (~60 bayt/sn) ve ana kayıttan ayrı `kuyu.hayalet` anahtarında durur. Test: `node tools/hayalet-test.js`.
 
-## Yeni Hikâye · deneme (v0.59–v0.60, Aşama 1–2)
-24 uzun ve öğretici bölümün ilk on ikisi (Taş Kuyu 1–6, Maden 7–12) (plan: `docs/hikaye-bolumleri-plan.md`). Hikâye ekranının üstündeki "Yeni Hikâye · deneme" kartlarından ya da `?hikaye=1` bağlantısıyla açılır. Eski bölümler değişmedi; yeni bölümler ayrı kaydedilir (`save.yeniHikaye`), istatistiğe, notlara ve finallere karışmaz.
+## Yeni Hikâye · deneme (v0.59–v0.61, Aşama 1–3)
+24 uzun ve öğretici bölümün hepsi (Taş Kuyu 1–6, Maden 7–12, Kristal Mağara 13–18, Eski Kule 19–24) (plan: `docs/hikaye-bolumleri-plan.md`). Hikâye ekranının üstündeki "Yeni Hikâye · deneme" kartlarından ya da `?hikaye=1` bağlantısıyla açılır. Eski bölümler değişmedi; yeni bölümler ayrı kaydedilir (`save.yeniHikaye`), istatistiğe, notlara ve finallere karışmaz.
 - **Tarif:** `js/bolumler.js`. Taş Kuyu: 1 İlk Halka, 2 Savrul, 3 Ahşap ve Taş, 4 Hız Halkası, 5 Akış, 6 Kutu ve Kapak. Maden: 7 Yükselen Su, 8 Yay, 9 Rüzgâr, 10 Sarkaç, 11 Alev, 12 Maden Ağzı. Her bölüm üç bölme: öğret, uygula, sına; her bölüm yeni mekaniğini öğret bölmesinde tek başına gösterir. Üretici `gen.js` → `createBolum` (bölme başına yay, sarkaç, rüzgâr şeridi, hız, ateşböceği sayısı; 6. bölümde kutu-düğme-kapak).
+- **Kristal ve Kule (v0.61):** 13 Geçit, 14 Fırlatma Yolu, 15 Su Seni İzliyor, 16 Zincir, 17 Güçlendirmeler, 18 Kristal Kalbi; 19 Dar Merdiven, 20 Yaylar ve Geçitler, 21 Uzun Akış, 22 İki Yol, 23 Fırtına, 24 Fener (hikâyenin sonu). Dört bölme (Fırtına üç, fener az). Üretici bölme başına geçit, fırlatma yolu (Sonsuz'daki gibi `dalMini` ile doğrulanır), altın ateşböceği zinciri ve güçlendirme (kalkan, fener, kanat; kanadın üstündeki 9 halkada başka öğe yok) koyar. 15'ten sonra su izler (Kristal 22 m, Kule 18 m, Fırtına 15 m) ve yanlış taraf ipi bırakır.
 - **Su (Maden):** Zamanla yükselir, bölümden bölüme hızlanır (45 → 66 birim/sn). 8–12'de öğret bölmesi susuzdur; su ilk fener yanınca son fenerin altından başlar (`def.suFener`). Su yakalarsa son fenerden dönülür.
-- **Notlar ve finaller:** Bekçinin notları 1–6 bölüm 2, 4, 6, 8, 10, 12'de (tarifte `not`); Taş Kuyu finali 6., Maden finali 12. bölümde. Önceden bulunan not ve görülen final yeniden çıkmaz.
+- **Notlar ve finaller:** Bekçinin 12 notu bölüm 2, 4, 6, …, 24'te (tarifte `not`); finaller her bölgenin son bölümünde (6, 12, 18, 24). Önceden bulunan not ve görülen final yeniden çıkmaz.
 - **Kutu (v0.60):** Asılıyken alttaki kutu da nişanla seçilir (kutu çekmek oyuncuyu indirmez); kutu bulmacası tek elle çözülür. Eski 4. bölüm de bundan yararlanır.
 - **Fener:** Bölmeler arasında fener asılı bir halka var. Tutununca yanar (tını, ışık, "fener yandı"). Taş Kuyu'da su yok; tutunduğun en yüksek yerin 26 m altına düşmek ölümdür (`def.dusus`). Ölünce ekran kararır ve son yanan fenerden devam edilir ("fenerden devam"); fener yoksa bölüm baştan başlar.
 - **Duvar ipuçları:** Bekçinin tebeşiri, arka duvar katmanında (paralaks); oyunu durdurmaz.
 - **Madalyalar:** Ateşböceği (4–6), Kusursuz (fenere dönmeden ve par atışla), Akış (x8 / x10 / x10).
-- Ölçüm: `node tools/hikaye-olcum.js` (hata yapan oyuncu modeli Taş Kuyu 37–45 sn, Maden 46–56 sn; her halkada 1,35 sn bekleyen yavaş model Maden'i 79–95 sn'de bitiriyor, fenere dönmeden). `bot.js` 12 bölümü rahat, akış ve ateşböceği rotasıyla geçiyor.
+- Ölçüm: `node tools/hikaye-olcum.js` (hata yapan oyuncu modeli Taş Kuyu 37–45 sn, Maden 46–56 sn; her halkada 1,35 sn bekleyen yavaş model Maden'i 79–95 sn'de bitiriyor, fenere dönmeden). Kristal ve Kule: model 54–74 sn, yavaş model 105–138 sn; %10 hatada ara sıra bir fenere dönüş. `bot.js` 24 bölümü rahat, akış ve ateşböceği rotasıyla geçiyor (fırlatma yolu ve zincir ateşböcekleri akış ister, asılarak alınmaz).
 
 ## Görsel akıcılık (v0.56, İstişare 2)
 Yalnız çizim; fizik, nişan ve botlar etkilenmez. Hareket azaltma açıksa ileri bakış, paralaks, toz ve su süsleri kapanır.

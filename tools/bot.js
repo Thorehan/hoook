@@ -59,9 +59,12 @@ function play(def, style, route) {
   route = route || def.route;
   const s = E.createSim(def);
   const log = [];
-  let prevKey = '';
+  let prevKey = '', kanatY = null;
   for (const [i, a] of route.entries()) {
     if (s.status !== 'play') break;
+    // kanat (Hikâye güçlendirmesi): bitene kadar bekle, rotanın artık altında kalan adımlarını atla
+    if (s.guc && s.guc.kanat > 0) { runFor(s, 4, () => !(s.guc.kanat > 0)); kanatY = s.p.y; }
+    if (kanatY != null) { if ((a[0] === 'hook' || a[0] === 'fling') && a[2] > kanatY - 40) continue; kanatY = null; }
     const key = a.slice(1, 3).join(',');
     if (style === 'akis' && key === prevKey) continue;
     prevKey = key;
@@ -87,6 +90,7 @@ function play(def, style, route) {
       log.push(`${tag} -> akış koptu, yeniden denendi`);
     }
     if (s.status === 'won') { log.push(`${tag} -> KAZANDI t=${s.t.toFixed(2)}s`); break; }
+    if (!s.rope && s.guc && s.guc.kanat > 0) continue; // kanat ipi aldı
     if (!s.rope) return { ok: false, s, log, why: `${tag}: tutunamadı (oyuncu ${s.p.x.toFixed(0)},${s.p.y.toFixed(0)}, mesafe ${Math.hypot(x - s.p.x, y - s.p.y).toFixed(0)})` };
     const okSw = s.rope.ref && s.rope.ref.sw && s.rope.ref.sw.px === x && Math.abs(s.rope.ref.sw.py + C.SARKAC_L - y) < 1;
     if (s.rope.kind === 'anchor' && !okSw && Math.hypot(s.rope.x - x, s.rope.y - y) > 20) return { ok: false, s, log, why: `${tag}: yanlış yere tutundu (${s.rope.x.toFixed(0)},${s.rope.y.toFixed(0)})` };
@@ -289,10 +293,11 @@ if (!only && G.createBolum) {
   for (const tf of T.BOLUMLER) {
     const def = G.createBolum(tf.no);
     const a = play(def, 'rahat'), b = play(def, 'akis'), c = play(def, 'rahat', def.ffRoute);
-    const ff = E.fireflyCount(c.s), ffT = c.s.fireflies.length;
+    // akış isteyen ateşböcekleri (fırlatma yolu, zincir) asılarak alınmaz; rotada sayılmaz. Zincir tamamlanınca ffGot'a bonus ekler.
+    const ff = c.s.fireflies.filter(f => f.got && f.zincir == null).length, akisli = (def.dalSay || 0), ffT = c.s.fireflies.filter(f => f.zincir == null).length;
     const fener = a.s.fenerSay || 0;
-    if (!a.ok || !b.ok || !c.ok || ff < ffT || fener < def.fenerler.length) allOk = false;
-    console.log(`${tf.no} ${def.name.padEnd(14)} rahat ${a.ok ? 'GEÇTİ' : 'KALDI ' + a.why} ${a.s.t.toFixed(0)} sn · akış ${b.ok ? 'GEÇTİ' : 'KALDI ' + b.why} ${b.s.t.toFixed(0)} sn x${b.s.maxCombo} (hedef x${def.flow}) · ateşböceği ${ff}/${ffT} · fener ${fener}/${def.fenerler.length} · par ${def.par}`);
+    if (!a.ok || !b.ok || !c.ok || ff < ffT - akisli || fener < def.fenerler.length) allOk = false;
+    console.log(`${tf.no} ${def.name.padEnd(14)} rahat ${a.ok ? 'GEÇTİ' : 'KALDI ' + a.why} ${a.s.t.toFixed(0)} sn · akış ${b.ok ? 'GEÇTİ' : 'KALDI ' + b.why} ${b.s.t.toFixed(0)} sn x${b.s.maxCombo} (hedef x${def.flow}) · ateşböceği ${ff}/${ffT}${akisli ? ' (' + akisli + ' akışla)' : ''}${def.zincirSay ? ' · zincir ' + def.zincirSay : ''} · fener ${fener}/${def.fenerler.length} · par ${def.par}`);
   }
 }
 

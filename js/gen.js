@@ -828,16 +828,79 @@
         }
       }
     }
+    // geçit çiftleri (v0.61): giriş bir düğümün alternatifi, çıkış iki düğüm yukarıdakinin alternatifi (createLevel kuralı)
+    var portals = [], portalAt = {};
+    bolmeler.forEach(function (bm) {
+      dagit(bm, bm.B.gecit || 0, 5, function (j) {
+        var k = j + PORTAL_SKIP;
+        if (k > bm.son - 1) return false;
+        for (var q = j; q <= k + 1; q++) if (!nodes[q] || nodes[q].fener || nodes[q].kutu || altAt[q]) return false;
+        return true;
+      }, function (j) {
+        var k = j + PORTAL_SKIP, pp = portalPair(allPts[j], target(nodes[j]), target(nodes[j + 1]), allPts[k], target(nodes[k]), target(nodes[k + 1]),
+          out.rings.concat(ffRings, hizRings, portals.reduce(function (a, p) { return a.concat([p.a, p.b]); }, [])));
+        if (!pp) return false;
+        portals.push(pp); altAt[j] = pp.a; altAt[k] = pp.b; portalAt[j] = portalAt[k] = true; return true;
+      });
+    });
+    function portalNokta() { return portals.reduce(function (a, p) { return a.concat([p.a, p.b]); }, []); }
     var gates = [];
     bolmeler.forEach(function (bm) {
       dagit(bm, bm.B.kapi || 0, 2, function (j) { return !altAt[j] && !altAt[j - 1] && !nodes[j].kutu && !nodes[j].fener; }, function (j) {
-        var gg = gateOn(allPts[j], target(nodes[j]), out.rings.concat(ffRings, hizRings, gates)); if (gg) gates.push(gg); return !!gg;
+        var gg = gateOn(allPts[j], target(nodes[j]), out.rings.concat(ffRings, hizRings, gates, portalNokta())); if (gg) gates.push(gg); return !!gg;
       });
       dagit(bm, bm.B.yay || 0, 3, function (j) { return serbest(j) && nodes[j].kind === 'ring' && nodes[j + 1]; }, function (j) {
         var o = halkaNesne(nodes[j]); if (!o || o.sarkac) return false; o.yay = yayAngle(nodes[j], target(nodes[j + 1])); return true;
       });
       dagit(bm, bm.B.sarkac || 0, 3, function (j) { return serbest(j) && swingOk(nodes[j]); }, function (j) {
         var o = halkaNesne(nodes[j]); if (!o || o.yay != null) return false; o.sarkac = true; return true;
+      });
+    });
+    // fırlatma yolu (v0.61): Sonsuz'daki gibi küçük bir motor sahnesinde doğrulanır (dalMini: asılıyken ulaşılmaz, akışla ulaşılır)
+    var dallar = [];
+    function tumHalkalar() { return out.rings.concat(ffRings, hizRings, gates.map(function (g) { return { x: g.x, y: g.y, kapi: true }; }), portalNokta(), dallar.reduce(function (a, d) { return a.concat([d.b1, d.b2]); }, [])); }
+    bolmeler.forEach(function (bm) {
+      dagit(bm, bm.B.dal || 0, 5, function (j) {
+        if (j < 1 || j + 4 >= nodes.length) return false;
+        var once = halkaNesne(nodes[j - 1]); if (once && (once.yay != null || once.sarkac)) return false;
+        for (var q = j; q <= j + 4; q++) if (!nodes[q] || nodes[q].fener || nodes[q].kutu || altAt[q] || portalAt[q]) return false;
+        return true;
+      }, function (j) {
+        var hatlar = [];
+        for (var q = Math.max(1, j - 1); q <= Math.min(nodes.length - 1, j + 5); q++) { hatlar.push([allPts[q], target(nodes[q])]); var al = altAt[q]; if (al) { hatlar.push([allPts[q], al]); if (nodes[q + 1]) hatlar.push([{ x: al.x, y: al.y + MIN }, target(nodes[q + 1])]); } }
+        var tum = tumHalkalar(), from = allPts[j];
+        var yakin = tum.filter(function (g) { return g.y > target(nodes[Math.min(nodes.length - 1, j + 5)]).y - 300 && g.y < from.y + 300; });
+        var halkalar = yakin.map(function (g) { return { x: g.x, y: g.y, sarkac: !!g.sarkac }; });
+        var dl = dalBul(allPts, nodes, j, halkalar, hatlar);
+        if (!dl || !dalMini(yakin.filter(function (g) { return !g.sarkac && !g.kapi; }), from, dl.b1, dl.b2)) return false;
+        dallar.push({ b1: { x: dl.b1.x, y: dl.b1.y }, b2: { x: dl.b2.x, y: dl.b2.y } }); altAt[j] = dl.b1; return true;
+      });
+    });
+    // ateşböceği zinciri (v0.61): üç ardışık kanca hattının ortasında altın ateşböcekleri; akış kopmadan toplanınca sayılır
+    var zincirler = [], zN = 0, gucler = [];
+    function bos(p, pay) { return !tumHalkalar().some(function (g) { return Math.hypot(g.x - p.x, g.y - p.y) < pay; }) && !zincirler.some(function (z) { return Math.hypot(z[0] - p.x, z[1] - p.y) < pay; }) && !gucler.some(function (z) { return Math.hypot(z[0] - p.x, z[1] - p.y) < pay; }); }
+    bolmeler.forEach(function (bm) {
+      dagit(bm, bm.B.zincir || 0, 4, function (j) {
+        for (var q = j; q < j + 3; q++) if (!nodes[q] || nodes[q].fener || nodes[q].kutu || q > bm.son || portalAt[q]) return false;
+        return true;
+      }, function (j) {
+        var pts = [];
+        for (var q = j; q < j + 3; q++) { var a = allPts[q], b = target(nodes[q]), p = { x: Math.round(lerp(a.x, b.x, 0.5)), y: Math.round(lerp(a.y, b.y, 0.5)) }; if (!bos(p, 45)) return false; pts.push(p); }
+        zN++; pts.forEach(function (p, k) { zincirler.push([p.x, p.y, zN, k + 1]); }); return true;
+      });
+      (bm.B.guc || []).forEach(function (tur, gi) {
+        var ic = [], adet = (bm.B.guc || []).length;
+        for (var i = bm.bas + 1; i <= bm.son; i++) ic.push(i);
+        var hedef = Math.round((gi + 1) * ic.length / (adet + 1)) - 1;
+        for (var tr = 0; tr < ic.length; tr++) {
+          var j = ic[clamp(hedef + (tr % 2 ? -1 : 1) * Math.ceil(tr / 2), 0, ic.length - 1)];
+          if (nodes[j].fener || nodes[j].kutu || portalAt[j] || altAt[j]) continue;
+          // kanat ~7 halka yukarı taşır: üstündeki 9 halkada ateşböceği, geçit, fırlatma yolu, zincir ya da fener olmasın (atlatılmasın)
+          if (tur === 'kanat') { var dolu = false; for (var q = j; q <= j + 9; q++) if (!nodes[q] || nodes[q].fener || altAt[q] || portalAt[q] || zincirler.some(function (z) { return Math.abs(z[1] - target(nodes[q]).y) < 120; })) dolu = true; if (dolu) continue; }
+          var a = allPts[j], b = target(nodes[j]), p = { x: Math.round(lerp(a.x, b.x, 0.55)), y: Math.round(lerp(a.y, b.y, 0.55)) };
+          if (!bos(p, 50)) continue;
+          gucler.push([p.x, p.y, tur]); break;
+        }
       });
     });
     // duvar ipuçları (bekçinin tebeşiri): düğümle sıradaki arasında, hedefin karşı yanında
@@ -863,6 +926,8 @@
     var ffRoute = route.map(function (st, k) { var a = altAt[k]; return a && ffRings.indexOf(a) >= 0 ? ['hook', a.x, Math.round(a.y + off)] : st; });
     var hizRoute = route.map(function (st, k) { var a = altAt[k]; return a ? ['hook', a.x, Math.round(a.y + off)] : st; });
     var ek = {};
+    // izleyen su (Kristal ve Kule, v0.61): tutunduğun en yüksek yerin tarif.takip m altında; yanlış taraf ipi bırakır (Sonsuz kuralı)
+    if (tarif.takip) { ek.suTakip = { bas: tarif.takip, son: tarif.takip, daralma: 1, bekle: 1e9, bekleSon: 1e9, surunme: 0, hiz: 220 }; ek.bosBirak = true; ek.bosKilit = 0.4; }
     if (kutu) {
       // bot rotası: ilk halkaya tutun, kutuyu çek, düğmeye düşmesini bekle, halkaya yeniden tutun
       [route, ffRoute, hizRoute].forEach(function (rt) { rt.splice(1, 0, ['box', 0], ['wait', 0.8], rt[0].slice()); });
@@ -876,7 +941,12 @@
       rings: out.rings.map(function (p) { var a = sh(p); if (fenerHalka[p.x + ',' + p.y]) a.push('fener'); else if (p.yay != null) a.push('yay', p.yay); else if (p.sarkac) a.push('sarkac'); return a; })
         .concat(ffRings.map(function (a) { return [a.x, Math.round(a.y + off), 'ff']; }))
         .concat(hizRings.map(function (a) { return [a.x, Math.round(a.y + off), 'hiz']; }))
-        .concat(gates.map(function (a) { return [a.x, Math.round(a.y + off), 'kapi']; })),
+        .concat(gates.map(function (a) { return [a.x, Math.round(a.y + off), 'kapi']; }))
+        .concat(portals.reduce(function (acc, pp, pi) { return acc.concat([[pp.a.x, Math.round(pp.a.y + off), 'gecit', pi + 1], [pp.b.x, Math.round(pp.b.y + off), 'cikis', pi + 1]]); }, []))
+        .concat(dallar.reduce(function (acc, d) { return acc.concat([[d.b1.x, Math.round(d.b1.y + off), 'firlat'], [d.b2.x, Math.round(d.b2.y + off), 'ff', 'dal']]); }, [])),
+      fireflies: zincirler.map(function (z) { return [z[0], Math.round(z[1] + off), z[2], z[3]]; }),
+      gucler: gucler.map(function (g) { return [g[0], Math.round(g[1] + off), g[2]]; }),
+      dalB2: dallar.length ? [dallar[0].b2.x, Math.round(dallar[0].b2.y + off)] : null, dalSay: dallar.length, zincirSay: zN,
       yazilar: yazilar.map(function (yz) { return { x: yz.x, y: Math.round(yz.y + off), m: yz.m }; }),
       fenerler: bolmeler.filter(function (bm) { return bm.fener >= 0; }).map(function (bm) { return sh(target(nodes[bm.fener])); }),
       route: route, ffRoute: ffRoute, hizRoute: hizRoute, dalRoute: null,

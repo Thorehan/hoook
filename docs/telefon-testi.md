@@ -66,6 +66,15 @@ Yayına çıkmadan yerelde denemek için: bilgisayarda `python3 -m http.server 8
 - [ ] **10 Sarkaç, 9 Rüzgâr, 11 Alev:** öğret bölmesi yeni mekaniği tek başına yeterince gösteriyor mu?
 - [ ] Bölümler uzunluk olarak nasıl? Maden, Taş Kuyu'dan biraz uzun olmalı.
 
+## 9. Yeni Hikâye 13–24 (v0.61, yaklaşık 20 dk; parça parça da olur)
+- [ ] **13 Geçit, 14 Fırlatma Yolu:** öğret bölmesi mekaniği anlatıyor mu? Fırlatma yolunun ateşböceğine akışla ulaşılıyor mu?
+- [ ] **15 Su Seni İzliyor:** su seni izliyor; yanlış tarafa basınca ipin bırakılması adil mi?
+- [ ] **16 Zincir:** altın ateşböceklerini sırayla toplamak anlaşılıyor mu?
+- [ ] **17 Güçlendirmeler:** kalkan, fener ve kanat kartları çıkıyor; kanat seni bir şey kaçırmadan taşıyor mu?
+- [ ] **18, 24:** Kristal ve Kule finalleri oynuyor; 24. bölüm hikâyenin sonu gibi hissettiriyor mu?
+- [ ] **19–23 (Kule):** zorluk yavaş yavaş artıyor mu, bir yerde sıçrıyor mu? Fırtına'da (23) fener az; sinir bozucu mu?
+- [ ] Bölüm uzunlukları: Kristal ~2 dk, Kule ~2–2,5 dk. Uzun mu?
+
 ## 5. Genel izlenim (serbest)
 - En sevdiğim an:
 - En çok zorlandığım yer:

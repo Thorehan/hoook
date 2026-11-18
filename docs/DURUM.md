@@ -8,9 +8,10 @@
 - Devir noktası: v0.55 (yayında). Bu dönemin başı: v0.51, etiket `geri-donus-v0.51`; v0.52–v0.55'in her biri ayrı commit, `git revert` ile tek tek geri alınabilir.
 - Devir Törehan'dayken Mustafa projede geliştirme yapmaz; devir `docs/DEVIR-MUSTAFA.md` §6'daki adımlarla yapılır.
 
-## Son durum (v0.60)
+## Son durum (v0.61)
 
-- **Yayında v0.60** (19/11/2026, Törehan): Yeni Hikâye Aşama 2, bölüm 4–12 (Taş Kuyu ve Maden; notlar 1–6, iki final). Telefonda denenecek: `docs/telefon-testi.md` §8.
+- **Yayında v0.61** (19/11/2026, Törehan): Yeni Hikâye Aşama 3, bölüm 13–24 (Kristal ve Kule; notlar 7–12, finaller). 24 bölüm deneme olarak tamam. Telefonda denenecek: `docs/telefon-testi.md` §9.
+- v0.60: Yeni Hikâye Aşama 2, bölüm 4–12 (Taş Kuyu ve Maden; notlar 1–6, iki final). Telefonda denenecek: `docs/telefon-testi.md` §8.
 - v0.59: Yeni Hikâye deneme (Aşama 1, bölüm 1–3; Hikâye ekranının üstünde). Telefonda denenecek: `docs/telefon-testi.md` §7.
 - v0.58: giriş tamponu (kilitliyken basılan dokunuş kaybolmaz; hata yapan oyuncu daha geç yanıyor, spam neredeyse aynı).
 - v0.57: geç basma payı, "geriye kanca" azaldı (%5,8 → %4,1; `tools/geri.js`).
@@ -29,7 +30,7 @@
 - ✅ 18/11: Törehan v0.52–v0.55 kararlarını gözden geçirdi, hepsi kalıyor (bölge suyu, ekonomi, Haftalık + lig, Supabase istemcisi kapalı).
 1. **Telefonda deneme**, özellikle bölge suyu mesafeleri ve Haftalık Kuyu.
 2. **Skor tablosunu açmak:** Supabase seçildi, şimdilik kapalı. Açma kararı ve hesap sonra (`docs/online-kurulum.md`).
-3. İstişare 2'nin kalanı: ✅ görsel akıcılık (v0.56) → **24 uzun bölüm: plan hazır (18/11), `docs/hikaye-bolumleri-plan.md`**. Tarifli üretim, fener kontrol noktası, ikinci yolculuk, bölgeye göre taşıma. Aşama 1 ✅ (v0.59): bölüm 1–3 oynanır (deneme kartları), fener ve fenerden devam, duvar ipuçları. Telefonda onaylandı (19/11). Aşama 2 ✅ (v0.60): bölüm 4–12. **Sıradaki: telefonda deneme §8 → Aşama 3 (Kristal ve Kule, 13–24: geçit, fırlatma yolu, izleyen su, zincir, güçlendirmeler; notlar 7–12, hikâye sonu).**
+3. İstişare 2'nin kalanı: ✅ görsel akıcılık (v0.56) → **24 uzun bölüm: plan hazır (18/11), `docs/hikaye-bolumleri-plan.md`**. Tarifli üretim, fener kontrol noktası, ikinci yolculuk, bölgeye göre taşıma. Aşama 1 ✅ (v0.59): bölüm 1–3 oynanır (deneme kartları), fener ve fenerden devam, duvar ipuçları. Telefonda onaylandı (19/11). Aşama 2 ✅ (v0.60): bölüm 4–12. Aşama 3 ✅ (v0.61): bölüm 13–24. **Sıradaki: telefonda deneme §9 → Aşama 4 (geçiş: yeni bölümler ana Hikâye olur, eski üretilen bölümler kalkar, kayıt bölgeye göre taşınır, görev ve başarım eşikleri, ikinci yolculuk 25–48) → Aşama 5 (denge).**
 
 ## Açık sorular (Törehan'a)
 
