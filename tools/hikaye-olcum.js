@@ -4,6 +4,7 @@
 // sarılıp bekler ve 0,35 sn tepki süresi var, akış ipi erken bırakır). Ölünce son yanan fenerden döner
 // (yoksa bölüm baştan); dönüş ve baştan başlama gerçek oyundaki perde için 1 sn sayılır.
 // Hedef (plan): Taş Kuyu 60–90 sn, Maden 90–120, Kristal 120–150, Kule 150–180 (ortalama oyuncu = temkinli %5).
+// Model insandan hızlıdır: v0.59'da telefonda onaylanan Taş Kuyu bölümleri modelde 35–45 sn.
 const E = require('../js/engine.js');
 const G = require('../js/gen.js');
 const T = require('../js/bolumler.js');
@@ -18,13 +19,17 @@ function iyiTaraf(s) {
   return ok(L) && ok(R) ? (y(L) <= y(R) ? 0.25 : 0.75) : ok(L) ? 0.25 : ok(R) ? 0.75 : null;
 }
 function oyna(def, tarz, p, seed, maxT) {
-  let s = E.createSim(def), ek = 0, donus = 0, bastan = 0;
+  let s = E.createSim(def), ek = 0, donus = 0, bastan = 0, kutu = !(def.boxes && def.boxes.length);
   const r = rng(seed * 977 + Math.round(p * 1000) + 5);
   while (s.t + ek < maxT) {
     if (s.status === 'won') break;
     if (s.status === 'dead') {
       if (E.fenerDon(s)) { donus++; ek += 1; continue; }
-      const t0 = s.t + ek; s = E.createSim(def); ek = t0 + 1; bastan++; continue;
+      const t0 = s.t + ek; s = E.createSim(def); ek = t0 + 1; bastan++; kutu = !(def.boxes && def.boxes.length); continue;
+    }
+    if (!kutu && s.rope && s.rope.kind === 'anchor') { // kutu bulmacası: kutuyu çek, düğmeye düşür (tools/denge.js gibi)
+      const b = s.boxes[0]; E.release(s); E.press(s, b.x, b.y); step(s, 0.6, () => s.rope || !s.hook);
+      step(s, 1.2); E.release(s); step(s, 1.0); kutu = true; continue;
     }
     let f = iyiTaraf(s);
     if (f == null) { step(s, 0.1); continue; }

@@ -58,6 +58,14 @@ Yayına çıkmadan yerelde denemek için: bilgisayarda `python3 -m http.server 8
 - [ ] **Geriye kanca (v0.57):** ipi bırakıp biraz geç basınca kanca hâlâ geriye gidiyor mu?
 - [ ] **Giriş tamponu (v0.58):** yanlış tarafa basıp hemen doğru tarafa basılı tutunca kanca gecikmeyle de olsa atılıyor mu, "bastım ama olmadı" kaldı mı?
 
+## 8. Yeni Hikâye 4–12 (v0.60, yaklaşık 15 dk)
+- [ ] **4 Hız Halkası, 5 Akış:** duvar yazıları (TAM, zincir) anlaşılıyor mu?
+- [ ] **6 Kutu ve Kapak:** halkaya çıkıp sağa basınca kutu çekiliyor, kapak açılıyor mu? Taş Kuyu finali oynuyor mu?
+- [ ] **7–12 (Maden):** su baskı kuruyor mu, yoksa hiç hissedilmiyor mu? Su yakalayınca fenerden dönüş adil mi?
+- [ ] **8 Yay:** yay fırlattıktan sonra sıradaki halkaya basmak doğal mı, yoksa düşüp baştan başlıyor musun? (Öğret bölmesinde fener yok; düşersen bölüm baştan.)
+- [ ] **10 Sarkaç, 9 Rüzgâr, 11 Alev:** öğret bölmesi yeni mekaniği tek başına yeterince gösteriyor mu?
+- [ ] Bölümler uzunluk olarak nasıl? Maden, Taş Kuyu'dan biraz uzun olmalı.
+
 ## 5. Genel izlenim (serbest)
 - En sevdiğim an:
 - En çok zorlandığım yer:

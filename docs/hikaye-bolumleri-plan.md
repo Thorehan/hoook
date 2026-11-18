@@ -134,7 +134,7 @@ Diken, taş engel gibi yeni bir "zorluk" türü eklenmez; zorluk su, seçim ve z
 ## Aşamalar (her biri ayrı sürüm, önce geri dönüş etiketi `geri-donus-v0.56`)
 
 1. ✅ (v0.59, 19/11; telefonda deneme bekliyor) **Altyapı + ilk 3 bölüm:** Tarif biçimi, bölmeli üretici, fener kontrol noktası, bot doğrulaması, duvar ipuçları. Bölüm 1–3 oynanır hâlde. **Burada durup telefonda denenir:** uzunluk, fener sıklığı ve ipuçlarının hissi onaylanınca devam edilir. Eski bölümler bu aşamada dokunulmadan kalır (yeni bölümler deneme bayrağıyla açılır).
-2. **Taş Kuyu ve Maden (1–12):** Notlar 1–6, finaller.
+2. ✅ (v0.60, 19/11; telefonda deneme bekliyor) **Taş Kuyu ve Maden (1–12):** Notlar 1–6, finaller.
 3. **Kristal ve Kule (13–24):** Notlar 7–12, finaller, hikâye sonu.
 4. **Geçiş:** Kayıt taşıma, görev ve başarım eşikleri, Hikâye ekranı, ikinci yolculuk. Eski üretilen bölümler kalkar.
 5. **Denge:** Botlarla süre ve geçme oranları, telefon denemesi, son ayarlar.

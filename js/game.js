@@ -330,6 +330,7 @@
     $('baslik').textContent = 'Yeni · ' + levelNo + '. ' + def.name;
     levelBolge = def.bolge || 0;
     reset();
+    bolgeDuyur(levelBolge);
     MZ.sahne(BOLGELER[levelBolge].id);
   }
   function sonrakiBolum() { if (yeni) { if (levelNo < BOL.sayi) startHikaye(levelNo + 1); else goLevels(); } else startLevel(levelNo + 1); }
@@ -472,7 +473,8 @@
   function notKur() {
     notAktif = null; notHalka = null;
     if (mode !== 'level' || !NOT) return;
-    var n = !yeni && NOT.bolumde(levelNo), h = n && NOT.halka(def);
+    // yeni Hikâye: not tarifte (def.not, 1–12); eski bölümlerde bölüm numarasından
+    var n = yeni ? (def.not ? NOT.NOTLAR[def.not - 1] : null) : NOT.bolumde(levelNo), h = n && NOT.halka(def);
     if (!h || notBulundu(n.no)) return;
     notAktif = n;
     notHalka = sim.rings.find(function (r) { return r.ff && r.x === h[0] && r.y === h[1]; }) || null;
@@ -1484,8 +1486,10 @@
   // kulede fener yeniden yanar. Dokunmak geçer. Sahne bir kez oynar; metni Çıra'nın yolu'nda kalır.
   var FINAL = { 16: 0, 36: 1, 56: 2, 76: 3 }, FINAL_SURE = 7.5, finalCalan = {};
   function finalGoruldu(bi) { return !!(save.finaller && save.finaller[BOLGELER[bi].id]); }
-  function finalBekliyor() { return mode === 'level' && !yeni && FINAL[levelNo] != null && !finalGoruldu(FINAL[levelNo]); }
-  function finalBasla() { finalBi = FINAL[levelNo]; finalT = 0; finalCalan = {}; MZ.kis(true); }
+  var FINAL_YENI = { 6: 0, 12: 1, 18: 2, 24: 3 }; // yeni Hikâye: her bölgenin 6. bölümü
+  function finalNo() { return yeni ? FINAL_YENI[levelNo] : FINAL[levelNo]; }
+  function finalBekliyor() { return mode === 'level' && finalNo() != null && !finalGoruldu(finalNo()); }
+  function finalBasla() { finalBi = finalNo(); finalT = 0; finalCalan = {}; MZ.kis(true); }
   function finalBitir() {
     if (finalT === null) return;
     if (!save.finaller) save.finaller = {};

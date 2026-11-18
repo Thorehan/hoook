@@ -773,9 +773,17 @@
     if (!tarif) return null;
     var r = rng(no * 104729 + 31);
     var nodes = [], hp = { x: 180, y: 0 }, prevKind = null, bolmeler = [];
+    var kutu = null;
     tarif.bolmeler.forEach(function (B, bi) {
-      var bas = nodes.length;
-      for (var k = 0; k < B.n; k++) { var n = bolmeDugum(r, hp, B, prevKind); nodes.push(n); prevKind = n.kind; hp = hangOf(n); }
+      var bas = nodes.length, k0 = 0;
+      // Kutu ve kapak (eski 4. bölümün ölçüleri): halkaya çık, raftaki kutuyu kendine çek, düğmeye düşür, kapak açılır.
+      // Yalnız ilk bölmede (tabanın üstünde); kapaktan sonraki halka kapak kapalıyken kanca hattını keser.
+      if (B.kutu && bi === 0) {
+        nodes.push({ kind: 'ring', x: 180, y: -230, kutu: true }); nodes.push({ kind: 'ring', x: 170, y: -470, kutu: true });
+        hp = hangOf(nodes[nodes.length - 1]); prevKind = 'ring'; k0 = 2;
+        kutu = { raf: [262, -100, 82, 16, 's'], kutu: [300, -114], dugme: [140, 12, 80], kapak: [WL, -360, W - 2 * WL, 20, 'g'] };
+      }
+      for (var k = k0; k < B.n; k++) { var n = bolmeDugum(r, hp, B, prevKind); nodes.push(n); prevKind = n.kind; hp = hangOf(n); }
       var fen = -1;
       if (bi < tarif.bolmeler.length - 1) { var f = fenerDugum(r, hp); nodes.push(f); prevKind = 'ring'; hp = hangOf(f); fen = nodes.length - 1; }
       bolmeler.push({ B: B, bas: bas, son: bas + B.n - 1, fener: fen });
@@ -791,7 +799,7 @@
     function alternatifKoy(bm, adet, liste) {
       if (!adet) return;
       var ic = [];
-      for (var i = bm.bas + 1; i <= bm.son - 1; i++) ic.push(i);
+      for (var i = bm.bas + 1; i <= bm.son - 1; i++) if (!nodes[i].kutu && !(nodes[i - 1] && nodes[i - 1].kutu && i === bm.bas + 1)) ic.push(i);
       for (var q = 0; q < adet; q++) {
         var hedef = Math.round((q + 1) * ic.length / (adet + 1)) - 1;
         for (var tr = 0; tr < ic.length; tr++) {
@@ -804,6 +812,34 @@
     }
     bolmeler.forEach(function (bm) { alternatifKoy(bm, bm.B.ff || 0, ffRings); });
     bolmeler.forEach(function (bm) { alternatifKoy(bm, bm.B.hiz || 0, hizRings); });
+    // rüzgâr şeritleri, yay ve sarkaç halkaları: bölmenin ana yolunda, karar noktası olmayan adımlarda (createLevel kuralları)
+    function halkaNesne(nn) { for (var q = 0; q < out.rings.length; q++) if (out.rings[q].x === nn.x && out.rings[q].y === nn.y) return out.rings[q]; return null; }
+    function serbest(j) { return nodes[j] && !nodes[j].fener && !nodes[j].kutu && !altAt[j] && !(nodes[j + 1] && altAt[j + 1]) && !(nodes[j + 1] && nodes[j + 1].fener); }
+    function dagit(bm, adet, aralik, uygun, yap) {
+      if (!adet) return;
+      var son = -99, ic = [];
+      for (var i = bm.bas + 1; i <= bm.son - 1; i++) ic.push(i);
+      for (var q = 0; q < adet; q++) {
+        var hedef = Math.round((q + 1) * ic.length / (adet + 1)) - 1;
+        for (var tr = 0; tr < ic.length; tr++) {
+          var j = ic[clamp(hedef + (tr % 2 ? -1 : 1) * Math.ceil(tr / 2), 0, ic.length - 1)];
+          if (Math.abs(j - son) < aralik || !uygun(j)) continue;
+          if (yap(j)) { son = j; break; }
+        }
+      }
+    }
+    var gates = [];
+    bolmeler.forEach(function (bm) {
+      dagit(bm, bm.B.kapi || 0, 2, function (j) { return !altAt[j] && !altAt[j - 1] && !nodes[j].kutu && !nodes[j].fener; }, function (j) {
+        var gg = gateOn(allPts[j], target(nodes[j]), out.rings.concat(ffRings, hizRings, gates)); if (gg) gates.push(gg); return !!gg;
+      });
+      dagit(bm, bm.B.yay || 0, 3, function (j) { return serbest(j) && nodes[j].kind === 'ring' && nodes[j + 1]; }, function (j) {
+        var o = halkaNesne(nodes[j]); if (!o || o.sarkac) return false; o.yay = yayAngle(nodes[j], target(nodes[j + 1])); return true;
+      });
+      dagit(bm, bm.B.sarkac || 0, 3, function (j) { return serbest(j) && swingOk(nodes[j]); }, function (j) {
+        var o = halkaNesne(nodes[j]); if (!o || o.yay != null) return false; o.sarkac = true; return true;
+      });
+    });
     // duvar ipuçları (bekçinin tebeşiri): düğümle sıradaki arasında, hedefin karşı yanında
     var yazilar = [];
     bolmeler.forEach(function (bm) {
@@ -826,18 +862,26 @@
     route.push(['hook', Math.round(goal.x), Math.round(goal.y + off)]);
     var ffRoute = route.map(function (st, k) { var a = altAt[k]; return a && ffRings.indexOf(a) >= 0 ? ['hook', a.x, Math.round(a.y + off)] : st; });
     var hizRoute = route.map(function (st, k) { var a = altAt[k]; return a ? ['hook', a.x, Math.round(a.y + off)] : st; });
-    return {
+    var ek = {};
+    if (kutu) {
+      // bot rotası: ilk halkaya tutun, kutuyu çek, düğmeye düşmesini bekle, halkaya yeniden tutun
+      [route, ffRoute, hizRoute].forEach(function (rt) { rt.splice(1, 0, ['box', 0], ['wait', 0.8], rt[0].slice()); });
+      rects.push([kutu.raf[0], kutu.raf[1] + off, kutu.raf[2], kutu.raf[3], 's'], [kutu.kapak[0], kutu.kapak[1] + off, kutu.kapak[2], kutu.kapak[3], 'g']);
+      ek.boxes = [[kutu.kutu[0], kutu.kutu[1] + off]]; ek.buttons = [[kutu.dugme[0], Math.round(kutu.dugme[1] + off), kutu.dugme[2]]];
+    }
+    return Object.assign({
       id: no, name: tarif.ad, hikaye: no, bolge: tarif.bolge, H: H, generated: true, fenerli: true, dusus: 520,
-      hint: tarif.ipucu, start: [180, Math.round(off - 20)], goal: sh(goal), water: tarif.su || 0,
+      hint: tarif.ipucu, start: [180, Math.round(off - 20)], goal: sh(goal), water: tarif.su || 0, suFener: tarif.suFener != null ? tarif.suFener : null, not: tarif.not || 0,
       rects: rects,
-      rings: out.rings.map(function (p) { var a = sh(p); if (fenerHalka[p.x + ',' + p.y]) a.push('fener'); return a; })
+      rings: out.rings.map(function (p) { var a = sh(p); if (fenerHalka[p.x + ',' + p.y]) a.push('fener'); else if (p.yay != null) a.push('yay', p.yay); else if (p.sarkac) a.push('sarkac'); return a; })
         .concat(ffRings.map(function (a) { return [a.x, Math.round(a.y + off), 'ff']; }))
-        .concat(hizRings.map(function (a) { return [a.x, Math.round(a.y + off), 'hiz']; })),
+        .concat(hizRings.map(function (a) { return [a.x, Math.round(a.y + off), 'hiz']; }))
+        .concat(gates.map(function (a) { return [a.x, Math.round(a.y + off), 'kapi']; })),
       yazilar: yazilar.map(function (yz) { return { x: yz.x, y: Math.round(yz.y + off), m: yz.m }; }),
       fenerler: bolmeler.filter(function (bm) { return bm.fener >= 0; }).map(function (bm) { return sh(target(nodes[bm.fener])); }),
       route: route, ffRoute: ffRoute, hizRoute: hizRoute, dalRoute: null,
       par: route.length + tarif.bolmeler.length, flow: tarif.akis
-    };
+    }, ek);
   }
 
   var api = { createBolum: createBolum, HAFTALIK_SU: HAFTALIK_SU, createHaftalik: createHaftalik, ENDLESS_WATER: { base: 38, perM: 0.3, perS: 0, cap: 300 }, createLevel: createLevel, bolumSuyu: bolumSuyu, createEndless: createEndless, KURALLAR: KURALLAR, gunKurali: gunKurali, target: target, hangOf: hangOf, ffAlternative: ffAlternative, rng: rng };

@@ -290,7 +290,8 @@
 
   function onAttach(s, x, y, what) {
     s.hooks++;
-    if (s.waterFrom == null) { s.waterFrom = s.t; if (s.water != null) s.events.push({ type: 'waterStart' }); }
+    // bölme suyu fener bekliyorsa (def.suFener > 0) "su başladı" olayı fener yanınca verilir (suAcik)
+    if (s.waterFrom == null) { s.waterFrom = s.t; if (s.water != null && !(s.def.suFener > 0)) s.events.push({ type: 'waterStart' }); }
     if (!(s.chain && s.combo > 0)) s.alevPuan = 0; // zincir koptuysa alev sayacı da sıfırlanır
     s.combo = s.chain && s.combo > 0 ? s.combo + 1 : 1;
     s.chain = false;
@@ -451,7 +452,8 @@
     }
     // Öncelik: bu taraftaki en yakın dik yukarı hedef, sonra yandaki sığ hedef; tutunmuyorsan en son aşağıdaki.
     // Tutunurken aşağıya hiç atılmaz.
-    var tiers = holding ? [upSide, flatSide] : [upSide, flatSide, downSide];
+    // Kutu çekmek oyuncuyu aşağı indirmez: asılıyken alttaki kutu da seçilir (en son kademe; tek elle kutu bulmacası, v0.60)
+    var tiers = holding ? [upSide, flatSide, downSide.filter(function (cc) { return cc.kind === 'box'; })] : [upSide, flatSide, downSide];
     for (var tI = 0; tI < tiers.length; tI++) {
       var tier = tiers[tI].sort(function (u, v) { return (u.strict === v.strict) ? u.d - v.d : (u.strict ? -1 : 1); });
       for (i = 0; i < tier.length; i++) {
@@ -721,7 +723,7 @@
     if (s.water != null) {
       // Su ilk halkaya tutununca tetiklenir (oyuncu başlamadan beklerken yükselmez), kısa bir payla başlar.
       if (s.def.suTakip && s.waterFrom != null) suTakip(s, dt);
-      else if (s.waterFrom != null && s.t - s.waterFrom > CFG.WATER_GRACE) {
+      else if (s.waterFrom != null && s.t - s.waterFrom > CFG.WATER_GRACE && suAcik(s)) {
         var speed = s.def.waterSpeed ? s.def.waterSpeed(s) : s.def.water;
         s.water -= speed * dt;
         // sonsuz modda su çok geride kalmasın
@@ -863,6 +865,14 @@
     if (g.yandi) return;
     g.yandi = true; s.kontrol = { x: g.x, y: g.y, ref: g }; s.fenerSay = (s.fenerSay || 0) + 1;
     s.events.push({ type: 'fener', x: g.x, y: g.y, n: s.fenerSay });
+  }
+  // Bölme suyu (Hikâye, v0.60): def.suFener kadar fener yanınca su yükselmeye başlar; başladığı an son fenerin altından gelir
+  function suAcik(s) {
+    var k = s.def.suFener;
+    if (k == null) return true;
+    if ((s.fenerSay || 0) < k) return false;
+    if (!s.suAcildi) { s.suAcildi = true; if (s.kontrol) s.water = Math.min(s.water, s.kontrol.y + 420); if (k > 0) s.events.push({ type: 'waterStart' }); }
+    return true;
   }
   function fenerDon(s) {
     var k = s.kontrol;

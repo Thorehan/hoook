@@ -478,10 +478,13 @@
     var B = window.KuyuBolumler, el = $('yhKartlar');
     if (!B || !el) return;
     var y = save().yeniHikaye || {};
-    el.innerHTML = B.BOLUMLER.map(function (b) {
+    var BOLGE_AD = ['Taş Kuyu', 'Maden', 'Kristal Mağara', 'Eski Kule'], html = '', son = -1;
+    B.BOLUMLER.forEach(function (b) {
       var k = y[b.no] || {};
-      return '<button type="button" data-yh="' + b.no + '"' + (k.done ? ' class="gecti"' : '') + ' aria-label="Yeni Hikâye ' + b.no + '. bölüm: ' + b.ad + (k.done ? ', geçildi' : '') + '"><b>' + b.no + '</b><span>' + b.ad + '</span>' + (k.done ? '<i aria-hidden="true">✓</i>' : '') + '</button>';
-    }).join('');
+      if (b.bolge !== son) { son = b.bolge; html += '<h4 class="yh-bolge">' + (BOLGE_AD[b.bolge] || '') + '</h4>'; }
+      html += '<button type="button" data-yh="' + b.no + '"' + (k.done ? ' class="gecti"' : '') + ' aria-label="Yeni Hikâye ' + b.no + '. bölüm: ' + b.ad + (k.done ? ', geçildi' : '') + '"><b>' + b.no + '</b><span>' + b.ad + '</span>' + (k.done ? '<i aria-hidden="true">✓</i>' : '') + '</button>';
+    });
+    el.innerHTML = html;
   }
   if ($('yhKartlar')) $('yhKartlar').addEventListener('click', function (e) { var b = e.target.closest('[data-yh]'); if (b) G.startHikaye(+b.dataset.yh); });
   function renderLevels() {
