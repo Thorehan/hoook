@@ -1,6 +1,6 @@
 # Kuyu
 
-**Funday Morning Games** · 2D mobil oyun · prototip v0.58
+**Funday Morning Games** · 2D mobil oyun · prototip v0.59
 
 Derin bir kuyunun dibindesin. Telefonu tek elle tut: ekranın soluna ya da sağına dokun, kanca o taraftaki hedefe fırlasın; basılı tut, ipe sarıl; bırak, savrul. Halkadan halkaya, ahşaptan ahşaba tırmanıp kuyudan çık.
 
@@ -92,6 +92,14 @@ Yolun üstünde, bir halkadan sıradakine giden hatta duran yatay şerit (112 bi
 En iyi koşunun soluk bir kopyası seninle aynı zamanlamayla tırmanır: bölümde en kısa süreli geçişin, Sonsuz Kuyu'da rekor koşun, Günlük Kuyu'da günün en iyisi. Sonsuz her koşuda farklı olduğundan orada bir yükseklik yarışıdır. Hayalet ekranın dışındaysa üst ya da alt kenarda küçük bir işaret görünür. Yalnızca görüntüdür; nişan, puan ve fizik etkilenmez. Ayarlar → Hayalet ile kapatılır.
 
 Kayıt `js/hayalet.js`: kahramanın yeri sim zamanına göre saniyede 15 kez alınır, farklarla yazılır (~60 bayt/sn) ve ana kayıttan ayrı `kuyu.hayalet` anahtarında durur. Test: `node tools/hayalet-test.js`.
+
+## Yeni Hikâye · deneme (v0.59, Aşama 1)
+24 uzun ve öğretici bölümün ilk üçü (plan: `docs/hikaye-bolumleri-plan.md`). Hikâye ekranının üstündeki "Yeni Hikâye · deneme" kartlarından ya da `?hikaye=1` bağlantısıyla açılır. Eski bölümler değişmedi; yeni bölümler ayrı kaydedilir (`save.yeniHikaye`), istatistiğe, notlara ve finallere karışmaz.
+- **Tarif:** `js/bolumler.js` (bölüm 1 İlk Halka, 2 Savrul, 3 Ahşap ve Taş). Her bölüm üç bölme: öğret, uygula, sına. Üretici `gen.js` → `createBolum`.
+- **Fener:** Bölmeler arasında fener asılı bir halka var. Tutununca yanar (tını, ışık, "fener yandı"). Taş Kuyu'da su yok; tutunduğun en yüksek yerin 26 m altına düşmek ölümdür (`def.dusus`). Ölünce ekran kararır ve son yanan fenerden devam edilir ("fenerden devam"); fener yoksa bölüm baştan başlar.
+- **Duvar ipuçları:** Bekçinin tebeşiri, arka duvar katmanında (paralaks); oyunu durdurmaz.
+- **Madalyalar:** Ateşböceği (4–6), Kusursuz (fenere dönmeden ve par atışla), Akış (x8 / x10 / x10).
+- Ölçüm: `node tools/hikaye-olcum.js` (hata yapan oyuncu modeli 35–45 sn; telefonda ~1–1,5 dk bekleniyor). `bot.js` üç bölümü rahat, akış ve ateşböceği rotasıyla geçiyor.
 
 ## Görsel akıcılık (v0.56, İstişare 2)
 Yalnız çizim; fizik, nişan ve botlar etkilenmez. Hareket azaltma açıksa ileri bakış, paralaks, toz ve su süsleri kapanır.

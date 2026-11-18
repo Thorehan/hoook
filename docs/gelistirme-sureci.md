@@ -133,6 +133,7 @@ Kullanıcı hikâyeye online'dan önce geçti; online (5) sonra.
 - [?] Bekçinin adı.
 
 ## Yapılanlar
+- 2026-11-19 · v0.59 · Yeni Hikâye deneme (Aşama 1): bölüm 1–3 tarifli, fener kontrol noktası ve fenerden devam, duvar tebeşir ipuçları, Hikâye ekranında deneme kartları, `?hikaye=N`; eski bölümler değişmedi.
 - 2026-11-19 · v0.58 · Giriş tamponu: kilitliyken basılan dokunuş, kilit bitince parmak basılıysa atılır. Hata yapan oyuncu belirgin biçimde daha geç yanıyor; spam neredeyse aynı.
 - 2026-11-19 · v0.57 · Geç basma payı (Mustafa'nın "geriye kanca" geri bildirimi): havada tepe noktasının hemen ardında yukarı hedef menzilin 70 birim ötesine kadar alınır; geriye kanca %5,8 → %4,1, boş atış %7,1 → %6,0, akış oyuncusu daha geç yanıyor. Ölçüm aracı `tools/geri.js`.
 - 2026-11-18 · v0.56 · Görsel akıcılık (İstişare 2, adım 5): kamera ileri bakışı + kritik sönümlü yay, arka duvar paralaksı (0,88), iki katman toz, kenar gölgesi, kor ışığı, su ikinci dalga + pırıltı + kabarcık + yansıma, perde geçişleri, ekranlar arası yumuşak geçiş. Yalnız çizim.

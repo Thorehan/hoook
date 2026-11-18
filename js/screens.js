@@ -11,7 +11,7 @@
   var ONL = window.KuyuOnline;
   if (q.get('online') && ONL) ONL.ayarBaglanti(q.get('online')); // ?online=yerel: yerel sahte skor sunucusu; ?online=kapat
   var meydanLink = ONL && q.get('meydan') ? ONL.meydanCoz(q.get('meydan')) : null;
-  var deepLink = meydanLink ? { mode: 'meydan', m: meydanLink } : q.get('mod') === 'gunluk' ? { mode: 'daily' } : q.get('mod') === 'haftalik' ? { mode: 'weekly' } : q.get('mod') === 'sonsuz' ? { mode: 'endless' } : q.get('bolum') ? { mode: 'level', n: parseInt(q.get('bolum'), 10) || 1 } : null;
+  var deepLink = meydanLink ? { mode: 'meydan', m: meydanLink } : q.get('mod') === 'gunluk' ? { mode: 'daily' } : q.get('mod') === 'haftalik' ? { mode: 'weekly' } : q.get('mod') === 'sonsuz' ? { mode: 'endless' } : q.get('bolum') ? { mode: 'level', n: parseInt(q.get('bolum'), 10) || 1 } : q.get('hikaye') ? { mode: 'hikaye', n: parseInt(q.get('hikaye'), 10) || 1 } : null;
   var save = function () { return G.save(); };
 
   var SEKMELER = ['ekAna', 'ekBolumler', 'ekGorevler', 'ekDolap', 'ekProfil', 'ekAyarlar', 'ekIstat'];
@@ -74,7 +74,7 @@
   function openDeepLink() {
     var d = deepLink; deepLink = null;
     try { history.replaceState(null, '', location.pathname); } catch (e) {}
-    if (d.mode === 'meydan') G.startMeydan(d.m); else if (d.mode === 'daily') G.startDaily(); else if (d.mode === 'weekly') G.startWeekly(); else if (d.mode === 'endless') G.startEndless(); else G.startLevel(d.n);
+    if (d.mode === 'meydan') G.startMeydan(d.m); else if (d.mode === 'daily') G.startDaily(); else if (d.mode === 'weekly') G.startWeekly(); else if (d.mode === 'endless') G.startEndless(); else if (d.mode === 'hikaye') G.startHikaye(d.n); else G.startLevel(d.n);
   }
 
   // ---------- giriş ----------
@@ -466,12 +466,24 @@
     var s = save(), nx = nextLevel();
     listUpto = Math.max(16, groupOf(Math.max(nx, s.maxLevel || 1)).b);
     renderLevels();
+    renderYeniHikaye();
     show('ekBolumler');
     // sıradaki bölüme kaydır
     var el = $('liste').querySelector('[data-siradaki]');
     var ek = $('ekBolumler');
     if (el) ek.scrollTop = Math.max(0, el.offsetTop - ek.clientHeight / 2 + el.offsetHeight / 2); else ek.scrollTop = 0;
   }
+  // Yeni Hikâye (deneme, v0.59): tarifli uzun bölümler; eski bölümler değişmedi
+  function renderYeniHikaye() {
+    var B = window.KuyuBolumler, el = $('yhKartlar');
+    if (!B || !el) return;
+    var y = save().yeniHikaye || {};
+    el.innerHTML = B.BOLUMLER.map(function (b) {
+      var k = y[b.no] || {};
+      return '<button type="button" data-yh="' + b.no + '"' + (k.done ? ' class="gecti"' : '') + ' aria-label="Yeni Hikâye ' + b.no + '. bölüm: ' + b.ad + (k.done ? ', geçildi' : '') + '"><b>' + b.no + '</b><span>' + b.ad + '</span>' + (k.done ? '<i aria-hidden="true">✓</i>' : '') + '</button>';
+    }).join('');
+  }
+  if ($('yhKartlar')) $('yhKartlar').addEventListener('click', function (e) { var b = e.target.closest('[data-yh]'); if (b) G.startHikaye(+b.dataset.yh); });
   function renderLevels() {
     var s = save(), best = s.best || {}, nx = nextLevel(), h = '', shown = 0;
     var doneAll = 0, gotAll = 0, totAll = 0;

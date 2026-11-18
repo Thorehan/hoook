@@ -49,6 +49,15 @@ Yayına çıkmadan yerelde denemek için: bilgisayarda `python3 -m http.server 8
 - [ ] Görevler: hedefler (ör. 20 ateşböceği, 1000 m) bir oturumda makul mü?
 - [ ] 360 px genişlikte ana menü tek ekrana sığıyor, yana taşma yok.
 
+## 7. Yeni Hikâye ve nişan (v0.57 – v0.59, yaklaşık 10 dk)
+- [ ] **Hikâye → Yeni Hikâye · deneme → 1, 2, 3.** Her bölüm ne kadar sürdü? Uzun mu, kısa mı, sıkıcı mı?
+- [ ] Duvardaki tebeşir yazıları okunuyor mu, yerinde mi, dikkat dağıtıyor mu?
+- [ ] Fener halkası belli mi? Tutununca yanması (ses, ışık) hissediliyor mu?
+- [ ] Bilerek düş: ekran kararıp son fenerden devam ediyor mu? Fener sıklığı (bölüm başına 2) yeterli mi?
+- [ ] 3. bölümde ahşap paneller anlaşılıyor mu?
+- [ ] **Geriye kanca (v0.57):** ipi bırakıp biraz geç basınca kanca hâlâ geriye gidiyor mu?
+- [ ] **Giriş tamponu (v0.58):** yanlış tarafa basıp hemen doğru tarafa basılı tutunca kanca gecikmeyle de olsa atılıyor mu, "bastım ama olmadı" kaldı mı?
+
 ## 5. Genel izlenim (serbest)
 - En sevdiğim an:
 - En çok zorlandığım yer:

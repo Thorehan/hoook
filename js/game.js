@@ -288,7 +288,7 @@
     if (mode === 'level') {
       var top = sim.goal ? sim.startY - sim.goal.y : 0;
       c.ilerleme = top > 0 ? Math.max(0, Math.min(1, (sim.startY - sim.p.y) / top)) : 0;
-      IST.bolum(save, levelNo, tur, c);
+      if (!yeni) IST.bolum(save, levelNo, tur, c);
     } else {
       c.metre = E.meters(sim); c.akis = sim.maxCombo;
       IST.kosu(save, dailyKey ? 'gunluk' : 'sonsuz', c); // Haftalık Kuyu koşuları Sonsuz hanesine yazılır
@@ -299,7 +299,7 @@
   function startLevel(n) {
     istatBitir('terk');
     dailyKey = null; weekKey = null; meydan = null;
-    mode = 'level';
+    mode = 'level'; yeni = false;
     levelNo = Math.max(1, Math.floor(n) || 1);
     def = levelDef(levelNo);
     save.last = levelNo; if (levelNo > save.maxLevel) save.maxLevel = levelNo; persist();
@@ -312,6 +312,27 @@
     if (dongu(levelNo) > 0) ikinciDuyur(levelBolge); else bolgeDuyur(levelBolge);
     MZ.sahne(BOLGELER[levelBolge].id);
   }
+  // ---------- Hikâye bölümleri (deneme, v0.59; docs/hikaye-bolumleri-plan.md) ----------
+  // Tarifli uzun bölümler (js/bolumler.js → gen.createBolum) eski bölümlerden ayrı kaydedilir (save.yeniHikaye).
+  // Bölmeler arasında fener: ölünce son yanan fenerden dönülür (engine.fenerDon); duvarda bekçinin tebeşir ipuçları.
+  var yeni = false, BOL = window.KuyuBolumler;
+  function yeniBest() { return save.yeniHikaye || (save.yeniHikaye = {}); }
+  function bestKayit() { return yeni ? yeniBest() : save.best; }
+  function startHikaye(n) {
+    istatBitir('terk');
+    dailyKey = null; weekKey = null; meydan = null;
+    mode = 'level'; yeni = true;
+    levelNo = Math.max(1, Math.min(BOL.sayi, Math.floor(n) || 1));
+    def = GEN.createBolum(levelNo);
+    deaths = 0;
+    $('ipucu').textContent = def.hint;
+    $('puan').hidden = true;
+    $('baslik').textContent = 'Yeni · ' + levelNo + '. ' + def.name;
+    levelBolge = def.bolge || 0;
+    reset();
+    MZ.sahne(BOLGELER[levelBolge].id);
+  }
+  function sonrakiBolum() { if (yeni) { if (levelNo < BOL.sayi) startHikaye(levelNo + 1); else goLevels(); } else startLevel(levelNo + 1); }
   // Yeni bir bölgeye ilk girişte oyunu durdurmayan kısa duyuru (bölge başına bir kez)
   function bolgeDuyur(bi, ek) {
     if (!save.bolgeler) save.bolgeler = {};
@@ -333,7 +354,7 @@
 
   function startEndless(daily, weekly, md) {
     istatBitir('terk');
-    mode = 'endless';
+    mode = 'endless'; yeni = false;
     meydan = md || null;
     dailyKey = daily && !meydan ? todayKey() : null;
     weekKey = weekly && !daily && !meydan ? haftaKey() : null;
@@ -377,7 +398,7 @@
   var hayaletKayit = null, hayaletIz = null;
   function hayaletAcik() { return save.hayalet !== false; }
   function hayaletYeri() {
-    if (mode === 'level') return { tur: 'bolum', n: levelNo };
+    if (mode === 'level') return { tur: 'bolum', n: yeni ? 'y' + levelNo : levelNo };
     return dailyKey ? { tur: 'gunluk', gun: dailyKey } : weekKey ? { tur: 'haftalik', hafta: weekKey } : { tur: 'sonsuz' };
   }
   function hayaletKur() {
@@ -451,7 +472,7 @@
   function notKur() {
     notAktif = null; notHalka = null;
     if (mode !== 'level' || !NOT) return;
-    var n = NOT.bolumde(levelNo), h = n && NOT.halka(def);
+    var n = !yeni && NOT.bolumde(levelNo), h = n && NOT.halka(def);
     if (!h || notBulundu(n.no)) return;
     notAktif = n;
     notHalka = sim.rings.find(function (r) { return r.ff && r.x === h[0] && r.y === h[1]; }) || null;
@@ -544,6 +565,8 @@
         floatText(e.x, e.y - 28, GG.ad.toUpperCase() + '!', 'rgb(' + GG.renk + ')', 17);
       }
       else if (e.type === 'gucBitti') tone(440, 0.15, 'sine', 0.04, 330);
+      else if (e.type === 'fener') { tone(659, 0.18, 'triangle', 0.06, 988); tone(988, 0.32, 'sine', 0.04); burst(e.x, e.y - 26, 20, '#ffd36a', 160, 0.7, -50); floatText(e.x, e.y - 46, 'fener yandı', '#ffd36a', 15); buzz([15, 30, 15]); }
+      else if (e.type === 'fenerDon') { floatText(e.x, e.y - 40, 'fenerden devam', '#ffd36a', 14); }
       else if (e.type === 'kalkan') { perde = Math.max(perde, 0.55); tone(523, 0.15, 'triangle', 0.06, 1047); burst(e.x, e.y, 22, 'rgb(127,214,255)', 220, 0.6, -40); floatText(e.x, e.y - 34, 'kalkan kurtardı!', 'rgb(127,214,255)', 15); buzz([20, 40, 20]); }
       else if (e.type === 'cekildi') burst(e.x, e.y, 4, COL.atesbocegi, 80, 0.25, 0);
       else if (e.type === 'zincirAdim') { tone(e.bozuk ? 440 : 523 + e.n * 110, 0.09, 'sine', 0.05); burst(e.x, e.y, 6, e.bozuk ? '#8fa09c' : '#ffd36a', 120, 0.35, -20); floatText(e.x + 14, e.y - 16, e.n + '/' + CFG.ZINCIR_N, e.bozuk ? '#8fa09c' : '#ffd36a', 12); }
@@ -636,6 +659,7 @@
     ctx.restore();
     ctx.save(); ctx.translate(0, cam - pc);
     for (var y2 = start; y2 < pc + vh + tileH; y2 += tileH) { var bi = bolgeY((y2 + tileH / 2) / pf); if (bi) drawDecor(bi, Math.round(y2 / tileH), y2, t); }
+    if (sim.def.yazilar) drawYazilar(vh, pf, pc);
     ctx.restore();
     drawKenarGolge(vh);
     // bölgenin ortam ışığı (taş kuyuda yok)
@@ -729,6 +753,34 @@
     }
   }
 
+  // Fener halkası (Hikâye kontrol noktası): halkanın üstünde asılı fener; tutununca yanar. Yanmamışken halka hafifçe davet eder.
+  function drawFener(r, t) {
+    var x = r.x, y = r.y - 32, yan = r.yandi, fl = reduceMotion ? 1 : 0.88 + 0.08 * Math.sin(t / 110 + r.x) + 0.04 * Math.sin(t / 37);
+    if (yan) parilti(x, y, 78 * fl, '255,190,110', 0.5);
+    ctx.strokeStyle = 'rgba(120,96,70,0.9)'; ctx.lineWidth = 1.2;
+    ctx.beginPath(); ctx.moveTo(x, r.y - 15); ctx.lineTo(x, y + 10); ctx.stroke();
+    ctx.fillStyle = '#2b2118'; ctx.fillRect(x - 7, y - 9, 14, 18); ctx.fillRect(x - 9, y - 12, 18, 3); ctx.fillRect(x - 9, y + 8, 18, 3);
+    ctx.fillStyle = yan ? 'rgba(255,214,150,' + (0.75 + 0.25 * fl).toFixed(3) + ')' : 'rgba(120,110,95,0.6)';
+    ctx.fillRect(x - 4.5, y - 6, 9, 12);
+    if (!yan) {
+      ctx.strokeStyle = 'rgba(255,214,150,' + (0.3 + 0.25 * Math.sin(t / 300)).toFixed(3) + ')'; ctx.lineWidth = 1.5;
+      ctx.beginPath(); ctx.arc(r.x, r.y, CFG.RING_R + 6, 0, Math.PI * 2); ctx.stroke();
+    }
+  }
+  // Duvar ipuçları (bekçinin tebeşiri): arka duvar katmanında; ekranın ortasına geldiğinde gerçek yerinde durur
+  function drawYazilar(vh, pf, pc) {
+    var L = sim.def.yazilar;
+    ctx.font = '600 12px "Figtree", system-ui, sans-serif'; ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+    for (var i = 0; i < L.length; i++) {
+      var yz = L[i], yp = yz.y - (yz.y - vh * 0.5) * (1 - pf), sc = yp - pc;
+      if (sc < -60 || sc > vh + 60) continue;
+      var lines = satirla(yz.m, 130);
+      ctx.save(); ctx.translate(yz.x, yp); ctx.rotate(-0.035);
+      ctx.fillStyle = 'rgba(236,229,210,0.62)';
+      for (var k = 0; k < lines.length; k++) ctx.fillText(lines[k], 0, (k - (lines.length - 1) / 2) * 15);
+      ctx.restore();
+    }
+  }
   function drawRing(x, y) {
     ctx.fillStyle = '#1b1310'; ctx.fillRect(x - 4, y - 14, 8, 6);
     ctx.lineWidth = 4; ctx.strokeStyle = COL.bakirKoyu;
@@ -1284,7 +1336,7 @@
   // İlk bölümde ekranın iki yarısını gösteren ipucu; birkaç tutunmadan sonra kaybolur.
   var hintAlpha = 0;
   function drawTouchHint(dt) {
-    var want = mode === 'level' && levelNo === 1 && !(save.best[1] && save.best[1].done) && sim.hooks < 4 && sim.status === 'play';
+    var want = mode === 'level' && levelNo === 1 && !(bestKayit()[1] && bestKayit()[1].done) && sim.hooks < 4 && sim.status === 'play';
     hintAlpha += ((want ? 1 : 0) - hintAlpha) * Math.min(1, dt * 4);
     if (hintAlpha < 0.02) return;
     var w = viewW, h = viewH;
@@ -1354,7 +1406,7 @@
     var vh = viewH / K;
     for (var i = 0; i < sim.rects.length; i++) drawRect(sim.rects[i]);
     sim.buttons.forEach(drawButton);
-    sim.rings.forEach(function (r) { if (r.y > cam - 30 - (r.sw ? CFG.SARKAC_L : 0) && r.y < cam + vh + 30) { if (r.kapi) { drawGate(r, t); return; } if (r.gecit || r.cikis) { drawPortal(r, t); return; } if (r.sw) drawSwingChain(r); drawRing(r.x, r.y); if (r.yay != null) drawSpringRing(r, t); if (r.ff && !r.got) { drawFireflyRing(r, t); if (r === notHalka && notAktif) drawNot(r, t); } if (r.hiz) drawSpeedRing(r, t); if (r.firlat) drawFirlatRing(r, t); } });
+    sim.rings.forEach(function (r) { if (r.y > cam - 30 - (r.sw ? CFG.SARKAC_L : 0) && r.y < cam + vh + 30) { if (r.kapi) { drawGate(r, t); return; } if (r.gecit || r.cikis) { drawPortal(r, t); return; } if (r.sw) drawSwingChain(r); drawRing(r.x, r.y); if (r.yay != null) drawSpringRing(r, t); if (r.ff && !r.got) { drawFireflyRing(r, t); if (r === notHalka && notAktif) drawNot(r, t); } if (r.hiz) drawSpeedRing(r, t); if (r.firlat) drawFirlatRing(r, t); if (r.fener) drawFener(r, t); } });
     sim.fireflies.forEach(function (f) { if (f.y > cam - 20 && f.y < cam + vh + 20) drawFirefly(f, t); });
     sim.boxes.forEach(drawBox);
     drawHayalet(t);
@@ -1432,7 +1484,7 @@
   // kulede fener yeniden yanar. Dokunmak geçer. Sahne bir kez oynar; metni Çıra'nın yolu'nda kalır.
   var FINAL = { 16: 0, 36: 1, 56: 2, 76: 3 }, FINAL_SURE = 7.5, finalCalan = {};
   function finalGoruldu(bi) { return !!(save.finaller && save.finaller[BOLGELER[bi].id]); }
-  function finalBekliyor() { return mode === 'level' && FINAL[levelNo] != null && !finalGoruldu(FINAL[levelNo]); }
+  function finalBekliyor() { return mode === 'level' && !yeni && FINAL[levelNo] != null && !finalGoruldu(FINAL[levelNo]); }
   function finalBasla() { finalBi = FINAL[levelNo]; finalT = 0; finalCalan = {}; MZ.kis(true); }
   function finalBitir() {
     if (finalT === null) return;
@@ -1590,7 +1642,10 @@
       if (finalT !== null) { finalT += dt; finalSes(); if (finalT > FINAL_SURE) finalBitir(); }
     } else if (sim.status === 'dead' && deadT !== null) {
       deadT += dt;
-      if (mode === 'level' && deadT > 0.75) { istatBitir('olum'); deaths++; reset(); }
+      if (mode === 'level' && deadT > 0.75) {
+        if (sim.def.fenerli && E.fenerDon(sim)) { deaths++; deadT = null; acc = 0; perde = 1; trail = []; bekleyen = null; } // son yanan fenerden
+        else { istatBitir('olum'); deaths++; reset(); }
+      }
       else if (mode === 'endless' && deadT > 0.6 && !resultShown && !devamDurum) { if (devamUygun()) devamTeklif(); else showEndlessResult(); }
     }
     handleEvents();
@@ -1690,8 +1745,8 @@
     var ff = E.fireflyCount(sim), ffT = sim.fireflies.length, time = sim.t;
     // Kusursuz: boş atışlar (o tarafta hedef yokken basmak) sayılmaz; kurtarma kancası sayılır.
     var shots = sim.shots - sim.misses;
-    var perfect = shots <= def.par, flow = sim.maxCombo >= def.flow;
-    var b = save.best[levelNo] || {};
+    var perfect = shots <= def.par && !sim.donus, flow = sim.maxCombo >= def.flow; // Kusursuz: fenere dönmeden
+    var b = bestKayit()[levelNo] || {};
     // Ödül: temel (bölüm + ateşböceği + madalyalar) × çarpan (hız + ustalık)
     var base = 100 + 25 * ff + (perfect ? 50 : 0) + (flow ? 50 : 0) + (sim.tamKova ? 50 : 0); // TAM kova +50
     var mult = E.speedMult(sim), reward = Math.round(base * mult);
@@ -1701,24 +1756,24 @@
     var newFF = ff > (b.ff || 0) && ff >= ffT && ffT > 0, newPerfect = perfect && !b.perfect, newFlow = flow && !b.flow;
     var recTime = !first && time < (b.time || Infinity), recReward = !first && reward > (b.reward || 0), recSpeed = !first && speed > (b.speed || 0) + 0.05;
     if (HY && (first || recTime || !b.time)) HY.sakla(hayaletYeri(), hayaletKayit, time); // en kısa süreli koşu hayalet olur
-    save.best[levelNo] = {
+    bestKayit()[levelNo] = {
       ff: Math.max(b.ff || 0, ff), time: b.time ? Math.min(b.time, time) : time,
       perfect: !!(b.perfect || perfect), flow: !!(b.flow || flow), done: true,
       reward: Math.max(b.reward || 0, reward), speed: Math.max(b.speed || 0, speed)
     };
     noteStats(speed, reward);
-    if (levelNo + 1 > save.maxLevel) save.maxLevel = levelNo + 1;
+    if (!yeni && levelNo + 1 > save.maxLevel) save.maxLevel = levelNo + 1;
     persist();
     var odenen = EKO.bolumOde(save, b.ff || 0, Math.max(b.ff || 0, ff)); // yalnızca ilk kez alınan ateşböcekleri
     var kaz = recordRun({ mode: 'level', won: true, ff: ff, boosts: sim.boosts, gates: sim.gates, maxCombo: sim.maxCombo, speed: speed, perfect: perfect });
     $('kart').className = 'kart sonuc';
     $('kart').innerHTML =
-      '<div class="sonuc-bas"><h2>Gün ışığı!</h2><span>' + levelNo + '. ' + def.name + (first ? ' · ilk kez geçildi' : deaths ? ' · ' + (deaths + 1) + '. deneme' : '') + '</span></div>' +
+      '<div class="sonuc-bas"><h2>Gün ışığı!</h2><span>' + (yeni ? 'Yeni · ' : '') + levelNo + '. ' + def.name + (first ? ' · ilk kez geçildi' : deaths ? ' · ' + (deaths + 1) + '. deneme' : '') + '</span></div>' +
       '<div class="odul-satir"><i class="ikon-odul" aria-hidden="true"></i><b id="odulSayi">0</b>' + (recReward ? '<em class="rekor-etiket">REKOR</em>' : '') + '</div>' +
       '<p class="odul-hesap">' + (mult > 1 ? base + ' × x' + fmt(mult, 2) + ' çarpan' + (E.ustalikPay(sim) > 0 ? ' (hız x' + fmt(E.hizPay(sim), 2) + ' + ustalık ' + fmt(E.ustalikPay(sim), 2) + ')' : '') : 'Bölüm ödülü · hızlanırsan ve TAM bırakırsan çarpan artar') + '</p>' +
       '<div class="madalyalar">' +
       medal(ffT > 0 && ff >= ffT, ICON.ff, 'Ateşböceği', ff + '/' + ffT, newFF, 0) +
-      medal(perfect, ICON.perfect, 'Kusursuz', shots + '/' + def.par + ' atış', newPerfect, 1) +
+      medal(perfect, ICON.perfect, 'Kusursuz', sim.donus ? sim.donus + ' kez fenere döndün' : shots + '/' + def.par + ' atış', newPerfect, 1) +
       medal(flow, ICON.flow, 'Akış', 'x' + sim.maxCombo + ' · hedef x' + def.flow, newFlow, 2) +
       '</div>' +
       '<div class="istatistik">' +
@@ -1728,12 +1783,12 @@
       (sim.tamKova ? stat(IK.tam, 'TAM kova +50', 'kovaya akışla ve TAM bırakışla girdin, ödüle 50 eklendi', false) : '') +
       '</div>' + kazanimHtml(kaz, odenen) +
       dolapKisaYol(cuzdanOnce) +
-      '<button type="button" class="ana buyuk genis" id="sonrakiBtn">Bölüm ' + (levelNo + 1) + ' ›</button>' +
+      '<button type="button" class="ana buyuk genis" id="sonrakiBtn">' + (yeni && levelNo >= BOL.sayi ? 'Hikâye ›' : 'Bölüm ' + (levelNo + 1) + ' ›') + '</button>' +
       '<div class="dur-iki"><button type="button" id="tekrarBtn">Tekrar</button><button type="button" id="bolumlerDonBtn">Bölümler</button></div>';
     showSheet();
     countUp($('odulSayi'), reward);
     $('tekrarBtn').onclick = function () { reset(); };
-    $('sonrakiBtn').onclick = function () { startLevel(levelNo + 1); };
+    $('sonrakiBtn').onclick = function () { sonrakiBolum(); };
     dolapKisaBagla();
     $('bolumlerDonBtn').onclick = function () { goLevels(); };
     $('sonrakiBtn').focus({ preventScroll: true });
@@ -1942,7 +1997,7 @@
   // kalanı sonraki bölümlerde gelir. 7. bölümde yay, sarkaç ve şerit birlikte ilk kez çıkıyordu (art arda 3 kart).
   // Acil kartlar (boş atış, kurtarma, su, akış, el yorulması) sınırsız.
   var OGE_KARTLARI = ['ff', 'hiz', 'ahsap', 'kutu', 'kapi', 'yay', 'gecit', 'sarkac', 'firlat', 'zincir'], introOgeSayisi = 0;
-  function ogeSiniri() { return !(mode === 'level' && levelNo <= HAND.length) && introOgeSayisi >= 1; }
+  function ogeSiniri() { return !(mode === 'level' && (yeni || levelNo <= HAND.length)) && introOgeSayisi >= 1; }
   function maybeIntro() {
     if (introOpen || pauseOpen || sim.t < 0.6) return;
     // ekranda ilk kez görünenler
@@ -2033,7 +2088,7 @@
   };
   $('devamBtn').onclick = resumeGame;
   $('bastanBtn').onclick = function () { closePause(); reset(); };
-  $('dAtlaBtn').onclick = function () { closePause(); if (mode === 'level') { istatBitir('atla'); startLevel(levelNo + 1); } };
+  $('dAtlaBtn').onclick = function () { closePause(); if (mode === 'level') { istatBitir('atla'); sonrakiBolum(); } };
   $('anaMenuBtn').onclick = function () { goHome(); };
   $('dSesBtn').onclick = function () { save.mute = !save.mute; persist(); setMuteIcon(); syncPauseToggles(); };
   $('dMuzikBtn').onclick = function () { muzikDegis(); syncPauseToggles(); };
@@ -2102,7 +2157,7 @@
     if (paused) return;
     if (e.key === 'r' || e.key === 'R') reset();
     else if (e.key === 'Escape' || e.key === 'p' || e.key === 'P') { if (sim && sim.status === 'play') pauseGame(); else goHome(); }
-    else if (e.key === 'Enter' && !$('katman').hidden) { if (mode === 'level') startLevel(levelNo + 1); else reset(); }
+    else if (e.key === 'Enter' && !$('katman').hidden) { if (mode === 'level') sonrakiBolum(); else reset(); }
   });
   var rt = null;
   window.addEventListener('resize', function () { clearTimeout(rt); rt = setTimeout(layout, 80); });
@@ -2113,6 +2168,7 @@
   // Ekran yöneticisinin kullandığı arayüz
   window.KuyuGame = {
     startLevel: function (n) { ac(); startLevel(n); },
+    startHikaye: function (n) { ac(); startHikaye(n); },
     startEndless: function () { ac(); startEndless(false); },
     startDaily: function () { ac(); startEndless(true); },
     startWeekly: function () { ac(); startEndless(false, true); },
