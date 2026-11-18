@@ -1,6 +1,6 @@
 # Kuyu
 
-**Funday Morning Games** · 2D mobil oyun · prototip v0.56
+**Funday Morning Games** · 2D mobil oyun · prototip v0.57
 
 Derin bir kuyunun dibindesin. Telefonu tek elle tut: ekranın soluna ya da sağına dokun, kanca o taraftaki hedefe fırlasın; basılı tut, ipe sarıl; bırak, savrul. Halkadan halkaya, ahşaptan ahşaba tırmanıp kuyudan çık.
 
@@ -159,6 +159,9 @@ v0.42'deki itişler ve v0.44'teki fırlatma yolu uçuşları uzattı; havadayken
 - **Değdiğin halka engel değil:** Çıra'nın içinden geçtiği halka kancayı ve nişanı engellemez.
 
 Sonuç: havada basan oyuncuda aşağı atış %0,4–0,6, bölümler 60/60; nişan testinde kurala aykırı 0, bütün tarzlarda 80/80. Ortalama tempo aynı (1:17). Spam de aşağıya atılmadığı için Sonsuz'da ~1,1'den ~2,2 km'ye çıktı (düşünen 16 km).
+
+**Geç basma payı (v0.57, "geriye kanca" geri bildirimi):** İpi bırakıp havadayken tepe noktasını geçince yukarıdaki halka menzilden (300) birkaç birim taşıyordu ve kanca az önce bırakılan halkaya ya da altına (geriye) gidiyordu. Artık havada, bırakılan halkanın hâlâ üstündeyken ve düşüş henüz hızlanmamışken (`GEC_VY` 450 birim/sn, tepe noktasının ~0,3 sn ardı) bastığın taraftaki dik yukarı hedef menzilin `GEC_EK` (70) kadar ötesindeyse kanca ona uzanır (`engine.js` → `gecHedef`). Daha derine düştüysen eski davranış: yakındaki halka kurtarır (uzun ipin sarkacı suya indirmesin). Kanca hızı ve ip çekme hızı aynı.
+Ölçüm `node tools/geri.js` (insan gibi bırakıştan 0,05–0,75 sn sonra basan oyuncu, 16 koşu): geriye kanca %5,8 → %4,1, boş atış %7,1 → %6,0. `hata.js` 24 koşu: akış oyuncusu %5 hatada 2:02 → 3:11, %10 hatada 1:06 → 1:23; temkinli aynı. Nişan kurala aykırı 0, tek taraf 0/74.
 
 ## Fırlatma yolu (v0.44)
 **v0.46:** ateşböceği yalnız akışla alınır (zincir x2+ ya da pencere içinde erken bırakıp havadayken); akış yokken halka sönük görünür. Sonsuz Kuyu'da da var: her ~10 düğümde bir denenir, çevredeki halkalarla küçük bir motor sahnesinde doğrulanır (`gen.js` → `dalMini`); 8 tohumda 2 km'de ~11 ayrım. `tools/bot.js` Sonsuz'da 1500 m'ye kadar her ayrımı iki yönden denetler.

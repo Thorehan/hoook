@@ -133,6 +133,7 @@ Kullanıcı hikâyeye online'dan önce geçti; online (5) sonra.
 - [?] Bekçinin adı.
 
 ## Yapılanlar
+- 2026-11-19 · v0.57 · Geç basma payı (Mustafa'nın "geriye kanca" geri bildirimi): havada tepe noktasının hemen ardında yukarı hedef menzilin 70 birim ötesine kadar alınır; geriye kanca %5,8 → %4,1, boş atış %7,1 → %6,0, akış oyuncusu daha geç yanıyor. Ölçüm aracı `tools/geri.js`.
 - 2026-11-18 · v0.56 · Görsel akıcılık (İstişare 2, adım 5): kamera ileri bakışı + kritik sönümlü yay, arka duvar paralaksı (0,88), iki katman toz, kenar gölgesi, kor ışığı, su ikinci dalga + pırıltı + kabarcık + yansıma, perde geçişleri, ekranlar arası yumuşak geçiş. Yalnız çizim.
 - 2026-11-11 · v0.55 · Meydan okuma ve online hazırlığı (Mustafa): paylaşılan bağlantıyla aynı kuyuda puan karşılaştırma; skor tablosu istemcisi (kapalı, Supabase biçimi), yerel sahte sunucu ve test; yedek kodu; koleksiyon sayacı ve başarımı; pazar araştırması belgesi.
 - 2026-11-11 · v0.54 · Haftalık Kuyu ve lig (Mustafa): haftalık sabit tohum, devam hakkı yok, su erken sıkışır (26 → 18 m, 800 m'de); beş lig kademesi kendi en iyi puanına göre, ödül hafta bitince; ana menüde şerit, `?mod=haftalik`.

@@ -50,6 +50,7 @@ Kod: `js/engine.js` (deterministik fizik ve kurallar, DT 1/120), `js/gen.js` (b�
   - `node tools/oyuncu.js`
   - `node tools/spam.js`
   - `node tools/hata.js 6`
+  - `node tools/geri.js 16` (geriye kanca: v0.57'de %4,1; artmamalı) ve Hikâye bölümleri için `node tools/hikaye-olcum.js`
   - ekonomi ölçümü: `node tools/ekonomi-olcum.js` (ortalama oyuncu günde ~119 ateşböceği; v0.53'ten beri hata yapan oyuncularla ölçülür)
   - zorluk eğrisi: `node tools/denge.js` (bölümlerde geçme oranı bölgeyle düşmeli, hatasız oyuncu geçmeli)
   - birim testleri: `node tools/ekonomi-test.js`, `node tools/gorev-test.js`, `node tools/hayalet-test.js`, `node tools/istatistik-test.js`, `node tools/online-test.js`

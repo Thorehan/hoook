@@ -55,6 +55,9 @@
     BEKLE_VY: 150,      // nişan beklemesi: bundan hızlı yükselirken...
     BEKLE_EK: 110,      // ...yukarı hedef menzilin en çok bu kadar ötesindeyse kanca hemen aşağıya atılmaz
     BEKLE_SN: 0.35,     // en çok bu kadar beklenir; hedef menzile girmezse aşağıdakine atılır
+    GEC_VY: 450,        // geç basma payı yalnız düşüş bu hızı geçmeden (tepe noktasının ~0,3 sn ardı)
+    GEC_EK: 70,         // geç basma payı (v0.57): havada yukarı hedef menzilin bu kadar ötesindeyse ve kanca aksi hâlde geriye/boşa
+                        // gidecekse kanca ona uzanır (tepe noktasını geçip düşmeye başlayan insan oyuncu geriye atılmasın)
     USTALIK_TAM: 0.05,  // çarpanın ustalık payı: her TAM bırakış...
     USTALIK_MAX: 0.5,   // ...en çok bu kadar (hız payıyla birlikte en çok x2,00)
     ZINCIR_N: 3,        // ateşböceği zinciri: sıralı bu kadar ateşböceği...
@@ -370,8 +373,9 @@
     var r = aimTemel(s, f, tapX, tapY);
     if (r.rescue || !(r.tier === 2 || r.miss)) return r; // yalnızca aşağıdaki hedef ya da boş atış yerine beklenir (yan halka geçerli)
     var p = s.p, vy = (p.y - p.py) / CFG.DT;
-    if ((s.rope && s.rope.kind === 'anchor') || vy > -CFG.BEKLE_VY) return r;
+    if (s.rope && s.rope.kind === 'anchor') return r;
     var side = f < 0.5 ? -1 : 1, ignore = currentIgnore(s), yakin = yakinHalkalar(s), en = null;
+    if (vy > -CFG.BEKLE_VY) { var u0 = gecHedef(s, side, ignore, yakin); return u0 || r; }
     var list = candidates(s, CFG.HOOK_MAX + CFG.BEKLE_EK);
     // bekleme sonunda (ya da tepe noktasında) varılacak yer: yukarı hedef oradan menzile girecekse beklenir
     var vx = (p.x - p.px) / CFG.DT, tb = Math.min(CFG.BEKLE_SN, -vy / CFG.G);
@@ -387,7 +391,25 @@
       if (!en || c.d < en.d) en = c;
     }
     if (en) r.bekle = { x: en.x, y: en.y, kind: en.kind, ref: en.ref };
+    else { var u1 = gecHedef(s, side, ignore, yakin); if (u1) return u1; }
     return r;
+  }
+  // Geç basma payı: bu taraftaki dik yukarı hedef menzilin GEC_EK kadar ötesinde ve kanca hattı açıksa ona uzanılır
+  function gecHedef(s, side, ignore, yakin) {
+    // yalnız az önce bıraktığın halkanın hâlâ üstündeyken: daha aşağı düştüysen yakındaki halka kurtarır (uzun ipin sarkacı suya indirmesin)
+    if (!s.lastAnchor || s.p.y >= s.lastAnchor.y + 30) return null;
+    if ((s.p.y - s.p.py) / CFG.DT > CFG.GEC_VY) return null; // yalnız tepe noktasının hemen ardında (düşüş hızlanmadan)
+    var p = s.p, list = candidates(s, CFG.HOOK_MAX + CFG.GEC_EK), en = null, slope = Math.tan(CFG.UP_ANGLE * Math.PI / 180);
+    for (var i = 0; i < list.length; i++) {
+      var c = list[i], dx = c.x - p.x, rise = p.y - c.y;
+      if (c.ref === ignore || c.d <= CFG.HOOK_MAX - 4 || c.kind === 'box') continue;
+      if (!(side < 0 ? dx <= CFG.NEAR_V : dx >= -CFG.NEAR_V)) continue;
+      if (rise < CFG.UP_RISE || rise < Math.abs(dx) * slope) continue;           // yalnızca dik yukarıdaki
+      var d = c.d, hit = hookRay(s, p.x, p.y, p.x + dx / d * (d + 6), p.y + (c.y - p.y) / d * (d + 6), ignore, yakin);
+      if (!hit || (hit.ring || hit.rect || hit.box || (hit.kind === 'goal' ? 'goal' : null)) !== c.ref) continue;
+      if (!en || c.d < en.d) en = c;
+    }
+    return en ? { x: en.x, y: en.y, kind: en.kind, ref: en.ref, tier: 0, assisted: true, gec: true } : null;
   }
 
   function aimTemel(s, f, tapX, tapY) {
@@ -464,7 +486,7 @@
     s.pressed = true;
     // Tutunduğun ya da az önce bıraktığın noktaya yeni atış takılmasın (zincirlerken ipin yolu üstünde kalır).
     var ignore = currentIgnore(s);
-    var keep = !!(opts && opts.keep);
+    var keep = !!(opts && opts.keep), havada = !(s.rope && s.rope.kind === 'anchor');
     // Boş atış (bu tarafta hedef yok): kanca gidip döner, tutunduğun ip bırakılmaz.
     if (s.rope && !keep) detach(s, 'repress');
     var dx = tx - s.p.x, dy = ty - s.p.y, d = Math.sqrt(dx * dx + dy * dy);
@@ -479,7 +501,7 @@
       if (s.def.bosKilit) s.kilitSon = s.t + s.def.bosKilit; // Sonsuz: boş atıştan sonra kısa kilit (spam düşüşü birikir)
     }
     s.hook = { x: s.p.x, y: s.p.y, ox: s.p.x, oy: s.p.y, dx: dx / d, dy: dy / d, state: 'fly', ignore: ignore,
-      max: rescue ? CFG.RESCUE_MAX : CFG.HOOK_MAX, rescue: rescue, keep: keep, yakin: yakinHalkalar(s) };
+      max: rescue ? CFG.RESCUE_MAX : (havada && !keep && d > CFG.HOOK_MAX - 4 && ty < s.p.y - CFG.UP_RISE ? Math.min(d + 12, CFG.HOOK_MAX + CFG.GEC_EK) : CFG.HOOK_MAX), rescue: rescue, keep: keep, yakin: yakinHalkalar(s) };
     s.shots++;
     if (keep) s.misses++;
     if (rescue) { s.rescues++; if (s.combo > 0) breakCombo(s, 'kurtarma'); }
