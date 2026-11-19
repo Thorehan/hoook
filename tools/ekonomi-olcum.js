@@ -3,7 +3,8 @@
 // v0.53'ten beri oyuncular HATA YAPAR (tools/hata.js ve tools/denge.js ile aynı model): eski ölçüm hatasız ve yavaş bir
 // botla Sonsuz'u saatte 121 ateşböceği sayıyordu; gerçekte koşular suya yakalanarak biter ve kazanç bunun iki katıdır.
 // Bölümler: yalnızca ilk kez alınan ateşböceği ödenir; yanınca bölüm yeniden denenir. Sonsuz: toplanan her ateşböceği.
-// Tipik gün: 10 dk Sonsuz + 10 dk bölüm + 3 görev + günlük giriş (+ varsa Haftalık Kuyu ödülünün günlük payı).
+// Tipik gün (v0.64): 10 dk bölüm + 3 Günlük Kuyu denemesi (+ günün hedefi yıldızları) + haftada 5 Haftalık denemesinin günlük payı
+// + 3 görev + günlük giriş + lig ödülünün ve seri ödülünün günlük payı. Serbest Sonsuz kalktı.
 const E = require('../js/engine.js');
 const G = require('../js/gen.js');
 const EKO = require('../js/ekonomi.js');
@@ -54,12 +55,19 @@ const haftalikPay = puan => { if (!EKO.ligOdul) return 0; return EKO.ligOdul(pua
 const fiyatlar = EKO.KATALOG.filter(i => i.fiyat > 0).map(i => i.fiyat).sort((a, b) => a - b);
 const dolapToplam = fiyatlar.reduce((a, b) => a + b, 0);
 const basarimToplam = GOREV.ACH.length * EKO.BASARIM_ATES.reduce((a, b) => a + b, 0);
-const N = 10, gunler = [];
+// Yarışma koşusu en çok 200 sn sayılır: insan koşusu 1–3 dk sürer (model çok daha uzun yaşar); 3 Günlük denemesi ~10 dk eder,
+// v0.63'teki "10 dk Sonsuz" ile karşılaştırılabilir.
+const N = 10, gunler = [], KOSU_SN = 200;
 for (const [ad, tarz, p, ates] of PROFIL) {
-  // Sonsuz: N koşu; koşu arası 10 sn (sonuç kartı)
-  let sff = 0, ssn = 0, sm = 0, puan = [];
-  for (let sd = 1; sd <= N; sd++) { const s = oyna(G.createEndless(sd * 13), tarz, p, sd, 900, ates); sff += E.fireflyCount(s); ssn += s.t + 10; sm += E.meters(s); }
-  if (G.createHaftalik) for (let sd = 1; sd <= N; sd++) puan.push(E.finalScore(oyna(G.createHaftalik(sd * 7), tarz, p, sd, 900, false)));
+  // Günlük Kuyu (v0.64: serbest Sonsuz kalktı): günde 3 deneme (createEndless + günün kuralı); Haftalık: haftada 5 deneme
+  let gff = 0, gm = 0, yildiz = 0, puan = [], hff = 0;
+  for (let sd = 1; sd <= N; sd++) {
+    const key = '2026-11-' + String(10 + sd).padStart(2, '0'), kural = G.gunKurali(key);
+    let enM = 0;
+    for (let d = 0; d < EKO.HAK.gunluk; d++) { const s = oyna(G.createEndless(sd * 13 + d * 101, kural), tarz, p, sd * 7 + d, KOSU_SN, ates); gff += E.fireflyCount(s); enM = Math.max(enM, E.meters(s)); }
+    gm += enM; const y = EKO.yildizSay(key, enM); yildiz += EKO.YILDIZ_ODUL.slice(0, y).reduce((a, b) => a + b, 0);
+  }
+  if (G.createHaftalik) for (let sd = 1; sd <= 4; sd++) { let en = 0; for (let d = 0; d < EKO.HAK.haftalik; d++) { const s = oyna(G.createHaftalik(sd * 7), tarz, p, sd * 11 + d, KOSU_SN, false); hff += E.fireflyCount(s); en = Math.max(en, E.finalScore(s)); } puan.push(en); }
   puan.sort((a, b) => a - b);
   // Hikâye bölümleri 7–18 (v0.62, tarifli uzun bölümler, fenerden devam): ilk geçişe kadar yeniden dene (en çok 3); deneme arası 6 sn, sonuç kartı 6 sn
   let lff = 0, lsn = 0, den = 0, gecilen = 0;
@@ -70,14 +78,16 @@ for (const [ad, tarz, p, ates] of PROFIL) {
       if (s.status === 'won') { lff += best; lsn += 6; gecilen++; break; }
     }
   }
-  const sonsuzSaat = sff / (ssn / 3600), bolumSaat = lff / (lsn / 3600);
+  const bolumSaat = lff / (lsn / 3600), gunlukGun = gff / N, yildizGun = yildiz / N, haftalikKosu = hff / (4 * 7);
   const haftalik = puan.length ? haftalikPay(puan[puan.length >> 1]) : 0;
-  const gun = Math.round(sonsuzSaat / 6 + bolumSaat / 6 + gorev + giris + haftalik);
+  // seri ödülü: her gün oynayan için 30 günde 20+50+100+200 (yarısı sayılır: seri ara ara kopar)
+  const seri = Object.values(EKO.SERI_ODUL).reduce((a, b) => a + b, 0) / 30 / 2;
+  const gun = Math.round(bolumSaat / 6 + gunlukGun + yildizGun + haftalikKosu + gorev + giris + haftalik + seri);
   gunler.push(gun);
   console.log(`[${ad}]`);
-  console.log(`  sonsuz:   koşu başına ${(sff / N).toFixed(1)} ateşböceği (${Math.round(sm / N)} m, ${Math.round(ssn / N - 10)} sn) → saatte ${Math.round(sonsuzSaat)}`);
+  console.log(`  günlük:   3 denemede ${gunlukGun.toFixed(1)} ateşböceği, en iyi ${Math.round(gm / N)} m, günün hedefi ${yildizGun.toFixed(1)} · haftalık koşu payı ${haftalikKosu.toFixed(1)} · seri payı ${seri.toFixed(1)}`);
   console.log(`  bölümler: 7–18 arası ${gecilen}/12 bölüm, ${lff} ateşböceği, ${den} deneme, ${Math.round(lsn / 60)} dk → saatte ${Math.round(bolumSaat)}`);
-  console.log(`  tipik gün (10 dk sonsuz + 10 dk bölüm, 3 görev ${gorev}, giriş ort. ${giris.toFixed(0)}${haftalik ? ', haftalık lig payı ' + haftalik.toFixed(0) : ''}): ~${gun} ateşböceği, videolarla ~${gun + gorev + Math.round(giris)}`);
+  console.log(`  tipik gün (10 dk bölüm + 3 Günlük + 5/7 Haftalık koşu, 3 görev ${gorev}, giriş ort. ${giris.toFixed(0)}${haftalik ? ', haftalık lig payı ' + haftalik.toFixed(0) : ''}): ~${gun} ateşböceği, videolarla ~${gun + gorev + Math.round(giris)}`);
   console.log(`  Dolap ${Math.ceil(Math.max(0, dolapToplam - basarimToplam) / gun)} günde biter (başarımların ${basarimToplam} ateşböceği düşülerek); ışık yolu ${EKO.ISIK.length - 1}. seviye ${Math.ceil(EKO.ISIK[EKO.ISIK.length - 1] / gun)} günde`);
 }
 console.log(`Dolap: ${fiyatlar.length} satılık ürün (en ucuz ${fiyatlar[0]}, en pahalı ${fiyatlar[fiyatlar.length - 1]}, hepsi ${dolapToplam}) + ${EKO.KATALOG.filter(i => i.isik).length} ışık ödülü; başarımlar bir kez ${basarimToplam}`);

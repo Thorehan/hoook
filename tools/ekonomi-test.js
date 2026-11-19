@@ -61,11 +61,11 @@ hk = K.haftalikKaydet(hf, '2026-11-09', 1200, 500);
 ok(!hk.rekor && !hk.ligAtladi && K.haftalikDurum(hf, '2026-11-09').best === 2400 && K.haftalikDurum(hf, '2026-11-09').tries === 2, 'kötü koşu en iyiyi düşürmez');
 ok(K.haftalikKapat(hf, '2026-11-09') === null, 'hafta sürerken ödeme yok');
 const od = K.haftalikKapat(hf, '2026-11-16');
-ok(od && od.ligAd === 'Gümüş' && od.odul === 30 && hf.cuzdan.ates === 30, 'yeni haftada geçen haftanın ödülü');
-ok(K.haftalikKapat(hf, '2026-11-16') === null && hf.cuzdan.ates === 30, 'ödül bir kez');
+ok(od && od.ligAd === 'Gümüş' && od.odul === 50 && hf.cuzdan.ates === 50, 'yeni haftada geçen haftanın ödülü');
+ok(K.haftalikKapat(hf, '2026-11-16') === null && hf.cuzdan.ates === 50, 'ödül bir kez');
 ok(K.haftalikDurum(hf, '2026-11-16').best === 0 && K.haftalikDurum(hf, '2026-11-16').lig === -1, 'yeni hafta sıfırdan');
 K.haftalikKaydet(hf, '2026-11-16', 100, 40);
-ok(K.haftalikKapat(hf, '2026-11-23') === null && hf.cuzdan.ates === 30, 'ligsiz hafta ödül vermez');
+ok(K.haftalikKapat(hf, '2026-11-23') === null && hf.cuzdan.ates === 50, 'ligsiz hafta ödül vermez');
 // devam hakkı (v0.49): 25 / 50 / 100, en çok 3, yetmezse ödenmez
 const dv = {}; K.ensure(dv); dv.cuzdan.ates = 100;
 ok(K.devamBedel(0) === 25 && K.devamBedel(1) === 50 && K.devamBedel(2) === 100 && K.devamBedel(3) == null, 'devam bedelleri');
@@ -74,5 +74,18 @@ ok(K.devamOde(dv, 1) && dv.cuzdan.ates === 25, '2. devam 50');
 ok(!K.devamOde(dv, 2) && dv.cuzdan.ates === 25, '3. devam yetmezse ödenmez');
 ok(!K.devamOde(dv, 3), '4. devam yok');
 ok(dv.cuzdan.harcanan === 75, 'harcanan sayılır');
-console.log(bad ? bad + ' hata' : 'Tamam: cüzdan, günlük giriş, dolap, devam');
+// v0.64: deneme hakları (3/gün), video ile artan yenileme (1..5 video), günün hedefi yıldızları
+{
+  const hs = {}; K.ensure(hs);
+  for (let i = 0; i < 3; i++) ok(K.hakKullan(hs, 'gunluk', 'G'), 'üç hak');
+  ok(!K.hakKullan(hs, 'gunluk', 'G'), 'dördüncü deneme yok');
+  ok(K.hakVideo(hs, 'gunluk', 'G').yenilendi && K.hakDurum(hs, 'gunluk', 'G').kalan === 1, '1. yenileme 1 video');
+  ok(!K.hakVideo(hs, 'gunluk', 'G').yenilendi && K.hakVideo(hs, 'gunluk', 'G').yenilendi, '2. yenileme 2 video');
+  let v = 0; while (K.hakVideo(hs, 'gunluk', 'G')) v++;
+  ok(v === 12 && K.hakDurum(hs, 'gunluk', 'G').son && K.hakVideo(hs, 'gunluk', 'G') === null, 'en çok 5 yenileme (toplam 15 video)');
+  ok(K.hakDurum(hs, 'gunluk', 'H').kalan === 3, 'yeni gün yeni haklar');
+  const g = K.gunHedef('X');
+  ok(K.gunYildizKaydet(hs, 'X', g.metre * 2).yildiz === 3 && K.gunYildizKaydet(hs, 'X', g.metre * 2).odul === 0, 'yıldız ödülü bir kez');
+}
+console.log(bad ? bad + ' hata' : 'Tamam: cüzdan, günlük giriş, dolap, lig, haklar ve günün hedefi');
 process.exit(bad ? 1 : 0);

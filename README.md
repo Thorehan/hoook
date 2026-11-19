@@ -22,7 +22,7 @@ Pofi ile aynı akış:
 3. **Tanıtım:** "Funday Morning sunar", ardından kahraman dipten kanca atıp halkaya çekilir ve gün ışığına fırlar; "Kuyu" yazısı belirir. Dokununca geçilir.
 4. **Ana menü (v0.9):** Arka planda kuyunun içinde ipte sallanan kahraman ve ateşböcekleri. Üstte profil (avatar ve ad), toplam ödül puanı ve ateşböceği. Başparmak bölgesinde görev şeridi (v0.24: "Görevler 1/3", ilerleme çubukları, tamamlanmaya en yakın görev ya da "Ödül hazır"; dokununca Görevler), Hikâye kartı (kalınan bölümün adı ve hedefleri) ve Günlük Kuyu kartı (günün en iyisi ve seri). En altta gezinme çubuğu: Ana sayfa, Hikâye, Görevler, Dolap, Ayarlar (Profil: üstteki "Merhaba" düğmesi). Ayarlar: müzik ve ses efektleri (v0.32), büyük yazı (v0.27), oyun istatistikleri (v0.28), titreşim, tam ekran, oyuncu adı, nasıl oynanır, tanıtımı yeniden izle.
 
-5. **Dokun ve başla (v0.51, İstişare 2):** Ana menünün ortası tek büyük dokunma alanıdır; kuyunun boş yerine dokununca **Sonsuz Kuyu** başlar (ana mod). Altta nabız gibi atan "Başlamak için dokun" ve en iyi metre. 1. bölüm geçilene dek dokunuş öğretici **İlk Halka**'yı açar ("İlk Halka · Çıra'nın yolu başlıyor"). Bölümler artık **Hikâye** adıyla alt sekmede ve ana menüdeki küçük kartta; Sonsuz Kuyu kartı kalktı. Sahnedeki Çıra yazının üstünde sallanır.
+5. **Dokun ve başla (v0.64):** Ana menünün ortası tek büyük dokunma alanıdır; dokununca **Hikâye kaldığı yerden** (geçilmemiş ilk bölüm) başlar. Altında bölüm, ad, bölge ve bölgedeki ilerleme ("14. bölüm · Fırlatma Yolu / Kristal Mağara · 1/6") ve hedef noktaları yazar; 48 bölüm bitince Hikâye ekranını açar. Altta Günlük ve Haftalık Kuyu kartları (kural, günün hedefi ve yıldızlar, lig, kalan deneme). (v0.51–v0.63: dokununca Sonsuz Kuyu başlıyordu.) Altta nabız gibi atan "Başlamak için dokun" ve en iyi metre. 1. bölüm geçilene dek dokunuş öğretici **İlk Halka**'yı açar ("İlk Halka · Çıra'nın yolu başlıyor"). Bölümler artık **Hikâye** adıyla alt sekmede ve ana menüdeki küçük kartta; Sonsuz Kuyu kartı kalktı. Sahnedeki Çıra yazının üstünde sallanır.
 
 Oyun ekranının üst şeridinde solda bölüm adı ve altında küçük göstergeler var: ateşböceği noktaları, atış/par (Kusursuz için), akış (x2 ve üstünde parlar). Sonsuz Kuyu'da metre, akış ve hız çarpanı, sağda büyük puan. Oyundaki **duraklat** düğmesi (II) paneli açar: Devam et, Baştan başla (Sonsuz'da Yeni koşu), Bölümü atla, ses ve titreşim, Ana menü. Duraklarken oyun ve su durur, tutunduğun ip bırakılmaz. Telefon arka plana alınınca (bildirim, arama) oyun kendiliğinden durur. Klavyede Esc ya da P duraklatır, Esc/Enter/Boşluk devam ettirir. `?bolum=N` ya da `?mod=sonsuz` bağlantısı açılıştan sonra tanıtımı atlayıp doğrudan oyuna girer.
 
@@ -127,7 +127,18 @@ Sonsuz ve Günlük Kuyu'da (Günlük'te herkes için aynı yerde); yolun üstün
 - Fırlatma yolu güçlendirmenin yanına, kanadın üstündeki 9 halkaya konmaz (kanat yolu atlatırdı); 1500 m'de fırlatma yolu ~18 → ~14.
 - Uçuş ve çekme hızı değişmez; kanat ayrı bir itiştir. Kod: `engine.js` → `gucAl`, `kalkanKullan`; `gen.js` → `sonsuzGuc`; `game.js` → `drawGucler`, `drawGucEtki`, `drawGucHud`.
 
-## Devam hakkı (v0.49, İstişare 2)
+## Yarışma modları: Günlük ve Haftalık Kuyu (v0.64)
+Serbest Sonsuz Kuyu kalktı (eski bağlantılar Günlük Kuyu'ya gider; eski rekor Profil'de durur). Ana oyun Hikâye; yarışma Günlük ve Haftalık Kuyu'da, her deneme bir anlam taşısın diye sınırlı:
+- **Deneme hakkı:** Günlük günde 3, Haftalık haftada 5 (`ekonomi.js` → `HAK`). Her koşu bir hak harcar; "Bir daha dene" ve "Baştan başla" dahil. Meydan okuma bağlantısı hak harcamaz.
+- **Hak yenileme (video):** Hak bitince pencere açılır. Video izleyerek +1 deneme: 1. yenileme 1 video, 2. yenileme 2 video, … 5. yenileme 5 video (`hakVideo`). 5 yenilemeden sonra o gün/hafta başka reklam ve deneme yok; pencere oyuncuyu Hikâye'de sıradaki bölüme yönlendirir. Video yalnız oyuncu seçerse oynar.
+- **Günün hedefi:** Her gün bir hedef metre (600–1000, tarihten). 1 yıldız hedef, 2 yıldız 1,5 kat, 3 yıldız 2 kat; her yıldız günde bir kez +5 / +5 / +10 ateşböceği (`gunHedef`, `gunYildizKaydet`). Kartta ve sonuç kartında yıldızlar.
+- **Seri ödülü:** Art arda günlerde Günlük Kuyu: 3. günde 20, 7. günde 50, 14. günde 100, 30. günde 200 ateşböceği. Bir günlük donma hakkı: bir gün kaçırılınca seri sürer (başta 1, her 7 günde yeniden dolar).
+- **Lig:** Ödüller büyüdü (Bronz 25, Gümüş 50, Altın 80, Elmas 120, Fener 180; hafta bitince). Altın, Elmas ve Fener ligine ulaşınca birer satılmayan görünüm açılır (Altın lig atkısı, Elmas iz, Fener alevi).
+- **Rekor duvarı (Profil):** Son 28 günün Günlük Kuyu yıldızları (takvim) ve son 8 haftanın ligi ile en iyi puanı (`save.gecmis`).
+- **Devam hakkı kalktı:** Yarışmada herkes eşit.
+- Ekonomi (`node tools/ekonomi-olcum.js`, yarışma koşusu en çok 200 sn sayılır): ortalama oyuncu günde ~150 ateşböceği (v0.63: ~120).
+
+## Devam hakkı (v0.49, İstişare 2; v0.64'te kalktı)
 Yalnız Sonsuz Kuyu'da (Günlük Kuyu'da yok, herkes için eşit). Su yakalayınca ortada 5 saniyelik bir teklif çıkar: geri sayım halkası, **▶ Video izle** (yalnız ilk devamda, oyuncu seçerse), **ateşböceği ile devam** ve **Geç**. Bir koşuda en çok 3 devam; bedel 25 → 50 → 100 ateşböceği (`ekonomi.js` → `DEVAM_BEDEL`, `devamOde`). Bakiye yetmezse düğmede kaç eksik olduğu yazar. Süre dolarsa ya da menü düğmesine basılırsa "Geç" sayılır, koşu kaydedilir. Devam edince Çıra en yüksek güvenli halkaya (yay ve geçit değil) asılı döner, su güvenli mesafeye çekilir, akış sıfırlanır (`engine.js` → `dirilt`). Sonuç kartında devam sayısı görünür. Web sürümünde video 3 sn'lik yer tutucu; Unity'de ödüllü reklam bağlanacak.
 
 ## Bölge suyu: Hikâye'de zorluk eğrisi (v0.52; v0.62'de yerini 24 bölümün su kuralları aldı)

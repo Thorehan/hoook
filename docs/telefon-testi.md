@@ -86,6 +86,14 @@ Yayına çıkmadan yerelde denemek için: bilgisayarda `python3 -m http.server 8
 - [ ] Maden'den sonra halkalar bazen üst üste aynı yanda: işarete bakınca doğal mı, yoksa şaşırtıcı mı?
 - [ ] Yanlış tarafa basıp hemen doğru tarafa basılı tutunca kanca gecikmeyle atılıyor mu (giriş tamponu + 0,4 sn kilit)?
 
+## 12. Hikâye ana oyun, yarışma modları (v0.64, 10 dk)
+- [ ] Ana menüde dokununca Hikâye'de sıradaki bölüm açılıyor; altında bölüm adı, bölge ve ilerleme doğru mu?
+- [ ] Günlük Kuyu kartı: kural, günün hedefi, yıldızlar, "3/3 deneme". Haftalık kartı: lig ve "5/5 deneme".
+- [ ] Üç deneme bitince pencere açılıyor; video ile +1 deneme (1, sonra 2, 3… video) anlaşılır mı, can sıkıcı mı?
+- [ ] 5 yenilemeden sonra "Hikâye'ye devam" yönlendirmesi doğal mı?
+- [ ] Günün hedefi (yıldız) ulaşılabilir mi, çok mu kolay? Seri ve donma hakkı anlaşılıyor mu?
+- [ ] Profil → Rekor duvarı: takvim ve haftalar okunuyor mu?
+
 ## 5. Genel izlenim (serbest)
 - En sevdiğim an:
 - En çok zorlandığım yer:

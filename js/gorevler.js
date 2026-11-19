@@ -17,7 +17,7 @@
     akis:     { ad: function (n) { return 'Bir koşuda x' + n + ' akışa ulaş'; }, how: 'max', key: 'maxCombo', t: [6, 10, 16] },
     bolum:    { ad: function (n) { return n + ' bölüm geç'; }, how: 'sum', key: 'won', only: 'level', t: [1, 2, 3] }, // v0.62: bölümler uzun (1–2,5 dk)
     kusursuz: { ad: function (n) { return n === 1 ? 'Bir bölümü Kusursuz geç' : n + ' bölümü Kusursuz geç'; }, how: 'sum', key: 'perfect', only: 'level', t: [1, 1, 2] },
-    metre:    { ad: function (n) { return 'Tek koşuda ' + n + ' m tırman (Sonsuz ya da Günlük)'; }, how: 'max', key: 'meters', only: 'endless', t: [400, 1000, 2000] },
+    metre:    { ad: function (n) { return 'Tek koşuda ' + n + ' m tırman (Günlük ya da Haftalık)'; }, how: 'max', key: 'meters', only: 'endless', t: [400, 1000, 2000] },
     gunluk:   { ad: function (n) { return n === 1 ? 'Günlük Kuyu\'yu oyna' : 'Günlük Kuyu\'da ' + n + ' deneme yap'; }, how: 'sum', key: 'one', only: 'daily', t: [1, 2, 3] },
     serit:    { ad: function (n) { return n + ' rüzgâr şeridinden geç'; }, how: 'sum', key: 'gates', t: [2, 5, 9] },
     hizMs:    { ad: function (n) { return 'Bir koşuda ' + n + ' m/sn hıza çık'; }, how: 'max', key: 'speed', t: [25, 40, 52] }

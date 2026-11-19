@@ -133,6 +133,7 @@ Kullanıcı hikâyeye online'dan önce geçti; online (5) sonra.
 - [?] Bekçinin adı.
 
 ## Yapılanlar
+- 2026-11-19 · v0.64 · Hikâye ana oyun; serbest Sonsuz Kuyu kalktı. Günlük (3/gün) ve Haftalık (5/hafta) sınırlı denemeli, video ile artan yenileme (1→5, sonra Hikâye), günün hedefi yıldızları, seri ödülü ve donma, büyüyen lig ödülü ve lig görünümleri, Profil'de rekor duvarı; devam hakkı kalktı.
 - 2026-11-19 · v0.63 · Hikâye denge (Aşama 5): boş atış kilidi her bölümde, Maden'den sonra yanlış taraf ipi bırakır, halkalar %40 aynı yanda; spam ortalama oyuncu düzeyine indi, düşünen oyuncu etkilenmedi. Ölçüm aracı `tools/hikaye-denge.js`. 24 bölüm planı tamam.
 - 2026-11-19 · v0.62 · Hikâye geçişi (Aşama 4): 24 bölüm + ikinci yolculuk 25–48 asıl Hikâye; eski bölümler kalktı, kayıt bölgeye göre taşındı (save.eskiBest), notlar yeni numaralarda, görev ve başarım eşikleri küçüldü. Geri dönüş etiketi `geri-donus-v0.61`.
 - 2026-11-19 · v0.61 · Yeni Hikâye Aşama 3: bölüm 13–24 (Kristal ve Kule), geçit, fırlatma yolu, zincir, güçlendirmeler ve izleyen su bölümlerde; notlar 7–12, Kristal ve Kule finalleri. 24 bölüm deneme olarak tamam.

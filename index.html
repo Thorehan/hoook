@@ -16,8 +16,8 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@600;800&family=Figtree:wght@400;600&display=swap">
-<link rel="stylesheet" href="css/kuyu.css?v=0.63">
-<link rel="stylesheet" href="css/ekranlar.css?v=0.63">
+<link rel="stylesheet" href="css/kuyu.css?v=0.64">
+<link rel="stylesheet" href="css/ekranlar.css?v=0.64">
 </head>
 <body>
 <div class="app" id="oyunEkrani" hidden>
@@ -72,7 +72,7 @@
   <img id="acilisLogo" class="marka-logo" src="assets/funday-morning-logo.webp" alt="Funday Morning Games">
   <div class="yukleme" aria-hidden="true"><div id="yuklemeDolgu"></div></div>
   <div class="yukleme-not" id="yuklemeNot">Yükleniyor…</div>
-  <div class="ek-surum">Kuyu v0.63</div>
+  <div class="ek-surum">Kuyu v0.64</div>
 </section>
 
 <!-- Giriş: yalnızca ilk açılışta -->
@@ -112,9 +112,9 @@
     </div>
   </div>
   <div class="ana-logo"><h1>Kuyu</h1><span>Çıra'yı fenerine geri götür</span></div>
-  <!-- Dokun ve başla (İstişare 2): sahnenin boş yerine dokununca Sonsuz Kuyu başlar (ilk bölüm geçilene dek İlk Halka) -->
+  <!-- Dokun ve başla (v0.64): Hikâye'ye kaldığı yerden; hangi bölümde olduğun yazar -->
   <button type="button" class="dokun-alan" id="dokunBtn">
-    <span class="dokun-yazi"><b id="dokunBaslik">Başlamak için dokun</b><span id="dokunAlt">Sonsuz Kuyu</span></span>
+    <span class="dokun-yazi"><b id="dokunBaslik">Başlamak için dokun</b><span id="dokunAlt">1. bölüm · İlk Halka</span><span class="dokun-bolge" id="dokunBolge">Taş Kuyu · 0/6</span><span class="hedefler" id="oynaHedef" aria-label="Bu bölümün hedefleri"></span></span>
   </button>
   <div class="ana-alt">
     <button type="button" class="ana-gorev" id="anaGorevBtn" aria-label="Bugünün görevleri">
@@ -122,14 +122,9 @@
       <span class="ag-yazi"><b id="anaGorevBaslik">Görevler 0/3</b><span id="anaGorevAlt">Bugünün görevleri</span></span>
       <span class="ag-cubuk" id="anaGorevCubuk" aria-hidden="true"></span>
     </button>
-    <button type="button" class="ana-haftalik" id="haftalikBtn" aria-label="Haftalık Kuyu: bu hafta herkes aynı kuyuda yarışır">
-      <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M7 4h10v4a5 5 0 0 1-10 0V4zM7 6H4v1a3 3 0 0 0 3 3M17 6h3v1a3 3 0 0 1-3 3M12 13v4M8.5 20h7M10 17h4" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
-      <span class="ah-yazi"><b>Haftalık Kuyu</b><span id="haftalikBilgi">Herkes aynı kuyuda</span></span>
-      <span class="lig-rozet" id="haftalikLig">Lig yok</span>
-    </button>
     <div class="ana-kartlar">
-      <button type="button" class="ana-kart hikaye" id="oynaBtn"><b>Hikâye</b><span><span id="oynaNo">1</span>. bölüm · <span id="oynaAd">İlk Halka</span></span><span class="hedefler" id="oynaHedef" aria-label="Bu bölümün hedefleri"></span></button>
-      <button type="button" class="ana-kart gunluk" id="gunlukBtn"><b>Günlük Kuyu</b><span id="gunlukBilgi">Bugünün kuyusu hazır</span><span class="seri" id="gunlukSeri" hidden></span></button>
+      <button type="button" class="ana-kart gunluk" id="gunlukBtn"><b>Günlük Kuyu</b><span id="gunlukBilgi">Bugünün kuyusu hazır</span><span class="yildizlar kucuk" id="gunlukYildiz" aria-hidden="true"></span><span class="hak" id="gunlukHak"></span><span class="seri" id="gunlukSeri" hidden></span></button>
+      <button type="button" class="ana-kart haftalik" id="haftalikBtn"><b>Haftalık Kuyu</b><span id="haftalikBilgi">Herkes aynı kuyuda</span><span class="lig-rozet" id="haftalikLig">Lig yok</span><span class="hak" id="haftalikHak"></span></button>
     </div>
   </div>
 </section>
@@ -165,7 +160,7 @@
     <div class="gorev-liste" id="gorevListe"></div>
     <div class="gorev-bas"><h3>Başarımlar</h3><span id="basarimSay">0/27</span></div>
     <div class="basarim-liste" id="basarimListe"></div>
-    <p class="not">Görevler her gece yarısı (Türkiye saati) yenilenir ve o gün herkes için aynıdır. Sayılan koşular: geçilen bölümler ile biten Sonsuz ve Günlük Kuyu koşuları. Görev ödülleri ateşböceğidir (kolay 5, orta 10, zor 15); istersen video izleyip ikiye katlarsın. Başarımların üç kademesi var: Bronz, Gümüş, Altın.</p>
+    <p class="not">Görevler her gece yarısı (Türkiye saati) yenilenir ve o gün herkes için aynıdır. Sayılan koşular: geçilen bölümler ile biten Günlük ve Haftalık Kuyu koşuları. Görev ödülleri ateşböceğidir (kolay 5, orta 10, zor 15); istersen video izleyip ikiye katlarsın. Başarımların üç kademesi var: Bronz, Gümüş, Altın.</p>
   </div>
 </section>
 
@@ -187,7 +182,7 @@
       <button type="button" role="tab" data-dolap="alev" aria-selected="false">Alev</button>
     </div>
     <div class="dolap-liste" id="dolapListe"></div>
-    <p class="not">Hepsi yalnızca görünüş; oyunda güçlendirme satılmaz. Ateşböceği bölümlerde ilk kez topladıklarından, Sonsuz ve Günlük Kuyu'da topladığın her ateşböceğinden, görevlerden, başarımlardan ve günlük girişten gelir. "Işık" yazan görünümler satılmaz: kazandığın ateşböcekleri kuyuyu aydınlattıkça kendiliğinden açılır.</p>
+    <p class="not">Hepsi yalnızca görünüş; oyunda güçlendirme satılmaz. Ateşböceği bölümlerde ilk kez topladıklarından, Günlük ve Haftalık Kuyu'da topladığın her ateşböceğinden, görevlerden, başarımlardan ve günlük girişten gelir. "Işık" yazan görünümler satılmaz: kazandığın ateşböcekleri kuyuyu aydınlattıkça kendiliğinden açılır.</p>
   </div>
 </section>
 
@@ -198,7 +193,7 @@
     <div class="profil-izgara" id="istatGenel"></div>
     <h3>En çok zorlanılan bölümler</h3>
     <div class="istat-liste" id="istatZor"></div>
-    <h3>Sonsuz ve Günlük Kuyu</h3>
+    <h3>Günlük ve Haftalık Kuyu</h3>
     <div class="istat-liste" id="istatKosu"></div>
     <h3>Halka kullanımı</h3>
     <div class="profil-izgara uclu" id="istatHalka"></div>
@@ -237,7 +232,11 @@
         <div><small>En uzun seri</small><b id="pMaxSeri">0 gün</b></div>
         <div><small>Bugünkü deneme</small><b id="pDeneme">0</b></div>
       </div>
-      <h3>Sonsuz Kuyu</h3>
+      <h3>Rekor duvarı</h3>
+      <div class="duvar" id="pDuvar" role="img" aria-label="Son 28 günün Günlük Kuyu yıldızları"></div>
+      <ol class="duvar-hafta" id="pHaftalar"></ol>
+      <p class="not">Her kare bir gün: Günlük Kuyu'da kazandığın yıldız (günün hedefi). Haftalar: Haftalık Kuyu ligi ve en iyi puan.</p>
+      <h3>Sonsuz Kuyu rekoru (v0.63'e kadar)</h3>
       <div class="profil-izgara">
         <div><small>Rekor puan</small><b id="pRekor">0</b></div>
         <div><small>En yüksek</small><b id="pMetre">0 m</b></div>
@@ -256,7 +255,7 @@
     <div class="ayar-satir"><div><b>Müzik</b><span>Bölgeye göre değişen ortam müziği; akış sürerken canlanır</span></div><button type="button" class="anahtar" id="muzikAnahtar" role="switch" aria-checked="true" aria-label="Müzik"><i></i></button></div>
     <div class="ayar-satir"><div><b>Ses efektleri</b><span>Kanca, akış ve ateşböceği sesleri</span></div><button type="button" class="anahtar" id="sesAnahtar" role="switch" aria-checked="true" aria-label="Ses efektleri"><i></i></button></div>
     <div class="ayar-satir"><div><b>Büyük yazı</b><span>Menülerdeki küçük yazılar, açıklamalar ve ipuçları büyür</span></div><button type="button" class="anahtar" id="yaziAnahtar" role="switch" aria-checked="false" aria-label="Büyük yazı"><i></i></button></div>
-    <div class="ayar-satir"><div><b>Hayalet ve rekor</b><span>En iyi koşun başta kısa görünür, sonra yalnız yakınındayken belirir; Sonsuz'da rekora yaklaşınca ince bir rekor çizgisi</span></div><button type="button" class="anahtar" id="hayaletAnahtar" role="switch" aria-checked="true" aria-label="Hayalet"><i></i></button></div>
+    <div class="ayar-satir"><div><b>Hayalet ve rekor</b><span>En iyi koşun başta kısa görünür, sonra yalnız yakınındayken belirir; Günlük ve Haftalık Kuyu'da en iyine yaklaşınca ince bir rekor çizgisi</span></div><button type="button" class="anahtar" id="hayaletAnahtar" role="switch" aria-checked="true" aria-label="Hayalet"><i></i></button></div>
     <div class="ayar-satir"><div><b>Titreşim</b><span>Tutunurken ve ateşböceği alınca kısa titreşim (Android)</span></div><button type="button" class="anahtar" id="titresimAnahtar" role="switch" aria-checked="true" aria-label="Titreşim"><i></i></button></div>
     <form class="ayar-satir ad-satir" id="adForm">
       <label for="adDegis"><b>Oyuncu adı</b></label>
@@ -278,7 +277,7 @@
     <button type="button" id="istatBtn">Oyun istatistikleri</button>
     <button type="button" id="tanitimBtn">Tanıtımı yeniden izle</button>
     <button type="button" id="ipucuSifirBtn">Tanıtım kartlarını yeniden göster</button>
-    <p class="surum">Kuyu v0.63 · prototip · Funday Morning Games</p>
+    <p class="surum">Kuyu v0.64 · prototip · Funday Morning Games</p>
   </div>
 </section>
 
@@ -303,6 +302,18 @@
   </div>
 </div>
 
+<!-- Deneme hakkı (v0.64): Günlük ve Haftalık Kuyu; video ile artan yenileme, sonra Hikâye -->
+<div class="katman-ust" id="hakKatman" hidden role="dialog" aria-modal="true" aria-labelledby="hakBaslik">
+  <div class="kart hak-kart">
+    <h2 id="hakBaslik">Denemeler bitti</h2>
+    <p id="hakMetin"></p>
+    <div class="hak-video" id="hakVideoSay" aria-hidden="true"></div>
+    <button type="button" class="ana buyuk genis" id="hakVideoBtn">▶ Video izle</button>
+    <button type="button" class="genis" id="hakHikayeBtn">Hikâye</button>
+    <button type="button" class="metin-btn" id="hakKapat">Kapat</button>
+  </div>
+</div>
+
 <div class="katman-ust" id="videoKatman" hidden role="dialog" aria-modal="true" aria-labelledby="videoBaslik">
   <div class="kart video-kart">
     <h2 id="videoBaslik">Ödüllü video</h2>
@@ -314,18 +325,18 @@
 <div class="hikaye-kart" id="hikayeKart" role="status" hidden><b id="hkBaslik"></b><span id="hkMetin"></span></div>
 <div class="bildirim" id="bildirim" role="status" hidden></div>
 
-<script src="js/engine.js?v=0.63"></script>
-<script src="js/levels.js?v=0.63"></script>
-<script src="js/bolumler.js?v=0.63"></script>
-<script src="js/gen.js?v=0.63"></script>
-<script src="js/gorevler.js?v=0.63"></script>
-<script src="js/ekonomi.js?v=0.63"></script>
-<script src="js/istatistik.js?v=0.63"></script>
-<script src="js/muzik.js?v=0.63"></script>
-<script src="js/notlar.js?v=0.63"></script>
-<script src="js/hayalet.js?v=0.63"></script>
-<script src="js/online.js?v=0.63"></script>
-<script src="js/game.js?v=0.63"></script>
-<script src="js/screens.js?v=0.63"></script>
+<script src="js/engine.js?v=0.64"></script>
+<script src="js/levels.js?v=0.64"></script>
+<script src="js/bolumler.js?v=0.64"></script>
+<script src="js/gen.js?v=0.64"></script>
+<script src="js/gorevler.js?v=0.64"></script>
+<script src="js/ekonomi.js?v=0.64"></script>
+<script src="js/istatistik.js?v=0.64"></script>
+<script src="js/muzik.js?v=0.64"></script>
+<script src="js/notlar.js?v=0.64"></script>
+<script src="js/hayalet.js?v=0.64"></script>
+<script src="js/online.js?v=0.64"></script>
+<script src="js/game.js?v=0.64"></script>
+<script src="js/screens.js?v=0.64"></script>
 </body>
 </html>

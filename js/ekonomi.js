@@ -69,7 +69,11 @@
     { id: 'alev-yesil', tur: 'alev', ad: 'Yeşil alev', renk: '#3ecf6a', renk2: '#d9ffb0', fiyat: 280 },
     { id: 'alev-mor', tur: 'alev', ad: 'Mor alev', renk: '#a05cff', renk2: '#f0d0ff', fiyat: 360 },
     { id: 'alev-beyaz', tur: 'alev', ad: 'Ak alev', renk: '#dfe9ff', renk2: '#ffffff', fiyat: 600 },
-    { id: 'alev-altin', tur: 'alev', ad: 'Altın alev', renk: '#f2b23a', renk2: '#fff6c8', isik: 11 }
+    { id: 'alev-altin', tur: 'alev', ad: 'Altın alev', renk: '#f2b23a', renk2: '#fff6c8', isik: 11 },
+    // Haftalık lig görünümleri (v0.64): satın alınmaz, o lige ulaşınca açılır (lig: LIG sırası)
+    { id: 'atki-altin-lig', tur: 'atki', ad: 'Altın lig', renk: '#f2c94c', lig: 2 },
+    { id: 'iz-elmas', tur: 'iz', ad: 'Elmas', renk: '#9fe8ff', lig: 3 },
+    { id: 'alev-fener-lig', tur: 'alev', ad: 'Fener alevi', renk: '#ffe08a', renk2: '#ffffff', lig: 4 }
   ];
   var TURLER = { govde: 'Kahraman', atki: 'Atkı', ip: 'İp', kanca: 'Kanca', iz: 'Uçuş izi', alev: 'Alev' };
   var VARSAYILAN = { govde: 'govde-turuncu', atki: 'atki-turkuaz', ip: 'ip-keten', kanca: 'kanca-ok', iz: 'iz-atki', alev: 'alev-kor' };
@@ -143,8 +147,9 @@
   // Eşikler tools/denge.js ölçümünden: %20 hata yapan ~1000, %10 hata ~1600, akışla %10 hata ~11000, akışla %5 ~52000.
   // Ödül hafta bitince, bir sonraki açılışta ödenir (kayıt: save.haftalik = { key, best, meters, tries }).
   var LIG = [
-    { ad: 'Bronz', puan: 500, odul: 15 }, { ad: 'Gümüş', puan: 2000, odul: 30 }, { ad: 'Altın', puan: 6000, odul: 50 },
-    { ad: 'Elmas', puan: 20000, odul: 80 }, { ad: 'Fener', puan: 50000, odul: 120 }
+    // v0.64: ödüller büyüdü (Sonsuz kalktı, yarışma Haftalık ve Günlük'te); Altın, Elmas ve Fener birer görünüm de açar
+    { ad: 'Bronz', puan: 500, odul: 25 }, { ad: 'Gümüş', puan: 2000, odul: 50 }, { ad: 'Altın', puan: 6000, odul: 80 },
+    { ad: 'Elmas', puan: 20000, odul: 120 }, { ad: 'Fener', puan: 50000, odul: 180 }
   ];
   function ligOf(puan) { var k = -1; for (var i = 0; i < LIG.length; i++) if (puan >= LIG[i].puan) k = i; return k; }
   function ligOdul(puan) { var k = ligOf(puan); return k < 0 ? 0 : LIG[k].odul; }
@@ -162,7 +167,11 @@
     var once = ligOf(h.best), rekor = puan > h.best;
     h.tries++; h.best = Math.max(h.best, puan); h.meters = Math.max(h.meters, metre || 0);
     save.haftalik = h;
-    return { rekor: rekor, lig: ligOf(h.best), ligAtladi: ligOf(h.best) > once };
+    // lig görünümleri: ulaşılan lige kadar olanlar açılır (bir kez)
+    var k = ligOf(h.best), yeni = [];
+    KATALOG.forEach(function (it) { if (it.lig != null && it.lig <= k && save.dolap.sahip.indexOf(it.id) < 0) { save.dolap.sahip.push(it.id); yeni.push(it); } });
+    gecmisYaz(save, 'haftalik', key, { puan: h.best, lig: k });
+    return { rekor: rekor, lig: k, ligAtladi: k > once, yeniGorunum: yeni };
   }
   // Yeni hafta başladıysa geçen haftanın lig ödülünü öde ve kaydı kapat. Ödenecek bir şey yoksa null.
   function haftalikKapat(save, key) {
@@ -192,6 +201,7 @@
     if (!it) return { ok: false, neden: 'yok' };
     if (sahip(save, id)) return { ok: false, neden: 'sahip' };
     if (it.isik) return { ok: false, neden: 'isik', seviye: it.isik }; // satın alınmaz: ışık seviyesiyle açılır
+    if (it.lig != null) return { ok: false, neden: 'lig', lig: it.lig }; // satın alınmaz: Haftalık ligle açılır
     if (save.cuzdan.ates < it.fiyat) return { ok: false, neden: 'yetersiz', eksik: it.fiyat - save.cuzdan.ates };
     save.cuzdan.ates -= it.fiyat; save.cuzdan.harcanan += it.fiyat;
     save.dolap.sahip.push(id);
@@ -212,7 +222,76 @@
     return out;
   }
 
-  var api = { GIRIS: GIRIS, GOREV_ATES: GOREV_ATES, BASARIM_ATES: BASARIM_ATES, KATALOG: KATALOG, TURLER: TURLER, VARSAYILAN: VARSAYILAN,
+  // ---------- Günlük ve Haftalık Kuyu: deneme hakları (v0.64) ----------
+  // Serbest Sonsuz Kuyu kalktı; yarışma modlarında her koşu bir hak harcar (Yeniden dene ve Baştan başla dahil).
+  // Hak bitince video ile +1 deneme: 1. yenileme 1 video, 2. yenileme 2 video, … 5. yenileme 5 video; sonra o gün/hafta
+  // başka reklam ve deneme yok, oyuncu Hikâye'ye yönlendirilir. Video yalnız oyuncu seçerse oynar.
+  var HAK = { gunluk: 3, haftalik: 5 }, YENILEME_EN = 5;
+  function hakKayit(save, tur, key) {
+    if (!save.haklar) save.haklar = {};
+    var h = save.haklar[tur];
+    if (!h || h.key !== key) h = save.haklar[tur] = { key: key, kullanilan: 0, ek: 0, yenileme: 0, izlenen: 0 };
+    return h;
+  }
+  function hakDurum(save, tur, key) {
+    var h = hakKayit(save, tur, key), toplam = HAK[tur] + h.ek;
+    return { kalan: Math.max(0, toplam - h.kullanilan), toplam: toplam, kullanilan: h.kullanilan, yenileme: h.yenileme,
+      bedel: h.yenileme < YENILEME_EN ? h.yenileme + 1 : null, izlenen: h.izlenen, son: h.yenileme >= YENILEME_EN };
+  }
+  function hakKullan(save, tur, key) {
+    if (hakDurum(save, tur, key).kalan <= 0) return false;
+    hakKayit(save, tur, key).kullanilan++;
+    return true;
+  }
+  // Bir video izlendi. Döner: { yenilendi, kalanVideo } ya da sınır dolduysa null
+  function hakVideo(save, tur, key) {
+    var h = hakKayit(save, tur, key);
+    if (h.yenileme >= YENILEME_EN) return null;
+    h.izlenen++;
+    if (h.izlenen >= h.yenileme + 1) { h.yenileme++; h.izlenen = 0; h.ek++; return { yenilendi: true, kalanVideo: 0 }; }
+    return { yenilendi: false, kalanVideo: h.yenileme + 1 - h.izlenen };
+  }
+  // ---------- Günün hedefi (v0.64) ----------
+  // Her gün bir hedef metre (600–1000, günün tarihinden); 1 yıldız hedef, 2 yıldız 1,5 kat, 3 yıldız 2 kat.
+  // Her yıldız günde bir kez ödül verir.
+  var YILDIZ_ODUL = [5, 5, 10]; // v0.64 ölçümü: daha büyükse ortalama gün ~120'den ~165'e çıkıyor
+  function gunHedef(key) {
+    var h = 2166136261 >>> 0;
+    for (var i = 0; i < key.length; i++) { h ^= key.charCodeAt(i); h = Math.imul(h, 16777619) >>> 0; }
+    var m = 600 + (h % 9) * 50;
+    return { metre: m, esik: [m, Math.round(m * 1.5), m * 2] };
+  }
+  function yildizSay(key, metre) { var e = gunHedef(key).esik, n = 0; for (var i = 0; i < 3; i++) if (metre >= e[i]) n = i + 1; return n; }
+  // Koşu bitti: bugünün yıldızlarını güncelle, yeni yıldızların ödülünü öde. Döner: { yildiz, yeni, odul }
+  function gunYildizKaydet(save, key, metre) {
+    ensure(save);
+    var g = save.gunYildiz && save.gunYildiz.key === key ? save.gunYildiz : { key: key, yildiz: 0 };
+    var n = yildizSay(key, metre), odul = 0, yeni = 0;
+    for (var i = g.yildiz; i < n; i++) { odul += YILDIZ_ODUL[i]; yeni++; }
+    g.yildiz = Math.max(g.yildiz, n); save.gunYildiz = g;
+    if (odul) kazan(save, odul);
+    return { yildiz: g.yildiz, yeni: yeni, odul: odul };
+  }
+  function gunYildizDurum(save, key) { return save.gunYildiz && save.gunYildiz.key === key ? save.gunYildiz.yildiz : 0; }
+  // ---------- Seri ödülü (v0.64) ----------
+  // Art arda günlerde Günlük Kuyu: 3, 7, 14, 30. günde ateşböceği. Bir günlük donma hakkı: bir gün kaçırılınca seri sürer;
+  // başlangıçta 1, her 7 günlük eşikte yeniden dolar (en çok 1).
+  var SERI_ODUL = { 3: 20, 7: 50, 14: 100, 30: 200 };
+  // ---------- Kişisel rekor duvarı (v0.64) ----------
+  // Günlük ve Haftalık Kuyu'nun en iyileri; Profil'de takvim. Son 60 gün ve 16 hafta tutulur.
+  function gecmisYaz(save, tur, key, deger) {
+    if (!save.gecmis) save.gecmis = { gunluk: {}, haftalik: {} };
+    var g = save.gecmis[tur] || (save.gecmis[tur] = {}), o = g[key] || {};
+    Object.keys(deger).forEach(function (k) { o[k] = typeof deger[k] === 'number' ? Math.max(o[k] || 0, deger[k]) : deger[k]; });
+    g[key] = o;
+    var keys = Object.keys(g).sort(), sinir = tur === 'gunluk' ? 60 : 16;
+    while (keys.length > sinir) delete g[keys.shift()];
+  }
+
+  var api = { HAK: HAK, YENILEME_EN: YENILEME_EN, hakDurum: hakDurum, hakKullan: hakKullan, hakVideo: hakVideo,
+    YILDIZ_ODUL: YILDIZ_ODUL, gunHedef: gunHedef, yildizSay: yildizSay, gunYildizKaydet: gunYildizKaydet, gunYildizDurum: gunYildizDurum,
+    SERI_ODUL: SERI_ODUL, gecmisYaz: gecmisYaz,
+    GIRIS: GIRIS, GOREV_ATES: GOREV_ATES, BASARIM_ATES: BASARIM_ATES, KATALOG: KATALOG, TURLER: TURLER, VARSAYILAN: VARSAYILAN,
     ensure: ensure, kazan: kazan, bolumOde: bolumOde, girisDurum: girisDurum, girisAl: girisAl,
     LIG: LIG, ligOf: ligOf, ligOdul: ligOdul, haftalikDurum: haftalikDurum, haftalikKaydet: haftalikKaydet, haftalikKapat: haftalikKapat,
     ISIK: ISIK, isikSeviye: isikSeviye, isikOdul: isikOdul, isikSiradaki: isikSiradaki,

@@ -136,9 +136,15 @@
   function home() {
     var s = save();
     $('selamAd').textContent = (s.profile && s.profile.name) || 'Tırmanıcı';
-    var cur = s.last || 1, curDef = G.levelDef(cur), cb = (s.best || {})[cur] || {};
-    $('oynaNo').textContent = cur;
-    $('oynaAd').textContent = curDef.name;
+    // dokun ve başla (v0.64): Hikâye'de sıradaki bölüm (geçilmemiş ilk bölüm); bölge ve bölgedeki ilerleme yazar
+    var cur = G.siradaki(), bitti = G.hikayeBitti(), curDef = G.levelDef(cur), cb = (s.best || {})[cur] || {};
+    var ga = 1 + Math.floor((cur - 1) / 6) * 6, gGec = 0;
+    for (var gn = ga; gn < ga + 6; gn++) if (s.best[gn] && s.best[gn].done) gGec++;
+    $('dokunBaslik').textContent = bitti ? 'Hikâye tamam' : 'Başlamak için dokun';
+    $('dokunAlt').textContent = bitti ? 'Bir bölümü yeniden oyna, hedefleri tamamla' : cur + '. bölüm · ' + curDef.name;
+    $('dokunBolge').textContent = bitti ? '48 bölüm geçildi' : G.bolgeAdi(cur) + ' · ' + gGec + '/6';
+    $('dokunBtn').setAttribute('aria-label', bitti ? 'Hikâye tamam: bölümleri aç' : 'Başla: ' + cur + '. bölüm, ' + curDef.name + ', ' + G.bolgeAdi(cur));
+    $('oynaHedef').hidden = bitti;
     // bu bölümün hedefleri: ateşböceği noktaları + kusursuz + akış
     var ffN = (curDef.rings || []).filter(function (r) { return r[2] === 'ff'; }).length;
     var hd = '';
@@ -150,12 +156,12 @@
     Object.keys(s.best || {}).forEach(function (k2) { tot += s.best[k2].reward || 0; ates += s.best[k2].ff || 0; });
     $('toplamOdul').textContent = tot + (s.odulEk || 0);
     $('toplamAtes').textContent = G.cuzdan().ates; // harcanabilir bakiye
-    var rec = s.endless || {}, ilk = ilkKez();
-    $('dokunAlt').textContent = ilk ? "İlk Halka · Çıra'nın yolu başlıyor" : rec.meters ? 'Sonsuz Kuyu · en iyi ' + rec.meters + ' m' : 'Sonsuz Kuyu';
-    $('dokunBtn').setAttribute('aria-label', ilk ? 'Başla: İlk Halka' : 'Başla: Sonsuz Kuyu');
     renderAnaGorev();
     var di = G.dailyInfo();
-    $('gunlukBilgi').textContent = di.tries ? di.kural.ad + ' · en iyi ' + di.best : 'Bugün: ' + di.kural.ad;
+    $('gunlukBilgi').textContent = di.kural.ad + ' · hedef ' + di.hedef.metre + ' m';
+    $('gunlukYildiz').innerHTML = [0, 1, 2].map(function (i) { return '<i class="' + (i < di.yildiz ? 'var' : '') + '">★</i>'; }).join('');
+    $('gunlukHak').textContent = hakYazi(di.hak, 'Yarın');
+    $('gunlukBtn').setAttribute('aria-label', 'Günlük Kuyu: ' + di.kural.ad + ', hedef ' + di.hedef.metre + ' metre, ' + di.yildiz + ' yıldız, ' + hakYazi(di.hak, 'yarın'));
     // Haftalık Kuyu: geçen haftanın lig ödülü (varsa) ve bu haftanın durumu
     var gecen = G.haftalikKapat();
     if (gecen) { $('toplamAtes').textContent = G.cuzdan().ates; setTimeout(function () { toast('Geçen hafta ' + gecen.ligAd + ' ligindeydin · +' + gecen.odul + ' ateşböceği', 3600); }, 1600); }
@@ -163,11 +169,12 @@
     $('haftalikBilgi').textContent = hf.tries ? 'En iyi ' + hf.best + ' puan' + (hf.sonraki ? ' · ' + hf.sonraki.ad + ' için ' + (hf.sonraki.puan - hf.best) + ' daha' : '') : 'Herkes aynı kuyuda · ' + hf.kalan + ' kaldı';
     $('haftalikLig').textContent = hf.ligAd || 'Lig yok';
     $('haftalikLig').className = 'lig-rozet lig' + hf.lig;
+    $('haftalikHak').textContent = hakYazi(hf.hak, 'Pazartesi');
     isikGuncelle();
     var ik = G.isik ? G.isik() : null;
     if (ik && ik.seviye > ik.gorulen) { G.isikGordu(ik.seviye); setTimeout(function () { toast('Kuyu biraz daha aydınlandı · Işık ' + ik.seviye + '/' + ik.en + (ik.odul ? ' · Dolap\'ta yeni: ' + ik.odul.ad + ' ' + window.KuyuEkonomi.TURLER[ik.odul.tur].toLocaleLowerCase('tr-TR') : ''), ik.odul ? 3600 : 2400); }, 700); }
     $('gunlukSeri').hidden = !di.streak;
-    $('gunlukSeri').textContent = di.streak + ' gün seri' + (di.playedToday ? '' : ' · bugün oyna, seri sürsün');
+    $('gunlukSeri').textContent = di.streak + ' gün seri' + (di.playedToday ? '' : di.donmada ? ' · donmada, bugün oyna' : ' · bugün oyna, seri sürsün');
     show('ekAna');
     // günlük giriş: bugün alınmadıysa ana menüye ilk gelişte bir kez göster
     var gd = G.giris();
@@ -199,16 +206,57 @@
     $('anaGorevBtn').setAttribute('aria-label', 'Bugünün görevleri: ' + bitti + ' / ' + list.length + ' tamam. ' + alt);
   }
   $('anaGorevBtn').addEventListener('click', function () { openTasks(); });
-  $('oynaBtn').addEventListener('click', function () { G.startLevel(save().last || 1); });
   // dokun ve başla: ilk bölüm geçilene dek öğretici (İlk Halka), sonra Sonsuz Kuyu
-  function ilkKez() { var b = (save().best || {})[1]; return !(b && b.done); }
-  $('dokunBtn').addEventListener('click', function () { if (ilkKez()) G.startLevel(1); else G.startEndless(); });
+  function hakYazi(h, zaman) { return h.kalan > 0 ? h.kalan + '/' + h.toplam + ' deneme' : h.son ? zaman + ' yeni denemeler' : 'Deneme bitti · ▶ +1'; }
+  $('dokunBtn').addEventListener('click', function () { if (G.hikayeBitti()) openLevels(); else G.startLevel(G.siradaki()); });
+  // ---------- deneme hakkı penceresi (v0.64) ----------
+  var hakTur = null;
+  function openHak(tur) {
+    hakTur = tur;
+    var d = G.hakDurum(tur), ad = tur === 'gunluk' ? 'Günlük Kuyu' : 'Haftalık Kuyu', taban = window.KuyuEkonomi.HAK[tur];
+    $('hakBaslik').textContent = ad + ': denemeler bitti';
+    if (d.son) {
+      $('hakMetin').textContent = (tur === 'gunluk' ? 'Bugün' : 'Bu hafta') + ' başka deneme yok. ' + (tur === 'gunluk' ? 'Yarın' : 'Pazartesi') + ' ' + taban + ' yeni deneme. Bu arada Hikâye seni bekliyor.';
+      $('hakVideoBtn').hidden = true; $('hakVideoSay').innerHTML = '';
+    } else {
+      $('hakMetin').textContent = 'Video izleyerek 1 deneme daha alabilirsin. Her yenilemede bir video daha gerekir (1, 2, 3, 4, 5); ' + window.KuyuEkonomi.YENILEME_EN + ' yenilemeden sonra ' + (tur === 'gunluk' ? 'yarına' : 'haftaya') + ' kadar başka deneme yok.';
+      $('hakVideoSay').innerHTML = (d.yenileme + 1) + '. yenileme: ' + Array.apply(null, Array(d.bedel)).map(function (x, i) { return '<i class="' + (i < d.izlenen ? 'var' : '') + '"></i>'; }).join('');
+      $('hakVideoBtn').hidden = false; $('hakVideoBtn').textContent = '▶ Video izle (' + (d.izlenen + 1) + '/' + d.bedel + ')';
+    }
+    $('hakHikayeBtn').textContent = G.hikayeBitti() ? 'Hikâye' : 'Hikâye\'ye devam · ' + G.siradaki() + '. bölüm';
+    $('hakKatman').hidden = false;
+    ($('hakVideoBtn').hidden ? $('hakHikayeBtn') : $('hakVideoBtn')).focus({ preventScroll: true });
+  }
+  $('hakVideoBtn').addEventListener('click', function () {
+    $('hakKatman').hidden = true;
+    video(function () {
+      var r = G.hakVideo(hakTur);
+      if (r && r.yenilendi) { toast('+1 deneme', 1800); if (hakTur === 'gunluk') G.startDaily(); else G.startWeekly(); }
+      else openHak(hakTur);
+    });
+  });
+  $('hakHikayeBtn').addEventListener('click', function () { $('hakKatman').hidden = true; if (G.hikayeBitti()) openLevels(); else G.startLevel(G.siradaki()); });
+  $('hakKapat').addEventListener('click', function () { $('hakKatman').hidden = true; if (current === 'ekAna') home(); });
   $('gunlukBtn').addEventListener('click', function () { G.startDaily(); });
   $('haftalikBtn').addEventListener('click', function () { G.startWeekly(); });
   $('profilBtn').addEventListener('click', function () { openProfile(); });
 
   // ---------- profil kartı ----------
   function fmt(n, d) { return Number(n || 0).toFixed(d).replace('.', ','); }
+  // Kişisel rekor duvarı (v0.64): son 28 günün Günlük Kuyu yıldızları, son 8 haftanın ligi
+  function renderDuvar(bugun) {
+    var g = G.gecmis(), gun = g.gunluk || {}, hf = g.haftalik || {}, h = '';
+    for (var i = 27; i >= 0; i--) {
+      var d = new Date(bugun + 'T12:00:00Z'); d.setUTCDate(d.getUTCDate() - i);
+      var k = d.toISOString().slice(0, 10), o = gun[k];
+      h += '<i class="g' + (o ? ' y' + (o.yildiz || 0) : '') + (i === 0 ? ' bugun' : '') + '" title="' + d.getUTCDate() + ' · ' + (o ? (o.yildiz || 0) + ' yıldız, ' + (o.metre || 0) + ' m' : 'oynanmadı') + '"><b>' + d.getUTCDate() + '</b>' + (o && o.yildiz ? '<em>' + '★'.repeat(o.yildiz) + '</em>' : '') + '</i>';
+    }
+    $('pDuvar').innerHTML = h;
+    var L = window.KuyuEkonomi.LIG;
+    $('pHaftalar').innerHTML = Object.keys(hf).sort().reverse().slice(0, 8).map(function (k) {
+      var o = hf[k]; return '<li><span>' + new Date(k + 'T12:00:00Z').toLocaleDateString('tr-TR', { day: 'numeric', month: 'short' }) + ' haftası</span><b>' + (o.lig >= 0 ? L[o.lig].ad : 'Lig yok') + '</b><em>' + (o.puan || 0) + '</em></li>';
+    }).join('') || '<li class="bos">Henüz Haftalık Kuyu koşusu yok.</li>';
+  }
   function openProfile() {
     var s = save(), st = s.stats || {}, rec = s.endless || {};
     var best = s.best || {}, keys = Object.keys(best);
@@ -249,6 +297,7 @@
     $('pSeri').textContent = di.streak + ' gün';
     $('pMaxSeri').textContent = di.maxStreak + ' gün';
     $('pDeneme').textContent = di.tries;
+    renderDuvar(di.key);
     show('ekProfil');
   }
   document.querySelectorAll('[data-geri]').forEach(function (b) { b.addEventListener('click', home); });
@@ -378,6 +427,7 @@
       else if (on) durum = '<span class="d-durum kusanili">Kuşanıldı</span>';
       else if (has) durum = '<span class="d-durum">Kuşan</span>';
       else if (it.isik) durum = '<span class="d-durum isik-kilit">Işık ' + it.isik + '</span>';
+      else if (it.lig != null) durum = '<span class="d-durum isik-kilit">' + window.KuyuEkonomi.LIG[it.lig].ad + ' ligi</span>';
       else durum = '<span class="d-durum fiyat' + (bak < it.fiyat ? ' yetmez' : '') + '"><i class="ikon-ates" aria-hidden="true"></i>' + it.fiyat + '</span>';
       return '<button type="button" class="d-urun' + (bak2 ? ' onizlenen' : on && !onizlemeTur(it.tur) ? ' secili' : '') + '" data-urun="' + it.id + '" aria-label="' + it.ad + (bak2 ? ', önizleniyor' : on ? ', kuşanıldı' : has ? ', kuşan' : it.isik ? ', kuyunun ışığı ' + it.isik + '. seviyede açılır' : ', ' + it.fiyat + ' ateşböceği, önizlemek için dokun') + '">' +
         swatch(it) + '<b>' + it.ad + '</b>' + durum + '</button>';
@@ -390,6 +440,12 @@
     $('satinCubuk').hidden = !it;
     if (!it) return;
     $('scUrun').innerHTML = swatch(it) + '<span><b>' + it.ad + '</b><small>' + window.KuyuEkonomi.TURLER[it.tur] + '</small></span>';
+    if (it.lig != null) { // Haftalık lig ödülü: satın alınmaz
+      var lad = window.KuyuEkonomi.LIG[it.lig].ad;
+      $('scAl').disabled = true; $('scAl').textContent = lad + ' liginde açılır';
+      $('scAl').setAttribute('aria-label', it.ad + ', Haftalık Kuyu\'da ' + lad + ' ligine ulaşınca açılır');
+      return;
+    }
     if (it.isik) { // ışık yolu ödülü: satın alınmaz
       $('scAl').disabled = true; $('scAl').textContent = 'Işık ' + it.isik + '\'te açılır';
       $('scAl').setAttribute('aria-label', it.ad + ', kuyunun ışığı ' + it.isik + '. seviyeye gelince açılır');
@@ -405,7 +461,7 @@
     var it = onizleme && window.KuyuEkonomi.item(onizleme); if (!it) return;
     var r = G.satinAl(it.id);
     if (r.ok) { onizleme = null; if (G.sfx) G.sfx.won(); toast(it.ad + ' alındı ve kuşanıldı'); }
-    else if (r.neden === 'yetersiz') toast(r.eksik + ' ateşböceği eksik. Bölüm, Sonsuz Kuyu, görev ve günlük girişten toplanır.');
+    else if (r.neden === 'yetersiz') toast(r.eksik + ' ateşböceği eksik. Bölüm, Günlük ve Haftalık Kuyu, görev ve günlük girişten toplanır.');
     renderDolap();
   });
   document.querySelectorAll('[data-dolap]').forEach(function (b) { b.addEventListener('click', function () { dolapTur = b.dataset.dolap; renderDolap(); }); });
@@ -860,6 +916,7 @@
   // oyunun kullandığı arayüz
   window.KuyuScreens = {
     home: home,
+    hak: openHak,
     // sonuç kartındaki kısa yol: Dolap o ürünün önizlemesiyle açılır
     dolap: function (id) {
       var it = window.KuyuEkonomi.item(id);
