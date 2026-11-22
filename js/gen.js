@@ -771,16 +771,20 @@
     }
     return { kind: 'ring', x: 180, y: Math.round(hp.y - 175), fener: true };
   }
-  // İkinci yolculuk (25–48, v0.62): aynı tarif, öğret bölmesi ve duvar yazısı yok, su baştan izler (Taş 26, Maden 22,
-  // Kristal 18, Kule 15 m), halkalar biraz seyrek; yerleşim kendi tohumundan (aynı bölümün farklı kuyusu). Not ve kutu yok.
-  var IKINCI_TAKIP = [26, 22, 18, 15];
+  // İkinci yolculuk (25–48, v0.62; v0.65 denge): aynı tarif, duvar yazısı ve kutu yok; öğret bölmesi "sına"ya döner (zikzaksız,
+  // birer ateşböceği; bölüm ilk yolculuk kadar uzun), su baştan ve daha yakından izler (Taş 22, Maden 18, Kristal 16, Kule 15 m),
+  // halkalar biraz seyrek; yerleşim kendi tohumundan (aynı bölümün farklı kuyusu). Not yok.
+  var IKINCI_TAKIP = [22, 18, 16, 15];
   function ikinciTarif(T, no) {
     var t = T.bul(no - T.sayi);
     if (!t) return null;
-    var bl = t.bolmeler.filter(function (b, i) { return !(i === 0 && b.tur === 'ogret' && t.bolmeler.length > 2); })
-      .map(function (b) { return Object.assign({}, b, { yazilar: [], kutu: false, dy: [(b.dy ? b.dy[0] : 165) + 10, (b.dy ? b.dy[1] : 210) + 8] }); });
+    var bl = t.bolmeler.map(function (b) {
+      var o = Object.assign({}, b, { yazilar: [], kutu: false, duzen: null, dy: [(b.dy ? b.dy[0] : 165) + 10, (b.dy ? b.dy[1] : 210) + 8] });
+      if (b.tur === 'ogret') { o.tur = 'sina'; o.ff = Math.max(1, b.ff || 0); }
+      return o;
+    });
     return Object.assign({}, t, { no: no, bolmeler: bl, takip: Math.min(t.takip || 99, IKINCI_TAKIP[t.bolge]), su: 0, suFener: null, not: 0, ikinci: true,
-      ipucu: 'İkinci yolculuk: öğretici bölme yok, su baştan izliyor. ' + t.ipucu });
+      ipucu: 'İkinci yolculuk: su baştan ve daha yakından izliyor, öğretici yazı yok. ' + t.ipucu });
   }
   function createBolum(no) {
     var T = tarifler(), tarif = T && (no > T.sayi ? ikinciTarif(T, no) : T.bul(no));
