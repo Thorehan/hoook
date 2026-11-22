@@ -8,9 +8,10 @@
 - Devir noktası: v0.55 (yayında). Bu dönemin başı: v0.51, etiket `geri-donus-v0.51`; v0.52–v0.55'in her biri ayrı commit, `git revert` ile tek tek geri alınabilir.
 - Devir Törehan'dayken Mustafa projede geliştirme yapmaz; devir `docs/DEVIR-MUSTAFA.md` §6'daki adımlarla yapılır.
 
-## Son durum (v0.64)
+## Son durum (v0.65)
 
-- **Yayında v0.64** (19/11/2026, Törehan): Hikâye ana oyun (dokun → sıradaki bölüm); serbest Sonsuz kalktı; Günlük 3/gün, Haftalık 5/hafta deneme, video ile artan yenileme; günün hedefi, seri ödülü, lig görünümleri, rekor duvarı. Telefonda denenecek: `docs/telefon-testi.md` §12.
+- **Yayında v0.65** (22/11/2026, Törehan): denge; ikinci yolculuk ilk yolculuk kadar uzun ve su daha yakın. Spam önlemi sınırında: daha sert önlem düşünen oyuncuyu bozuyor.
+- v0.64 (19/11/2026): Hikâye ana oyun (dokun → sıradaki bölüm); serbest Sonsuz kalktı; Günlük 3/gün, Haftalık 5/hafta deneme, video ile artan yenileme; günün hedefi, seri ödülü, lig görünümleri, rekor duvarı. Telefonda denenecek: `docs/telefon-testi.md` §12.
 - v0.63: Hikâye denge (Aşama 5): spam ortalama oyuncu düzeyine indi (boş atış kilidi, Maden'den sonra yanlış taraf ipi bırakır, halkalar %40 aynı yanda). 24 bölüm planı tamam. Telefonda denenecek: `docs/telefon-testi.md` §11.
 - v0.62: Hikâye geçişi. 24 bölüm + ikinci yolculuk (25–48) asıl Hikâye; eski bölümler kalktı, kayıt bölgeye göre taşındı. Geri dönüş: `geri-donus-v0.61`. Telefonda denenecek: `docs/telefon-testi.md` §10.
 - v0.61: Yeni Hikâye Aşama 3, bölüm 13–24 (Kristal ve Kule; notlar 7–12, finaller). 24 bölüm deneme olarak tamam. Telefonda denenecek: `docs/telefon-testi.md` §9.

@@ -1,6 +1,6 @@
 # Kuyu
 
-**Funday Morning Games** · 2D mobil oyun · prototip v0.63
+**Funday Morning Games** · 2D mobil oyun · prototip v0.65
 
 Derin bir kuyunun dibindesin. Telefonu tek elle tut: ekranın soluna ya da sağına dokun, kanca o taraftaki hedefe fırlasın; basılı tut, ipe sarıl; bırak, savrul. Halkadan halkaya, ahşaptan ahşaba tırmanıp kuyudan çık.
 
@@ -96,7 +96,8 @@ Kayıt `js/hayalet.js`: kahramanın yeri sim zamanına göre saniyede 15 kez al�
 ## Hikâye: 24 uzun bölüm + ikinci yolculuk (v0.59–v0.62)
 **v0.62'den beri asıl Hikâye:** 24 uzun ve öğretici bölüm (Taş Kuyu 1–6, Maden 7–12, Kristal Mağara 13–18, Eski Kule 19–24) ve ikinci yolculuk 25–48 (plan: `docs/hikaye-bolumleri-plan.md`). Eski el yapımı (1–6) ve sınırsız üretilen bölümler oyundan kalktı (kodları `levels.js` ve `gen.createLevel`, botlar için duruyor). `?bolum=N` ya da `?hikaye=N` (1–48) doğrudan açar.
 - **Kayıt taşıma (v0.62, `game.js` → `hikayeGecisi`, bir kez):** Eski bölüm kayıtları `save.eskiBest`'e arşivlenir. Geçilen eski bölümler bölgeye göre oranla yeni bölümlere çevrilir (Taş 1–16 → 1–6, Maden 17–36 → 7–12, Kristal 37–56 → 13–18, Kule 57–76 → 19–24, 77–156 → 25–48; ör. 20 bölümün 10'u geçildiyse bölgenin ilk 3 bölümü). Çevrilen bölümler geçildi sayılır, madalyalar yeniden kazanılır. Deneme kayıtları (`save.yeniHikaye`) madalyalarıyla korunur. Toplam ödül puanı `odulEk`'e taşınır; notlar, finaller, cüzdan, Dolap ve başarım kademeleri aynen kalır. Bölüm hayaletleri yeni numaralara geçer (eskiler silinir).
-- **İkinci yolculuk (25–48):** Aynı tarif; öğret bölmesi, duvar yazısı ve kutu yok; su baştan izler (Taş 26, Maden 22, Kristal 18, Kule 15 m); halkalar biraz seyrek; yerleşim kendi tohumundan. Bölgeye ilk girişte ikinci yolculuk kartı.
+- **İkinci yolculuk (25–48):** Aynı tarif; duvar yazısı ve kutu yok; öğret bölmesi "sına"ya döner (zikzaksız, birer ateşböceği; v0.65, bölümler ilk yolculuk kadar uzun); su baştan ve daha yakından izler (v0.65: Taş 22, Maden 18, Kristal 16, Kule 15 m); halkalar biraz seyrek; yerleşim kendi tohumundan. Ölçüm (`hikaye-denge.js`): temkinli %5 Taş/Maden 36–47 sn (v0.64'te 28–42), %20 hatalı ara sıra fenere döner.
+- **Spam (v0.65 notu):** Kısa basıp bırakan spam, hareketi akış oyuncusuna benzediği için yavaş-temkinli modelden bazen hızlı, düşünen akış oyuncusundan 2–3 kat yavaş. Daha sert önlem (boş atış kilidi 0,6 sn, %55 aynı yan) denendi: spam değişmedi, temkinli oyuncu 67 → 118 sn ve 5 fener dönüşüne çıktı; geri alındı. Bölgeye ilk girişte ikinci yolculuk kartı.
 - **Hikâye ekranı:** 8 grup (dört bölge, sonra ikinci yolculukta dört bölge), 48 kart; özet, "Eksik hedefler" filtresi, sıradaki bölüm.
 - **Denge (v0.63, Aşama 5):** Boş atışa (yanlış taraf) her bölümde 0,4 sn kilit (giriş tamponu düşünen oyuncuyu korur); Maden'den sonra ve ikinci yolculukta yanlış taraf ipi bırakır (v0.52'de onaylanan kural; Taş Kuyu öğretici, ip kalır). Maden'den sonra halkalar ara sıra (%40) öncekiyle aynı yanda: sırayla sol-sağ basan spam yanlış yana basar. Ölçüm `node tools/hikaye-denge.js` (48 bölüm): hatasız ve %5 hatalı oyuncu hepsini geçer (Taş ~40 sn, Kule ~65 sn), %20 hatalı bölüm başına 0–3 fener dönüşüyle, yavaş oyuncu Kule'yi ~150 sn'de; tek taraf hiçbirini geçmez; spam Maden'den sonra ortalama oyuncu düzeyinde ya da yavaş, düşünen akış oyuncusundan 2–10 kat yavaş (Taş Kuyu ve ikinci yolculuğun ilk bölümlerinde ortalamadan biraz hızlı).
 - **Görev ve başarım eşikleri (v0.62):** "bölüm geç" 2/4/7 → 1/2/3, "Kusursuz geç" 1/2/4 → 1/1/2; Kâşif 10/30/100 → 6/24/48, Kusursuz 5/20/60 → 3/12/30. Kazanılmış kademe geri alınmaz.
