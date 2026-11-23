@@ -133,6 +133,7 @@ Kullanıcı hikâyeye online'dan önce geçti; online (5) sonra.
 - [?] Bekçinin adı.
 
 ## Yapılanlar
+- 2026-11-23 · Telefon onayı (v0.71): kor, çark, akıntı, bölüm süreleri, su, fener, his efektleri ve kontrol iyi; ince ayar gerekmedi.
 - 2026-11-23 · v0.71 · Akıntı sütunu (Aşama C, 3/3): akış sürerken yukarı süzdüren hava sütunu, kestirme. 21. bölüm öğretir, 22–24'te birer; Günlük/Haftalık aynı tarihten. Bot 48/48, nişan kurala aykırı 0; hatasız oyuncu yanmıyor (0/12; önce akıntı yay süzülmesini sıfırlıyordu, düzeltildi), spam geride kalıyor (ortanca 1013 m, eskisi 2002).
 - 2026-11-23 · v0.70 · Döner çark (Aşama C, 2/3): üç halkalı dönen çark; yükselen halka taşır, yükselirken bırakınca fırlatır; aynı çarkın diğer halkaları kancayı tutmaz. 16. bölüm öğretir, 18/20/22/24'te birer; Günlük/Haftalık kor ile aynı tarihten. Bot 48/48, nişan kurala aykırı 0, denge modelleri çarklı bölümleri geçiyor.
 - 2026-11-23 · v0.69 · Kor halka (Aşama C, 1/3): 1,5 sn sonra söner ve bırakır, 1 sn soğur. 7. bölüm öğretir, Maden/Kristal/Kule'de karışık; Günlük 24/11'den, Haftalık 30/11 haftasından. Bot 48/48, nişan kurala aykırı 0, tek taraf geçemiyor; denge: tepki vermeyen yavaş oyuncu 1,5 sn'de de 2 sn'de de takılıyordu, modele yay tepkisi eklendi (geçiyor). Kor açık Sonsuz'da hatasız oyuncu yanmıyor, sıralı spam 1161 → 886 m.
