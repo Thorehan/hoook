@@ -587,3 +587,4 @@ button:active { filter: brightness(.94); }
 .duvar-hafta li span { flex: 1; color: var(--soluk); }
 .duvar-hafta li em { font-style: normal; font-variant-numeric: tabular-nums; }
 .duvar-hafta li.bos { color: var(--soluk); }
+.duvar-hafta .duvar-yildiz { font-style: normal; color: #ffd36a; font-size: 11px; margin-left: 4px; }

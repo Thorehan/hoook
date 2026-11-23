@@ -16,8 +16,8 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@600;800&family=Figtree:wght@400;600&display=swap">
-<link rel="stylesheet" href="css/kuyu.css?v=0.65">
-<link rel="stylesheet" href="css/ekranlar.css?v=0.65">
+<link rel="stylesheet" href="css/kuyu.css?v=0.66">
+<link rel="stylesheet" href="css/ekranlar.css?v=0.66">
 </head>
 <body>
 <div class="app" id="oyunEkrani" hidden>
@@ -72,7 +72,7 @@
   <img id="acilisLogo" class="marka-logo" src="assets/funday-morning-logo.webp" alt="Funday Morning Games">
   <div class="yukleme" aria-hidden="true"><div id="yuklemeDolgu"></div></div>
   <div class="yukleme-not" id="yuklemeNot">Yükleniyor…</div>
-  <div class="ek-surum">Kuyu v0.65</div>
+  <div class="ek-surum">Kuyu v0.66</div>
 </section>
 
 <!-- Giriş: yalnızca ilk açılışta -->
@@ -124,7 +124,7 @@
     </button>
     <div class="ana-kartlar">
       <button type="button" class="ana-kart gunluk" id="gunlukBtn"><b>Günlük Kuyu</b><span id="gunlukBilgi">Bugünün kuyusu hazır</span><span class="yildizlar kucuk" id="gunlukYildiz" aria-hidden="true"></span><span class="hak" id="gunlukHak"></span><span class="seri" id="gunlukSeri" hidden></span></button>
-      <button type="button" class="ana-kart haftalik" id="haftalikBtn"><b>Haftalık Kuyu</b><span id="haftalikBilgi">Herkes aynı kuyuda</span><span class="lig-rozet" id="haftalikLig">Lig yok</span><span class="hak" id="haftalikHak"></span></button>
+      <button type="button" class="ana-kart haftalik" id="haftalikBtn"><b>Haftalık Kuyu</b><span id="haftalikBilgi">Herkes aynı kuyuda</span><span class="yildizlar kucuk" id="haftalikYildiz" aria-hidden="true"></span><span class="lig-rozet" id="haftalikLig">Lig yok</span><span class="hak" id="haftalikHak"></span></button>
     </div>
   </div>
 </section>
@@ -235,7 +235,7 @@
       <h3>Rekor duvarı</h3>
       <div class="duvar" id="pDuvar" role="img" aria-label="Son 28 günün Günlük Kuyu yıldızları"></div>
       <ol class="duvar-hafta" id="pHaftalar"></ol>
-      <p class="not">Her kare bir gün: Günlük Kuyu'da kazandığın yıldız (günün hedefi). Haftalar: Haftalık Kuyu ligi ve en iyi puan.</p>
+      <p class="not">Her kare bir gün: Günlük Kuyu'da kazandığın yıldız (günün hedefi). Haftalar: Haftalık Kuyu yıldızları (haftanın hedefi), ligi ve en iyi puan.</p>
       <h3>Sonsuz Kuyu rekoru (v0.63'e kadar)</h3>
       <div class="profil-izgara">
         <div><small>Rekor puan</small><b id="pRekor">0</b></div>
@@ -277,7 +277,7 @@
     <button type="button" id="istatBtn">Oyun istatistikleri</button>
     <button type="button" id="tanitimBtn">Tanıtımı yeniden izle</button>
     <button type="button" id="ipucuSifirBtn">Tanıtım kartlarını yeniden göster</button>
-    <p class="surum">Kuyu v0.65 · prototip · Funday Morning Games</p>
+    <p class="surum">Kuyu v0.66 · prototip · Funday Morning Games</p>
   </div>
 </section>
 
@@ -325,18 +325,18 @@
 <div class="hikaye-kart" id="hikayeKart" role="status" hidden><b id="hkBaslik"></b><span id="hkMetin"></span></div>
 <div class="bildirim" id="bildirim" role="status" hidden></div>
 
-<script src="js/engine.js?v=0.65"></script>
-<script src="js/levels.js?v=0.65"></script>
-<script src="js/bolumler.js?v=0.65"></script>
-<script src="js/gen.js?v=0.65"></script>
-<script src="js/gorevler.js?v=0.65"></script>
-<script src="js/ekonomi.js?v=0.65"></script>
-<script src="js/istatistik.js?v=0.65"></script>
-<script src="js/muzik.js?v=0.65"></script>
-<script src="js/notlar.js?v=0.65"></script>
-<script src="js/hayalet.js?v=0.65"></script>
-<script src="js/online.js?v=0.65"></script>
-<script src="js/game.js?v=0.65"></script>
-<script src="js/screens.js?v=0.65"></script>
+<script src="js/engine.js?v=0.66"></script>
+<script src="js/levels.js?v=0.66"></script>
+<script src="js/bolumler.js?v=0.66"></script>
+<script src="js/gen.js?v=0.66"></script>
+<script src="js/gorevler.js?v=0.66"></script>
+<script src="js/ekonomi.js?v=0.66"></script>
+<script src="js/istatistik.js?v=0.66"></script>
+<script src="js/muzik.js?v=0.66"></script>
+<script src="js/notlar.js?v=0.66"></script>
+<script src="js/hayalet.js?v=0.66"></script>
+<script src="js/online.js?v=0.66"></script>
+<script src="js/game.js?v=0.66"></script>
+<script src="js/screens.js?v=0.66"></script>
 </body>
 </html>

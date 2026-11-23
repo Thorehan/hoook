@@ -133,6 +133,7 @@ Kullanıcı hikâyeye online'dan önce geçti; online (5) sonra.
 - [?] Bekçinin adı.
 
 ## Yapılanlar
+- 2026-11-23 · v0.66 · Haftanın hedefi: Haftalık Kuyu'da haftalık puan hedefi, 1–3 yıldız (+10/+10/+20), kartta, sonuç kartında ve rekor duvarında. Ortalama gün ~157 ateşböceği.
 - 2026-11-22 · v0.65 · Denge: ikinci yolculuk ilk yolculuk kadar uzun (öğret bölmesi sına olur), su daha yakın (22/18/16/15 m). Spam için daha sert kilit ve aynı yan denendi, düşünen oyuncuyu bozduğu için geri alındı.
 - 2026-11-19 · v0.64 · Hikâye ana oyun; serbest Sonsuz Kuyu kalktı. Günlük (3/gün) ve Haftalık (5/hafta) sınırlı denemeli, video ile artan yenileme (1→5, sonra Hikâye), günün hedefi yıldızları, seri ödülü ve donma, büyüyen lig ödülü ve lig görünümleri, Profil'de rekor duvarı; devam hakkı kalktı.
 - 2026-11-19 · v0.63 · Hikâye denge (Aşama 5): boş atış kilidi her bölümde, Maden'den sonra yanlış taraf ipi bırakır, halkalar %40 aynı yanda; spam ortalama oyuncu düzeyine indi, düşünen oyuncu etkilenmedi. Ölçüm aracı `tools/hikaye-denge.js`. 24 bölüm planı tamam.

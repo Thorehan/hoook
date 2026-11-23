@@ -86,6 +86,11 @@ ok(dv.cuzdan.harcanan === 75, 'harcanan sayılır');
   ok(K.hakDurum(hs, 'gunluk', 'H').kalan === 3, 'yeni gün yeni haklar');
   const g = K.gunHedef('X');
   ok(K.gunYildizKaydet(hs, 'X', g.metre * 2).yildiz === 3 && K.gunYildizKaydet(hs, 'X', g.metre * 2).odul === 0, 'yıldız ödülü bir kez');
+  // v0.66: haftanın hedefi (puan)
+  const hh = K.haftaHedef('2026-11-23'), once = hs.cuzdan.ates;
+  ok(hh.esik[1] === Math.round(hh.puan * 1.5) && K.haftaYildizKaydet(hs, '2026-11-23', hh.puan).yildiz === 1 && hs.cuzdan.ates === once + K.HAFTA_YILDIZ_ODUL[0], 'haftanın hedefi 1 yıldız');
+  ok(K.haftaYildizKaydet(hs, '2026-11-23', hh.puan * 2).odul === K.HAFTA_YILDIZ_ODUL[1] + K.HAFTA_YILDIZ_ODUL[2] && K.haftaYildizKaydet(hs, '2026-11-23', hh.puan * 2).odul === 0, 'hafta yıldızları birer kez');
+  ok(K.haftaYildizDurum(hs, '2026-11-30') === 0, 'yeni hafta yıldızsız');
 }
 console.log(bad ? bad + ' hata' : 'Tamam: cüzdan, günlük giriş, dolap, lig, haklar ve günün hedefi');
 process.exit(bad ? 1 : 0);

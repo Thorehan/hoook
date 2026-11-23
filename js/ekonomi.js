@@ -273,6 +273,28 @@
     return { yildiz: g.yildiz, yeni: yeni, odul: odul };
   }
   function gunYildizDurum(save, key) { return save.gunYildiz && save.gunYildiz.key === key ? save.gunYildiz.yildiz : 0; }
+  // ---------- Haftanın hedefi (v0.66) ----------
+  // Haftalık Kuyu'da her hafta bir hedef PUAN (lig de puanla belirlenir; haftanın tarihinden). 1 yıldız hedef, 2 yıldız 1,5 kat,
+  // 3 yıldız 2 kat; her yıldız haftada bir kez ödül verir. Haftanın ilk denemelerinden itibaren bir amaç olsun.
+  var HAFTA_YILDIZ_ODUL = [10, 10, 20], HAFTA_HEDEF = [1200, 200]; // taban, adım (5 adım)
+  function haftaHedef(key) {
+    var h = 2166136261 >>> 0, s = 'hafta-' + key;
+    for (var i = 0; i < s.length; i++) { h ^= s.charCodeAt(i); h = Math.imul(h, 16777619) >>> 0; }
+    var p = HAFTA_HEDEF[0] + (h % 5) * HAFTA_HEDEF[1];
+    return { puan: p, esik: [p, Math.round(p * 1.5), p * 2] };
+  }
+  function haftaYildizSay(key, puan) { var e = haftaHedef(key).esik, n = 0; for (var i = 0; i < 3; i++) if (puan >= e[i]) n = i + 1; return n; }
+  function haftaYildizKaydet(save, key, puan) {
+    ensure(save);
+    var g = save.haftaYildiz && save.haftaYildiz.key === key ? save.haftaYildiz : { key: key, yildiz: 0 };
+    var n = haftaYildizSay(key, puan), odul = 0, yeni = 0;
+    for (var i = g.yildiz; i < n; i++) { odul += HAFTA_YILDIZ_ODUL[i]; yeni++; }
+    g.yildiz = Math.max(g.yildiz, n); save.haftaYildiz = g;
+    if (odul) kazan(save, odul);
+    gecmisYaz(save, 'haftalik', key, { yildiz: g.yildiz });
+    return { yildiz: g.yildiz, yeni: yeni, odul: odul };
+  }
+  function haftaYildizDurum(save, key) { return save.haftaYildiz && save.haftaYildiz.key === key ? save.haftaYildiz.yildiz : 0; }
   // ---------- Seri ödülü (v0.64) ----------
   // Art arda günlerde Günlük Kuyu: 3, 7, 14, 30. günde ateşböceği. Bir günlük donma hakkı: bir gün kaçırılınca seri sürer;
   // başlangıçta 1, her 7 günlük eşikte yeniden dolar (en çok 1).
@@ -291,6 +313,7 @@
   var api = { HAK: HAK, YENILEME_EN: YENILEME_EN, hakDurum: hakDurum, hakKullan: hakKullan, hakVideo: hakVideo,
     YILDIZ_ODUL: YILDIZ_ODUL, gunHedef: gunHedef, yildizSay: yildizSay, gunYildizKaydet: gunYildizKaydet, gunYildizDurum: gunYildizDurum,
     SERI_ODUL: SERI_ODUL, gecmisYaz: gecmisYaz,
+    HAFTA_YILDIZ_ODUL: HAFTA_YILDIZ_ODUL, haftaHedef: haftaHedef, haftaYildizSay: haftaYildizSay, haftaYildizKaydet: haftaYildizKaydet, haftaYildizDurum: haftaYildizDurum,
     GIRIS: GIRIS, GOREV_ATES: GOREV_ATES, BASARIM_ATES: BASARIM_ATES, KATALOG: KATALOG, TURLER: TURLER, VARSAYILAN: VARSAYILAN,
     ensure: ensure, kazan: kazan, bolumOde: bolumOde, girisDurum: girisDurum, girisAl: girisAl,
     LIG: LIG, ligOf: ligOf, ligOdul: ligOdul, haftalikDurum: haftalikDurum, haftalikKaydet: haftalikKaydet, haftalikKapat: haftalikKapat,

@@ -293,7 +293,7 @@
   function haftaKey() { var d = new Date(Date.now() + GUN_KAYMA); d.setUTCDate(d.getUTCDate() - (d.getUTCDay() + 6) % 7); return d.toISOString().slice(0, 10); }
   function msHaftaSonu() { var n = new Date(Date.now() + GUN_KAYMA), t = Date.UTC(n.getUTCFullYear(), n.getUTCMonth(), n.getUTCDate() - (n.getUTCDay() + 6) % 7 + 7); return t - n.getTime(); }
   function kalanYazi(ms) { var g = Math.floor(ms / 864e5), sa = Math.floor(ms % 864e5 / 36e5), dk = Math.floor(ms % 36e5 / 6e4); return g ? g + ' gün ' + sa + ' sa' : sa ? sa + ' sa ' + dk + ' dk' : dk + ' dk'; }
-  function haftalikInfo() { var d = EKO.haftalikDurum(save, haftaKey()); d.kalan = kalanYazi(msHaftaSonu()); d.hak = EKO.hakDurum(save, 'haftalik', haftaKey()); return d; }
+  function haftalikInfo() { var d = EKO.haftalikDurum(save, haftaKey()); d.kalan = kalanYazi(msHaftaSonu()); d.hak = EKO.hakDurum(save, 'haftalik', haftaKey()); d.hedef = EKO.haftaHedef(haftaKey()); d.yildiz = EKO.haftaYildizDurum(save, haftaKey()); return d; }
   // Hikâye'de sıradaki bölüm: geçilmemiş ilk bölüm (dokun ve başla buradan sürer, v0.64)
   function siradakiBolum() { var n = 1; while (save.best[n] && save.best[n].done && n < BOLUM_SAYI) n++; return n; }
   function hikayeBitti() { for (var n = 1; n <= BOLUM_SAYI; n++) if (!(save.best[n] && save.best[n].done)) return false; return true; }
@@ -1914,6 +1914,11 @@
     } else if (weekKey) {
       // Haftalık: haftanın en iyisi ve lig (js/ekonomi.js); ödül hafta bitince ödenir
       var hk = EKO.haftalikKaydet(save, weekKey, sc, m), hd = EKO.haftalikDurum(save, weekKey);
+      // haftanın hedefi (v0.66): puanla 1–3 yıldız, her yıldız haftada bir kez ödül
+      var hy = EKO.haftaYildizKaydet(save, weekKey, sc), hh = EKO.haftaHedef(weekKey);
+      var haftaYildizHtml = '<div class="gun-yildiz" aria-label="Haftanın hedefi ' + hh.puan + ' puan, ' + hy.yildiz + ' yıldız"><span class="yildizlar">' +
+        [0, 1, 2].map(function (i) { return '<i class="' + (i < hy.yildiz ? 'var' : '') + '">★</i>'; }).join('') + '</span><small>Haftanın hedefi ' + hh.esik.join(' · ') + ' puan' +
+        (hy.odul ? ' · +' + hy.odul + ' ateşböceği' : '') + '</small></div>';
       isRecord = hk.rekor; recM = false;
       title = hk.ligAtladi ? hd.ligAd + ' ligi!' : isRecord && hd.tries > 1 ? 'Haftanın rekoru!' : isRecord ? 'Haftanın ilk puanı' : 'Su yetişti';
       sub = 'Haftalık Kuyu · ' + hd.tries + '. deneme · ' + EKO.hakDurum(save, 'haftalik', weekKey).kalan + ' deneme kaldı';
@@ -1947,7 +1952,7 @@
       (sim.zincir ? stat(IK.tam, sim.zincir + ' zincir', sim.zincir + ' ateşböceği zincirini akışla tamamladın', false) : '') +
       (sim.devam ? stat(IK.akis, sim.devam + ' devam', sim.devam + ' kez devam ettin', false) : '') +
       '</div>' +
-      (dailyKey ? yildizHtml : '') +
+      (dailyKey ? yildizHtml : weekKey && !meydan ? haftaYildizHtml : '') +
       '<p class="rekor-satir">' + recLine + '</p>' + kazanimHtml(kaz, odenen) +
       dolapKisaYol(cuzdanOnce) +
       (tahta ? '<div class="skor-tablo" id="skorTablo" aria-live="polite"><small>Skor tablosu yükleniyor…</small></div>' : '') +

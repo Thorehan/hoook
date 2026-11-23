@@ -1,6 +1,6 @@
 # Kuyu
 
-**Funday Morning Games** · 2D mobil oyun · prototip v0.65
+**Funday Morning Games** · 2D mobil oyun · prototip v0.66
 
 Derin bir kuyunun dibindesin. Telefonu tek elle tut: ekranın soluna ya da sağına dokun, kanca o taraftaki hedefe fırlasın; basılı tut, ipe sarıl; bırak, savrul. Halkadan halkaya, ahşaptan ahşaba tırmanıp kuyudan çık.
 
@@ -133,11 +133,12 @@ Serbest Sonsuz Kuyu kalktı (eski bağlantılar Günlük Kuyu'ya gider; eski rek
 - **Deneme hakkı:** Günlük günde 3, Haftalık haftada 5 (`ekonomi.js` → `HAK`). Her koşu bir hak harcar; "Bir daha dene" ve "Baştan başla" dahil. Meydan okuma bağlantısı hak harcamaz.
 - **Hak yenileme (video):** Hak bitince pencere açılır. Video izleyerek +1 deneme: 1. yenileme 1 video, 2. yenileme 2 video, … 5. yenileme 5 video (`hakVideo`). 5 yenilemeden sonra o gün/hafta başka reklam ve deneme yok; pencere oyuncuyu Hikâye'de sıradaki bölüme yönlendirir. Video yalnız oyuncu seçerse oynar.
 - **Günün hedefi:** Her gün bir hedef metre (600–1000, tarihten). 1 yıldız hedef, 2 yıldız 1,5 kat, 3 yıldız 2 kat; her yıldız günde bir kez +5 / +5 / +10 ateşböceği (`gunHedef`, `gunYildizKaydet`). Kartta ve sonuç kartında yıldızlar.
+- **Haftanın hedefi (v0.66):** Haftalık Kuyu'da her hafta bir hedef puan (1200–2000, haftanın tarihinden). 1 yıldız hedef, 2 yıldız 1,5 kat, 3 yıldız 2 kat; her yıldız haftada bir kez +10 / +10 / +20 ateşböceği (`haftaHedef`, `haftaYildizKaydet`). Haftalık kartında ve sonuç kartında yıldızlar; rekor duvarındaki hafta satırında da.
 - **Seri ödülü:** Art arda günlerde Günlük Kuyu: 3. günde 20, 7. günde 50, 14. günde 100, 30. günde 200 ateşböceği. Bir günlük donma hakkı: bir gün kaçırılınca seri sürer (başta 1, her 7 günde yeniden dolar).
 - **Lig:** Ödüller büyüdü (Bronz 25, Gümüş 50, Altın 80, Elmas 120, Fener 180; hafta bitince). Altın, Elmas ve Fener ligine ulaşınca birer satılmayan görünüm açılır (Altın lig atkısı, Elmas iz, Fener alevi).
 - **Rekor duvarı (Profil):** Son 28 günün Günlük Kuyu yıldızları (takvim) ve son 8 haftanın ligi ile en iyi puanı (`save.gecmis`).
 - **Devam hakkı kalktı:** Yarışmada herkes eşit.
-- Ekonomi (`node tools/ekonomi-olcum.js`, yarışma koşusu en çok 200 sn sayılır): ortalama oyuncu günde ~150 ateşböceği (v0.63: ~120).
+- Ekonomi (`node tools/ekonomi-olcum.js`, yarışma koşusu en çok 200 sn sayılır): ortalama oyuncu günde ~157 ateşböceği (v0.63: ~120; haftanın hedefi günde ~6 ekler).
 
 ## Devam hakkı (v0.49, İstişare 2; v0.64'te kalktı)
 Yalnız Sonsuz Kuyu'da (Günlük Kuyu'da yok, herkes için eşit). Su yakalayınca ortada 5 saniyelik bir teklif çıkar: geri sayım halkası, **▶ Video izle** (yalnız ilk devamda, oyuncu seçerse), **ateşböceği ile devam** ve **Geç**. Bir koşuda en çok 3 devam; bedel 25 → 50 → 100 ateşböceği (`ekonomi.js` → `DEVAM_BEDEL`, `devamOde`). Bakiye yetmezse düğmede kaç eksik olduğu yazar. Süre dolarsa ya da menü düğmesine basılırsa "Geç" sayılır, koşu kaydedilir. Devam edince Çıra en yüksek güvenli halkaya (yay ve geçit değil) asılı döner, su güvenli mesafeye çekilir, akış sıfırlanır (`engine.js` → `dirilt`). Sonuç kartında devam sayısı görünür. Web sürümünde video 3 sn'lik yer tutucu; Unity'de ödüllü reklam bağlanacak.

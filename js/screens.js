@@ -166,10 +166,12 @@
     var gecen = G.haftalikKapat();
     if (gecen) { $('toplamAtes').textContent = G.cuzdan().ates; setTimeout(function () { toast('Geçen hafta ' + gecen.ligAd + ' ligindeydin · +' + gecen.odul + ' ateşböceği', 3600); }, 1600); }
     var hf = G.haftalikInfo();
-    $('haftalikBilgi').textContent = hf.tries ? 'En iyi ' + hf.best + ' puan' + (hf.sonraki ? ' · ' + hf.sonraki.ad + ' için ' + (hf.sonraki.puan - hf.best) + ' daha' : '') : 'Herkes aynı kuyuda · ' + hf.kalan + ' kaldı';
+    $('haftalikBilgi').textContent = 'Hedef ' + hf.hedef.puan + ' puan' + (hf.tries ? ' · en iyi ' + hf.best : ' · ' + hf.kalan + ' kaldı');
     $('haftalikLig').textContent = hf.ligAd || 'Lig yok';
     $('haftalikLig').className = 'lig-rozet lig' + hf.lig;
     $('haftalikHak').textContent = hakYazi(hf.hak, 'Pazartesi');
+    $('haftalikYildiz').innerHTML = [0, 1, 2].map(function (i) { return '<i class="' + (i < hf.yildiz ? 'var' : '') + '">★</i>'; }).join('');
+    $('haftalikBtn').setAttribute('aria-label', 'Haftalık Kuyu: hedef ' + hf.hedef.puan + ' puan, ' + hf.yildiz + ' yıldız, ' + (hf.ligAd ? hf.ligAd + ' ligi' : 'lig yok') + ', ' + hakYazi(hf.hak, 'pazartesi'));
     isikGuncelle();
     var ik = G.isik ? G.isik() : null;
     if (ik && ik.seviye > ik.gorulen) { G.isikGordu(ik.seviye); setTimeout(function () { toast('Kuyu biraz daha aydınlandı · Işık ' + ik.seviye + '/' + ik.en + (ik.odul ? ' · Dolap\'ta yeni: ' + ik.odul.ad + ' ' + window.KuyuEkonomi.TURLER[ik.odul.tur].toLocaleLowerCase('tr-TR') : ''), ik.odul ? 3600 : 2400); }, 700); }
@@ -254,7 +256,7 @@
     $('pDuvar').innerHTML = h;
     var L = window.KuyuEkonomi.LIG;
     $('pHaftalar').innerHTML = Object.keys(hf).sort().reverse().slice(0, 8).map(function (k) {
-      var o = hf[k]; return '<li><span>' + new Date(k + 'T12:00:00Z').toLocaleDateString('tr-TR', { day: 'numeric', month: 'short' }) + ' haftası</span><b>' + (o.lig >= 0 ? L[o.lig].ad : 'Lig yok') + '</b><em>' + (o.puan || 0) + '</em></li>';
+      var o = hf[k]; return '<li><span>' + new Date(k + 'T12:00:00Z').toLocaleDateString('tr-TR', { day: 'numeric', month: 'short' }) + ' haftası' + (o.yildiz ? ' <i class="duvar-yildiz">' + '★'.repeat(o.yildiz) + '</i>' : '') + '</span><b>' + (o.lig >= 0 ? L[o.lig].ad : 'Lig yok') + '</b><em>' + (o.puan || 0) + '</em></li>';
     }).join('') || '<li class="bos">Henüz Haftalık Kuyu koşusu yok.</li>';
   }
   function openProfile() {
