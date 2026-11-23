@@ -2339,7 +2339,7 @@
     function yaz(html) { var el = $('skorTablo'); if (el && sim === kosu) el.innerHTML = html; }
     ONLINE.gonder(save, tahta, ad, puan, metre).then(function () { persist(); return ONLINE.tablo(tahta, 100); }).then(function (rows) {
       var oz = ONLINE.ozet(rows, ONLINE.kimlik(save), 5);
-      yaz('<b>Skor tablosu' + (oz.sira ? ' · ' + oz.sira + '. sıradasın (' + oz.toplam + (oz.toplam >= 100 ? '+' : '') + ' oyuncu)' : ' · ilk 100 dışındasın') + '</b><ol>' +
+      yaz('<b>Skor tablosu' + (oz.sira ? ' · ' + oz.sira + '. sıradasın (' + oz.toplam + ' oyuncu)' : ' · ilk 100 dışındasın') + '</b><ol>' +
         oz.liste.map(function (r) { return '<li class="' + (r.ben ? 'ben' : '') + '"><span>' + r.sira + '. ' + r.ad + '</span><em>' + r.puan + '</em></li>'; }).join('') + '</ol>');
     }).catch(function () { yaz('<small>Skor tablosuna ulaşılamadı. Puanın bu cihazda kayıtlı.</small>'); });
   }

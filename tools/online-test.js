@@ -8,6 +8,8 @@ const ok = (c, m) => { if (!c) { bad++; console.log('HATA:', m); } };
 const kasa = {};
 global.localStorage = { getItem: k => (k in kasa ? kasa[k] : null), setItem: (k, v) => { kasa[k] = String(v); }, removeItem: k => { delete kasa[k]; } };
 const O = require('../js/online.js');
+ok(/^https:\/\/.+\.workers\.dev$/.test(O.AYAR.url) && O.AYAR.firebase.length > 20, 'canlı ayar dolu (Worker adresi ve Firebase anahtarı)');
+O.AYAR.url = ''; O.AYAR.firebase = ''; // testler canlı sunucuya gitmez: kapalı ayardan başlar
 
 // ---- meydan okuma: kodla / çöz ----
 const m = { tur: 's', seed: 3999999999, puan: 2450, ad: 'Çıra & <Kor>' };

@@ -13,7 +13,7 @@
   'use strict';
   // Hesaplar açılınca doldurulur. url: Worker adresi; firebase: Firebase web apiKey (herkese açık olacak şekilde
   // tasarlanmıştır, gizli anahtar değildir). Boşken online kapalıdır.
-  var AYAR = { url: '', firebase: '' };
+  var AYAR = { url: 'https://hoook-skor.torehan-anbarli.workers.dev', firebase: 'AIzaSyB4PlqU2y8fzorDA8cDaGJt0_C0MboReJM' };
   var YEREL = { url: 'http://localhost:8767', firebase: 'yerel-deneme', kimlikUrl: 'http://localhost:8767', yenileUrl: 'http://localhost:8767' };
   var KIMLIK_URL = 'https://identitytoolkit.googleapis.com', YENILE_URL = 'https://securetoken.googleapis.com';
   var DEPO = 'kuyu.online', OTURUM = 'kuyu.oturum';

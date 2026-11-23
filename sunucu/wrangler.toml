@@ -13,4 +13,4 @@ KOKENLER = "https://thorehan.github.io,http://localhost:8766"
 binding = "DB"
 database_name = "hoook-skor"
 # "npx wrangler@4 d1 create hoook-skor" komutunun verdiği kimlik buraya yazılır
-database_id = ""
+database_id = "3bb9ce0c-e7af-4550-8c9d-fff2718d655f"

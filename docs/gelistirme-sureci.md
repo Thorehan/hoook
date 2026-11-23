@@ -133,6 +133,7 @@ Kullanıcı hikâyeye online'dan önce geçti; online (5) sonra.
 - [?] Bekçinin adı.
 
 ## Yapılanlar
+- 2026-11-23 · v0.72 · Gerçek skor tablosu açıldı: Firebase anonim kimlik (proje hoook-6fed5) + Cloudflare Worker ve D1 (`hoook-skor`). Günlük ve Haftalık Kuyu sonuç kartında gerçek sıra ve ilk 5. Canlıda denendi (giriş, gönderim, sıra, izinli sayfa, sahte belge 401). Puan henüz doğrulanmıyor (Aşama 2).
 - 2026-11-23 · Telefon onayı (v0.71): kor, çark, akıntı, bölüm süreleri, su, fener, his efektleri ve kontrol iyi; ince ayar gerekmedi.
 - 2026-11-23 · v0.71 · Akıntı sütunu (Aşama C, 3/3): akış sürerken yukarı süzdüren hava sütunu, kestirme. 21. bölüm öğretir, 22–24'te birer; Günlük/Haftalık aynı tarihten. Bot 48/48, nişan kurala aykırı 0; hatasız oyuncu yanmıyor (0/12; önce akıntı yay süzülmesini sıfırlıyordu, düzeltildi), spam geride kalıyor (ortanca 1013 m, eskisi 2002).
 - 2026-11-23 · v0.70 · Döner çark (Aşama C, 2/3): üç halkalı dönen çark; yükselen halka taşır, yükselirken bırakınca fırlatır; aynı çarkın diğer halkaları kancayı tutmaz. 16. bölüm öğretir, 18/20/22/24'te birer; Günlük/Haftalık kor ile aynı tarihten. Bot 48/48, nişan kurala aykırı 0, denge modelleri çarklı bölümleri geçiyor.
