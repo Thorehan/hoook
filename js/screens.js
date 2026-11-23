@@ -25,10 +25,10 @@
       if (b.dataset.sekme === id && (!b.dataset.mod || b.dataset.mod === dolapMod)) b.setAttribute('aria-current', 'page'); else b.removeAttribute('aria-current');
     });
     if (id === 'ekAna' || id === 'ekTanitim') startScene(); else stopScene();
-    if (id === 'ekDolap') startPreview(); else stopPreview();
+    if (id !== 'ekDolap' && !$('urunKatman').hidden) urunKapat();
     if (id === 'ekKoleksiyon') kolBaslat(); else kolDur();
     if (id !== 'oyun' && id !== 'ekAcilis') G.muzikSahne('menu'); // menülerde sakin müzik
-    if (SEKMELER.indexOf(id) >= 0) $('gorevNokta').hidden = !G.gorevBekleyen();
+    if (SEKMELER.indexOf(id) >= 0) { $('gorevNokta').hidden = !G.gorevBekleyen(); $('marketNokta').hidden = !G.vitrinYeni() || id === 'ekDolap'; } // Market: bugünün vitrini görülmedi
   }
 
   // Hikâye kartı: ekranın üstünde, oyunu durdurmaz; dokununca ya da birkaç saniye sonra kapanır.
@@ -473,93 +473,111 @@
   $('girisVideoBtn').addEventListener('click', function () { $('girisKatman').hidden = true; video(function () { girisAl(2); }); });
   $('girisKapat').addEventListener('click', closeGiris);
 
-  // ---------- dolap ----------
-  // Sahip olunmayan ürüne ilk dokunuş ÖNİZLEMEdir: kahraman o renge bürünür, altta "Al · fiyat" çubuğu açılır.
-  // Satın alma yalnızca o çubuktaki "Al" ile olur. Sahip olunan ürüne dokunmak doğrudan kuşanır.
-  var dolapTur = 'karakter', previewRaf = 0, onizleme = null, onizlemeGorunum = null;
-  // v0.75: Dolap iki kipte açılır: Market (sende olmayanlar, fiyat ve kilit) · Koleksiyon (sende olanlar, kuşan). Aşama 2–3'te ayrı ekranlar olur.
-  var dolapMod = 'market';
-  function openDolap(mod) { dolapMod = mod === 'koleksiyon' ? 'koleksiyon' : 'market'; onizleme = null; renderDolap(); show('ekDolap'); $('ekDolap').scrollTop = 0; }
-  function swatch(it) {
-    if (it.tur === 'karakter' || it.tur === 'bas' || it.tur === 'yuz' || (it.tur === 'atki' && it.sekil)) return '<span class="renk resimli" style="background:url(' + resim(it) + ') center/cover" aria-hidden="true"></span>';
-    if (it.tur === 'kanca') {
-      var cv = document.createElement('canvas'), d = 2; cv.width = cv.height = 34 * d;
-      var c = cv.getContext('2d'); c.scale(d, d); c.fillStyle = '#24302d'; c.beginPath(); c.arc(17, 17, 17, 0, 6.29); c.fill();
-      c.translate(17, 17); c.scale(2, 2); G.kancaCiz(c, it.renk, '#e6eeec', -Math.PI / 2);
-      return '<span class="renk kanca-renk" style="background:url(' + cv.toDataURL() + ') center/cover" aria-hidden="true"></span>';
-    }
-    if (it.tur === 'alev') return '<span class="renk" style="background:radial-gradient(circle at 50% 78%, ' + it.renk2 + ' 12%, ' + it.renk + ' 52%, #24302d 78%)" aria-hidden="true"></span>';
-    if (it.tur === 'govde') return '<span class="renk" style="background:radial-gradient(circle at 35% 30%, ' + it.renk + ' 55%, ' + it.renk2 + ')" aria-hidden="true"></span>';
-    var c = it.renk === 'gokkusagi' ? 'conic-gradient(#ff5d5d, #ffd35d, #7ce36a, #5dd6ff, #9b6bff, #ff5d5d)' : it.renk === 'atki' ? 'linear-gradient(135deg, #2fb3a6 50%, #e2445c 50%)' : it.renk;
-    return '<span class="renk" style="background:' + c + '" aria-hidden="true"></span>';
+  // ---------- Market (v0.77, İstişare 4 Aşama 3) ----------
+  // Haftanın ürünü (Destansı/Efsane, pazartesi döner), günlük vitrin (4 ürün, biri video ile %50), kategoriler.
+  // Ürüne dokunmak ürün kartını açar: büyük önizleme, nadirlik, fiyat; Al ya da (sende varsa) Giy. Rastgele kutu yok.
+  var dolapTur = 'karakter', dolapMod = 'market', urunId = null, urunRaf = 0;
+  function openDolap() { renderMarket(); show('ekDolap'); $('ekDolap').scrollTop = 0; G.vitrinGordu(); $('marketNokta').hidden = true; }
+  function urunDurum(it) {
+    var EK = window.KuyuEkonomi, has = sahipMi(it.id), on = save().dolap.kusan[it.tur] === it.id, f = G.fiyat(it.id);
+    if (on) return { metin: 'KUŞANILDI', sinif: 'sende' };
+    if (has) return { metin: 'SENDE', sinif: 'sende' };
+    if (it.etkinlik) return { metin: 'ETKİNLİK', sinif: 'kilit' };
+    if (it.isik) return { metin: 'IŞIK ' + it.isik, sinif: 'kilit' };
+    if (it.lig != null) return { metin: EK.LIG[it.lig].ad.toLocaleUpperCase('tr-TR'), sinif: 'kilit' };
+    if (!G.satista(it.id)) return { metin: 'HAFTANIN ÜRÜNÜ OLUNCA', sinif: 'kilit' };
+    return { metin: '<i class="ikon-ates" aria-hidden="true"></i>' + f + (f < it.fiyat ? ' <s>' + it.fiyat + '</s>' : ''), sinif: G.cuzdan().ates >= f ? 'al' : 'yetmez', fiyat: f };
   }
-  function renderDolap() {
-    var sv = save(), bak = G.cuzdan().ates, kus = sv.dolap.kusan, sahip = sv.dolap.sahip;
-    $('dolapBakiye').textContent = bak;
-    // koleksiyon: bedava varsayılanlar dışında sahip olunan / toplam
-    var KAT = window.KuyuEkonomi.KATALOG, ozel = KAT.filter(function (it) { return it.fiyat !== 0; });
-    $('dolapKoleksiyon').textContent = 'Koleksiyon ' + ozel.filter(function (it) { return sahip.indexOf(it.id) >= 0; }).length + '/' + ozel.length;
-    document.querySelectorAll('[data-dolap]').forEach(function (b) { b.setAttribute('aria-selected', b.dataset.dolap === dolapTur ? 'true' : 'false'); });
-    $('dolapBaslik').textContent = dolapMod === 'koleksiyon' ? 'Koleksiyon' : 'Market';
-    var liste = window.KuyuEkonomi.KATALOG.filter(function (it) { var has = sahip.indexOf(it.id) >= 0 || it.fiyat === 0; return it.tur === dolapTur && (dolapMod === 'koleksiyon' ? has : !has); });
-    if (!liste.length) { $('dolapListe').innerHTML = '<p class="not bos-not">' + (dolapMod === 'koleksiyon' ? 'Bu bölümde henüz bir şeyin yok. Market\'e göz at.' : 'Bu bölümdeki her şey sende. Koleksiyon\'dan kuşanabilirsin.') + '</p>'; renderSatinCubuk(bak); return; }
-    $('dolapListe').innerHTML = liste.map(function (it) {
-      var has = sahip.indexOf(it.id) >= 0, on = kus[it.tur] === it.id, bak2 = onizleme === it.id, durum;
-      if (bak2) durum = '<span class="d-durum onizleme">Önizleme</span>';
-      else if (on) durum = '<span class="d-durum kusanili">Kuşanıldı</span>';
-      else if (has) durum = '<span class="d-durum">Kuşan</span>';
-      else if (it.isik) durum = '<span class="d-durum isik-kilit">Işık ' + it.isik + '</span>';
-      else if (it.lig != null) durum = '<span class="d-durum isik-kilit">' + window.KuyuEkonomi.LIG[it.lig].ad + ' ligi</span>';
-      else durum = '<span class="d-durum fiyat' + (bak < it.fiyat ? ' yetmez' : '') + '"><i class="ikon-ates" aria-hidden="true"></i>' + it.fiyat + '</span>';
-      return '<button type="button" class="d-urun' + (bak2 ? ' onizlenen' : on && !onizlemeTur(it.tur) ? ' secili' : '') + '" data-urun="' + it.id + '" aria-label="' + it.ad + (bak2 ? ', önizleniyor' : on ? ', kuşanıldı' : has ? ', kuşan' : it.isik ? ', kuyunun ışığı ' + it.isik + '. seviyede açılır' : ', ' + it.fiyat + ' ateşböceği, önizlemek için dokun') + '">' +
-        swatch(it) + '<b>' + it.ad + '</b>' + durum + '</button>';
+  function urunKart(it, ek) {
+    var EK = window.KuyuEkonomi, nad = EK.nadirlik(it), d = urunDurum(it);
+    return '<button type="button" class="m-urun n-' + nad + (d.sinif === 'kilit' ? ' kilit' : '') + '" data-urun="' + it.id + '" aria-label="' + it.ad + ', ' + EK.NADIRLIK[nad] + ', ' + d.metin.replace(/<[^>]+>/g, '') + '">' +
+      '<span class="m-nad">' + EK.NADIRLIK[nad].toLocaleUpperCase('tr-TR') + '</span>' + (ek || '') + '<img src="' + resim(it) + '" alt=""><b>' + it.ad + '</b><span class="m-fiyat ' + d.sinif + '">' + d.metin + '</span></button>';
+  }
+  function renderMarket() {
+    var EK = window.KuyuEkonomi, T = G.tahtalar();
+    $('dolapBakiye').textContent = G.cuzdan().ates;
+    // haftanın ürünü
+    var hu = EK.item(G.haftaUrun());
+    $('mHaftalik').hidden = !hu;
+    if (hu) {
+      var dh = urunDurum(hu);
+      $('mHaftalik').className = 'm-haftalik n-' + EK.nadirlik(hu); $('mHaftalik').dataset.urun = hu.id;
+      $('mHaftalikImg').src = resim(hu); $('mHaftalikAd').textContent = hu.ad;
+      $('mHaftalikSure').textContent = '⏱ ' + T.haftaKalan;
+      $('mHaftalikFiyat').innerHTML = dh.metin; $('mHaftalikFiyat').className = 'm-fiyat ' + dh.sinif;
+    }
+    // günlük vitrin: indirimli ürünün üstünde video şeridi
+    var v = G.vitrin();
+    $('mVitrinSure').textContent = '⏱ ' + T.gunKalan;
+    $('mVitrin').innerHTML = v.urunler.map(function (id) {
+      var it = EK.item(id), ind = id === v.indirimli && !sahipMi(id);
+      return urunKart(it, ind ? '<span class="m-serit">' + (G.vitrinIndirimde(id) ? '%50 İNDİRİM' : '▶ %50') + '</span>' : '');
     }).join('');
-    renderSatinCubuk(bak);
+    // kategoriler
+    $('mSekmeler').innerHTML = Object.keys(EK.TURLER).map(function (t) { return '<button type="button" role="tab" data-mtur="' + t + '" aria-selected="' + (t === dolapTur) + '">' + EK.TURLER[t] + '</button>'; }).join('');
+    var NS = { baslangic: 0, sira: 1, nadir: 2, destansi: 3, efsane: 4 };
+    $('mIzgara').innerHTML = EK.KATALOG.filter(function (it) { return it.tur === dolapTur && it.fiyat !== 0; })
+      .sort(function (a, b) { return (sahipMi(a.id) - sahipMi(b.id)) || (NS[EK.nadirlik(a)] - NS[EK.nadirlik(b)]) || ((a.fiyat || 0) - (b.fiyat || 0)); })
+      .map(function (it) { return urunKart(it); }).join('');
   }
-  function onizlemeTur(tur) { var it = onizleme && window.KuyuEkonomi.item(onizleme); return it && it.tur === tur; }
-  function renderSatinCubuk(bak) {
-    var it = onizleme && window.KuyuEkonomi.item(onizleme);
-    $('satinCubuk').hidden = !it;
-    if (!it) return;
-    $('scUrun').innerHTML = swatch(it) + '<span><b>' + it.ad + '</b><small>' + window.KuyuEkonomi.TURLER[it.tur] + '</small></span>';
-    if (it.etkinlik) { // etkinlik ödülü (v0.76): satın alınmaz
-      $('scAl').disabled = true; $('scAl').textContent = it.etkinlik;
-      $('scAl').setAttribute('aria-label', it.ad + ', ' + it.etkinlik + ' olarak açılır');
-      return;
-    }
-    if (it.lig != null) { // Haftalık lig ödülü: satın alınmaz
-      var lad = window.KuyuEkonomi.LIG[it.lig].ad;
-      $('scAl').disabled = true; $('scAl').textContent = lad + ' liginde açılır';
-      $('scAl').setAttribute('aria-label', it.ad + ', Haftalık Kuyu\'da ' + lad + ' ligine ulaşınca açılır');
-      return;
-    }
-    if (it.isik) { // ışık yolu ödülü: satın alınmaz
-      $('scAl').disabled = true; $('scAl').textContent = 'Işık ' + it.isik + '\'te açılır';
-      $('scAl').setAttribute('aria-label', it.ad + ', kuyunun ışığı ' + it.isik + '. seviyeye gelince açılır');
-      return;
-    }
-    var yeter = bak >= it.fiyat;
-    $('scAl').disabled = !yeter;
-    $('scAl').innerHTML = yeter ? 'Al · <i class="ikon-ates" aria-hidden="true"></i>' + it.fiyat : (it.fiyat - bak) + ' eksik';
-    $('scAl').setAttribute('aria-label', yeter ? it.ad + ' satın al, ' + it.fiyat + ' ateşböceği' : it.fiyat - bak + ' ateşböceği eksik');
+  // ürün kartı (katman)
+  function urunAc(id) {
+    var EK = window.KuyuEkonomi, it = EK.item(id); if (!it) return;
+    urunId = id;
+    var nad = EK.nadirlik(it), d = urunDurum(it), has = sahipMi(id), on = save().dolap.kusan[it.tur] === id, v = G.vitrin();
+    $('urunAd').textContent = it.ad;
+    $('urunNadir').textContent = EK.NADIRLIK[nad] + ' · ' + EK.TURLER[it.tur]; $('urunNadir').className = 'n-yazi n-' + nad;
+    var not = it.tur === 'karakter' ? 'Aynı boyut ve hız, yalnız görünüş.' : '';
+    if (it.etkinlik) not = it.etkinlik + ' olarak açılır; Market\'te satılmaz.';
+    else if (it.isik) not = 'Kuyunun ışığı ' + it.isik + '. seviyeye gelince kendiliğinden açılır.';
+    else if (it.lig != null) not = 'Haftalık Kuyu\'da ' + EK.LIG[it.lig].ad + ' ligine ulaşınca açılır.';
+    else if (!has && !G.satista(id)) not = 'Efsane: yalnız haftanın ürünü olduğu hafta satılır.';
+    else if (id === v.indirimli && !has) not = G.vitrinIndirimde(id) ? 'Bugün vitrinde %50 indirimli.' : 'Bugünün vitrin indirimi: video izlersen %50.';
+    $('urunNot').textContent = not;
+    var al = $('urunAl');
+    al.disabled = false;
+    if (on) { al.textContent = 'KUŞANILDI'; al.disabled = true; }
+    else if (has) al.textContent = 'GİY';
+    else if (d.sinif === 'kilit') { al.textContent = 'Satılmaz'; al.disabled = true; }
+    else if (d.sinif === 'yetmez') { al.innerHTML = (d.fiyat - G.cuzdan().ates) + ' eksik'; al.disabled = true; }
+    else al.innerHTML = 'AL · <i class="ikon-ates" aria-hidden="true"></i>' + d.fiyat;
+    $('urunVideo').hidden = !(id === v.indirimli && !has && !G.vitrinIndirimde(id));
+    $('urunKatman').hidden = false;
+    urunOnizle();
+    (al.disabled ? $('urunKapat') : al).focus({ preventScroll: true });
   }
-  $('scVazgec').addEventListener('click', function () { onizleme = null; renderDolap(); });
-  $('scAl').addEventListener('click', function () {
-    var it = onizleme && window.KuyuEkonomi.item(onizleme); if (!it) return;
+  function urunKapat() { $('urunKatman').hidden = true; cancelAnimationFrame(urunRaf); urunId = null; }
+  function urunOnizle() {
+    var cv = $('urunOnizleme'), dpr = Math.min(2, window.devicePixelRatio || 1), w = cv.clientWidth || 300, h = 190;
+    cv.width = w * dpr; cv.height = h * dpr; cv.style.height = h + 'px';
+    var c = cv.getContext('2d');
+    cancelAnimationFrame(urunRaf);
+    (function tick(now) {
+      var it = urunId && window.KuyuEkonomi.item(urunId); if (!it) return;
+      var ek = {}; ek[it.tur] = it.id;
+      c.setTransform(dpr, 0, 0, dpr, 0, 0);
+      onizlemeCiz(c, w, h, now, G.gorunumIle(ek), it.tur === 'alev', '#2a1f5c', 1.3);
+      urunRaf = requestAnimationFrame(tick);
+    })(performance.now());
+  }
+  $('urunAl').addEventListener('click', function () {
+    var it = window.KuyuEkonomi.item(urunId); if (!it) return;
+    if (sahipMi(it.id)) { G.kusan(it.id); resimBellek = {}; toast(it.ad + ' kuşanıldı', 1600); urunKapat(); renderMarket(); return; }
     var r = G.satinAl(it.id);
-    if (r.ok) { onizleme = null; resimBellek = {}; if (G.sfx) G.sfx.won(); toast(it.ad + ' alındı ve kuşanıldı'); }
-    else if (r.neden === 'yetersiz') toast(r.eksik + ' ateşböceği eksik. Bölüm, Günlük ve Haftalık Kuyu, görev ve günlük girişten toplanır.');
-    renderDolap();
+    if (r.ok) { resimBellek = {}; if (G.sfx) G.sfx.won(); toast(it.ad + ' alındı ve kuşanıldı'); urunKapat(); renderMarket(); return; }
+    if (r.neden === 'yetersiz') toast(r.eksik + ' ateşböceği eksik. Bölüm, Günlük ve Haftalık Kuyu, görev ve günlük girişten toplanır.');
+    urunAc(it.id);
   });
-  document.querySelectorAll('[data-dolap]').forEach(function (b) { b.addEventListener('click', function () { dolapTur = b.dataset.dolap; renderDolap(); }); });
-  $('dolapListe').addEventListener('click', function (e) {
-    var b = e.target.closest('[data-urun]'); if (!b) return;
-    var id = b.dataset.urun;
-    if (save().dolap.sahip.indexOf(id) >= 0) { onizleme = null; G.kusan(id); resimBellek = {}; renderDolap(); return; }
-    onizleme = id; // ilk dokunuş: yalnızca önizleme
-    renderDolap();
+  $('urunVideo').addEventListener('click', function () {
+    var id = urunId; $('urunKatman').hidden = true; cancelAnimationFrame(urunRaf);
+    video(function () { G.vitrinVideo(); toast('Bugün %50 indirimli', 1600); renderMarket(); urunAc(id); });
   });
-  // önizleme: halkada sallanan kahraman, kuşanılan atkı, ip ve iz
+  $('urunKapat').addEventListener('click', urunKapat);
+  $('urunKatman').addEventListener('click', function (e) { if (e.target === $('urunKatman')) urunKapat(); });
+  $('urunKatman').addEventListener('keydown', function (e) { if (e.key === 'Escape') { e.stopPropagation(); urunKapat(); } });
+  $('mSekmeler').addEventListener('click', function (e) { var b = e.target.closest('[data-mtur]'); if (!b) return; dolapTur = b.dataset.mtur; renderMarket(); });
+  ['mVitrin', 'mIzgara'].forEach(function (k) { $(k).addEventListener('click', function (e) { var b = e.target.closest('[data-urun]'); if (b) urunAc(b.dataset.urun); }); });
+  $('mHaftalik').addEventListener('click', function () { if ($('mHaftalik').dataset.urun) urunAc($('mHaftalik').dataset.urun); });
   // Önizleme (Market ve Koleksiyon, v0.76): halkada sallanan kahraman; L görünüm, alevGoster alev basamaklarını döndürür
   function onizlemeCiz(c, w, h, now, L, alevGoster, zemin, olcek) {
       var t = now / 1000;
@@ -582,23 +600,6 @@
       if (alevGoster) G.alevCiz(c, hx, hy, r, now, 1 + Math.floor(t / 1.6) % 3, L.alev, L.alev2);
       hero(c, hx, hy, r, { x: Math.sin(t * 0.8) * 0.6, y: -0.5 }, null, L);
   }
-  function startPreview() {
-    var cv = $('dolapOnizleme'), dpr = Math.min(2, window.devicePixelRatio || 1);
-    var w = cv.clientWidth || 300, h = 150;
-    cv.width = w * dpr; cv.height = h * dpr; cv.style.height = h + 'px';
-    var c = cv.getContext('2d');
-    cancelAnimationFrame(previewRaf);
-    (function tick(now) {
-      var oz = onizleme && window.KuyuEkonomi.item(onizleme), ek = {};
-      if (oz) ek[oz.tur] = oz.id;
-      var L = G.gorunumIle(ek);
-      onizlemeGorunum = L;
-      c.setTransform(dpr, 0, 0, dpr, 0, 0);
-      onizlemeCiz(c, w, h, now, L, dolapTur === 'alev' || (oz && oz.tur === 'alev'));
-      previewRaf = requestAnimationFrame(tick);
-    })(performance.now());
-  }
-
   // ---------- Koleksiyon (v0.76, İstişare 4 Aşama 2) ----------
   // Karakterler ve takılar: nadirlik çerçeveli ızgara, büyük önizleme; sende olanı GİY, olmayanın nasıl açıldığı yazar.
   var kolTur = 'karakter', kolSecili = null, kolRaf = 0, resimBellek = {};
@@ -655,7 +656,7 @@
   $('kolGiy').addEventListener('click', function () {
     var EK = window.KuyuEkonomi, it = EK.item(kolSecili); if (!it) return;
     if (sahipMi(it.id)) { G.kusan(it.id); resimBellek = {}; if (G.sfx) G.sfx.won(); toast(it.ad + ' kuşanıldı', 1600); renderKol(); return; }
-    if (!it.etkinlik && !it.isik && it.lig == null) { openDolap('market'); dolapTur = it.tur; onizleme = it.id; renderDolap(); } // Market'te önizlemeyle açılır
+    if (!it.etkinlik && !it.isik && it.lig == null) { dolapTur = it.tur; openDolap(); urunAc(it.id); } // Market'te ürün kartıyla açılır
   });
   function kolBaslat() {
     var cv = $('kolOnizleme'), dpr = Math.min(2, window.devicePixelRatio || 1), w = cv.clientWidth || 320, h = 200;
@@ -671,7 +672,6 @@
     })(performance.now());
   }
   function kolDur() { cancelAnimationFrame(kolRaf); }
-  function stopPreview() { cancelAnimationFrame(previewRaf); }
 
   // ---------- bölümler ----------
   // Gruplar: 1–6 Öğrenme (el yapımı), sonra 10'arlı. Sıradaki bölüm = geçilmemiş ilk bölüm.
@@ -907,7 +907,7 @@
 
   // v0.76: kahraman seçili karakter ve takılarla (js/karakter.js); scarf: tanıtımdaki parlayan atkı rengi
   function hero(ctx, x, y, r, look, scarf, L) {
-    var L0 = L || (current === 'ekDolap' && onizlemeGorunum) || G.gorunum();
+    var L0 = L || G.gorunum();
     if (scarf) L0 = Object.assign({}, L0, { atki: scarf });
     G.kahramanCiz(ctx, x, y, r, performance.now() / 1000, L0, look);
   }
@@ -1087,8 +1087,9 @@
     koleksiyon: function (tur, id) { openKol(tur, id); },
     dolap: function (id) {
       var it = window.KuyuEkonomi.item(id);
+      if (it) dolapTur = it.tur;
       openDolap();
-      if (it) { dolapTur = it.tur; onizleme = id; renderDolap(); }
+      if (it) urunAc(id);
     },
     levels: function () { openLevels(); },
     showGame: function () { show('oyun'); },

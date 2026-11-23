@@ -133,6 +133,7 @@ Kullanıcı hikâyeye online'dan önce geçti; online (5) sonra.
 - [?] Bekçinin adı.
 
 ## Yapılanlar
+- 2026-11-24 · v0.77 · İstişare 4 Aşama 3: Market (haftanın ürünü, günlük vitrin + video %50, kategoriler, ürün kartı), fiyat dengesi (~12 hafta, onaylı), ekonomi testine vitrin/indirim/haftalık kuralları eklendi.
 - 2026-11-23 · v0.76 · İstişare 4 Aşama 2: 9 karakter (Nadir/Destansı/Efsane + Etkinlik), Baş/Yüz/Sırt takıları, Renk yuvası, nadirlik; `js/karakter.js` çizimi oyunda ve menülerde; Koleksiyon ekranı. Ekonomi: Dolap 83 gün (Aşama 3'te dengelenecek).
 - 2026-11-23 · v0.75 · İstişare 4 Aşama 1: tasarım dili (`css/arayuz.css`), hybrid-casual ana ekran (üst çubuk, yan kartlar, büyük Çıra, bölüm çipi, OYNA), 5 sekmeli alt gezinme, Yarışma ekranı; Market/Koleksiyon şimdilik Dolap'ın iki kipi. Mantık ve kimlikler korundu.
 - 2026-11-23 · v0.74 · Skor tablosu ekranı: ana menüden ve sonuç kartından; Günlük ve Haftalık sekmeleri, ilk 50 ve senin yerin (son gönderimin ad ve puanıyla, cihazda saklanır). Yerelde sahte sunucuyla denendi; online-test genişletildi.

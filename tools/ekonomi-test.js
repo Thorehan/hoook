@@ -92,5 +92,26 @@ ok(dv.cuzdan.harcanan === 75, 'harcanan sayılır');
   ok(K.haftaYildizKaydet(hs, '2026-11-23', hh.puan * 2).odul === K.HAFTA_YILDIZ_ODUL[1] + K.HAFTA_YILDIZ_ODUL[2] && K.haftaYildizKaydet(hs, '2026-11-23', hh.puan * 2).odul === 0, 'hafta yıldızları birer kez');
   ok(K.haftaYildizDurum(hs, '2026-11-30') === 0, 'yeni hafta yıldızsız');
 }
+// ---------- Market (v0.77): vitrin, haftanın ürünü, indirim ----------
+{
+  const v1 = K.vitrin('2026-11-24'), v2 = K.vitrin('2026-11-24');
+  ok(JSON.stringify(v1) === JSON.stringify(v2) && v1.urunler.length === 4 && new Set(v1.urunler).size === 4, 'vitrin: aynı gün herkes için aynı 4 farklı ürün');
+  ok(v1.urunler.every(id => K.satilir(K.item(id)) && K.nadirlik(K.item(id)) !== 'efsane'), 'vitrinde yalnız satılan, Efsane olmayan ürünler');
+  ok(v1.urunler.some(id => K.item(id).tur === 'karakter') && v1.urunler.indexOf(v1.indirimli) >= 0, 'vitrinde bir karakter ve bir indirimli ürün');
+  ok(v1.urunler.indexOf(K.haftalikUrun('2026-11-23')) < 0, 'haftanın ürünü vitrinde ayrıca çıkmaz');
+  const ef = K.KATALOG.find(i => K.satilir(i) && K.nadirlik(i) === 'efsane');
+  let hafta = null, d = new Date('2026-11-23T12:00:00Z');
+  for (let i = 0; i < 40 && !hafta; i++) { const k = d.toISOString().slice(0, 10); if (K.haftalikUrun(k) === ef.id) hafta = k; d.setUTCDate(d.getUTCDate() + 7); }
+  ok(hafta && K.satista(ef.id, hafta) && !K.satista(ef.id, '2026-11-23') === (K.haftalikUrun('2026-11-23') !== ef.id), 'Efsane yalnız haftanın ürünüyken satışta');
+  const s2 = {}; K.ensure(s2); s2.cuzdan.ates = 5000;
+  const ind = K.item(v1.indirimli);
+  ok(K.fiyatBugun(s2, ind.id, '2026-11-24') === ind.fiyat, 'video izlenmeden tam fiyat');
+  ok(K.vitrinVideo(s2, '2026-11-24') === ind.id && K.fiyatBugun(s2, ind.id, '2026-11-24') === Math.ceil(ind.fiyat / 2), 'video sonrası indirimli ürün yarı fiyat');
+  ok(K.fiyatBugun(s2, ind.id, '2026-11-25') === ind.fiyat, 'indirim yalnız o gün');
+  const once = s2.cuzdan.ates, r = K.satinAl(s2, ind.id, { gun: '2026-11-24', hafta: '2026-11-23' });
+  ok(r.ok && once - s2.cuzdan.ates === Math.ceil(ind.fiyat / 2), 'satın alma günün fiyatından düşer');
+  if (ef && K.haftalikUrun('2026-11-23') !== ef.id) ok(K.satinAl(s2, ef.id, { gun: '2026-11-24', hafta: '2026-11-23' }).neden === 'haftalik', 'haftanın ürünü olmayan Efsane alınamaz');
+  ok(K.satinAl(s2, 'kr-anka').neden === 'etkinlik', 'etkinlik karakteri satılmaz');
+}
 console.log(bad ? bad + ' hata' : 'Tamam: cüzdan, günlük giriş, dolap, lig, haklar ve günün hedefi');
 process.exit(bad ? 1 : 0);

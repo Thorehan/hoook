@@ -17,25 +17,25 @@
     // Karakterler (v0.76, İstişare 4 Aşama 2): renk alanı çizim anahtarıdır (js/karakter.js). Hepsi aynı boyut ve fizik, yalnız görünüş.
     // Nadirlik: Nadir · Destansı · Efsane; etkinlik karakterleri Market'te satılmaz (etkinlik: nereden geldiği).
     { id: 'kr-cira', tur: 'karakter', ad: 'Çıra', renk: 'cira', fiyat: 0, nadir: 'baslangic' },
-    { id: 'kr-kibrit', tur: 'karakter', ad: 'Kibrit', renk: 'kibrit', fiyat: 320, nadir: 'nadir' },
-    { id: 'kr-mum', tur: 'karakter', ad: 'Mum', renk: 'mum', fiyat: 360, nadir: 'nadir' },
-    { id: 'kr-komur', tur: 'karakter', ad: 'Kömür', renk: 'komur', fiyat: 400, nadir: 'nadir' },
-    { id: 'kr-bocek', tur: 'karakter', ad: 'Ateş böceği', renk: 'bocek', fiyat: 780, nadir: 'destansi' },
-    { id: 'kr-ruh', tur: 'karakter', ad: 'Fener ruhu', renk: 'ruh', fiyat: 850, nadir: 'destansi' },
-    { id: 'kr-volkan', tur: 'karakter', ad: 'Volkan taşı', renk: 'volkan', fiyat: 900, nadir: 'destansi' },
-    { id: 'kr-yildiz', tur: 'karakter', ad: 'Yıldız kayması', renk: 'yildiz', fiyat: 1800, nadir: 'efsane' },
+    { id: 'kr-kibrit', tur: 'karakter', ad: 'Kibrit', renk: 'kibrit', fiyat: 240, nadir: 'nadir' },
+    { id: 'kr-mum', tur: 'karakter', ad: 'Mum', renk: 'mum', fiyat: 260, nadir: 'nadir' },
+    { id: 'kr-komur', tur: 'karakter', ad: 'Kömür', renk: 'komur', fiyat: 280, nadir: 'nadir' },
+    { id: 'kr-bocek', tur: 'karakter', ad: 'Ateş böceği', renk: 'bocek', fiyat: 520, nadir: 'destansi' },
+    { id: 'kr-ruh', tur: 'karakter', ad: 'Fener ruhu', renk: 'ruh', fiyat: 560, nadir: 'destansi' },
+    { id: 'kr-volkan', tur: 'karakter', ad: 'Volkan taşı', renk: 'volkan', fiyat: 600, nadir: 'destansi' },
+    { id: 'kr-yildiz', tur: 'karakter', ad: 'Yıldız kayması', renk: 'yildiz', fiyat: 1200, nadir: 'efsane' },
     { id: 'kr-anka', tur: 'karakter', ad: 'Anka yavrusu', renk: 'anka', nadir: 'efsane', etkinlik: 'Sezon 1 ödülü' },
     // Baş ve Yüz takıları (v0.76); "Yok" bedava varsayılan
     { id: 'bas-yok', tur: 'bas', ad: 'Yok', renk: '', fiyat: 0 },
-    { id: 'bas-bere', tur: 'bas', ad: 'Bere', renk: 'bere', fiyat: 90 },
-    { id: 'bas-kask', tur: 'bas', ad: 'Madenci kaskı', renk: 'kask', fiyat: 320 },
-    { id: 'bas-silindir', tur: 'bas', ad: 'Silindir şapka', renk: 'silindir', fiyat: 420 },
-    { id: 'bas-tac', tur: 'bas', ad: 'Taç', renk: 'tac', fiyat: 950 },
+    { id: 'bas-bere', tur: 'bas', ad: 'Bere', renk: 'bere', fiyat: 70 },
+    { id: 'bas-kask', tur: 'bas', ad: 'Madenci kaskı', renk: 'kask', fiyat: 220 },
+    { id: 'bas-silindir', tur: 'bas', ad: 'Silindir şapka', renk: 'silindir', fiyat: 300 },
+    { id: 'bas-tac', tur: 'bas', ad: 'Taç', renk: 'tac', fiyat: 650 },
     { id: 'yuz-yok', tur: 'yuz', ad: 'Yok', renk: '', fiyat: 0 },
-    { id: 'yuz-gozluk', tur: 'yuz', ad: 'Güneş gözlüğü', renk: 'gozluk', fiyat: 120 },
-    { id: 'yuz-biyik', tur: 'yuz', ad: 'Bıyık', renk: 'biyik', fiyat: 140 },
-    { id: 'yuz-monokl', tur: 'yuz', ad: 'Monokl', renk: 'monokl', fiyat: 280 },
-    { id: 'yuz-maske', tur: 'yuz', ad: 'Kahraman maskesi', renk: 'maske', fiyat: 380 },
+    { id: 'yuz-gozluk', tur: 'yuz', ad: 'Güneş gözlüğü', renk: 'gozluk', fiyat: 90 },
+    { id: 'yuz-biyik', tur: 'yuz', ad: 'Bıyık', renk: 'biyik', fiyat: 100 },
+    { id: 'yuz-monokl', tur: 'yuz', ad: 'Monokl', renk: 'monokl', fiyat: 200 },
+    { id: 'yuz-maske', tur: 'yuz', ad: 'Kahraman maskesi', renk: 'maske', fiyat: 260 },
     // Renk (eski "Kahraman" gövdeleri, v0.76): her karaktere uygulanan boya. Özgün: her karakterin kendi rengi (Çıra'da turuncu).
     { id: 'govde-turuncu', tur: 'govde', ad: 'Özgün', renk: '#f26a3a', renk2: '#b8401b', fiyat: 0 },
     { id: 'govde-deniz', tur: 'govde', ad: 'Deniz', renk: '#3aa0f2', renk2: '#1b5fb8', fiyat: 60 },
@@ -68,9 +68,9 @@
     { id: 'atki-gokkusagi', tur: 'atki', ad: 'Gökkuşağı', renk: 'gokkusagi', fiyat: 300 },
     { id: 'atki-fener', tur: 'atki', ad: 'Fener', renk: '#ffb84a', isik: 6 },
     // Sırt (v0.76): atkıların yanında pelerin ve kanat (sekil); renk takının rengi
-    { id: 'atki-pelerin', tur: 'atki', ad: 'Mor pelerin', renk: '#9b5cff', sekil: 'pelerin', fiyat: 380 },
-    { id: 'atki-pelerin-kor', tur: 'atki', ad: 'Kor pelerin', renk: '#e2392f', sekil: 'pelerin', fiyat: 520 },
-    { id: 'atki-kanat', tur: 'atki', ad: 'Melek kanadı', renk: '#e8f6ff', sekil: 'kanat', fiyat: 880 },
+    { id: 'atki-pelerin', tur: 'atki', ad: 'Mor pelerin', renk: '#9b5cff', sekil: 'pelerin', fiyat: 260 },
+    { id: 'atki-pelerin-kor', tur: 'atki', ad: 'Kor pelerin', renk: '#e2392f', sekil: 'pelerin', fiyat: 360 },
+    { id: 'atki-kanat', tur: 'atki', ad: 'Melek kanadı', renk: '#e8f6ff', sekil: 'kanat', fiyat: 600 },
     { id: 'ip-keten', tur: 'ip', ad: 'Keten', renk: '#eadfc4', fiyat: 0 },
     { id: 'ip-gok', tur: 'ip', ad: 'Gök', renk: '#8fd6ff', fiyat: 30 },
     { id: 'ip-zumrut', tur: 'ip', ad: 'Zümrüt', renk: '#5fd39a', fiyat: 50 },
@@ -232,7 +232,8 @@
     save.cuzdan.ates -= b; save.cuzdan.harcanan += b;
     return true;
   }
-  function satinAl(save, id) {
+  // anahtar (v0.77): { gun, hafta } verilirse günün fiyatı (indirim) ve haftanın ürünü kuralı uygulanır
+  function satinAl(save, id, anahtar) {
     ensure(save);
     var it = item(id);
     if (!it) return { ok: false, neden: 'yok' };
@@ -240,12 +241,60 @@
     if (it.isik) return { ok: false, neden: 'isik', seviye: it.isik }; // satın alınmaz: ışık seviyesiyle açılır
     if (it.lig != null) return { ok: false, neden: 'lig', lig: it.lig }; // satın alınmaz: Haftalık ligle açılır
     if (it.etkinlik) return { ok: false, neden: 'etkinlik', etkinlik: it.etkinlik }; // satın alınmaz: etkinlikten gelir
-    if (save.cuzdan.ates < it.fiyat) return { ok: false, neden: 'yetersiz', eksik: it.fiyat - save.cuzdan.ates };
-    save.cuzdan.ates -= it.fiyat; save.cuzdan.harcanan += it.fiyat;
+    if (anahtar && anahtar.hafta && !satista(id, anahtar.hafta)) return { ok: false, neden: 'haftalik' }; // Efsane: haftanın ürünü değil
+    var fiyat = anahtar && anahtar.gun ? fiyatBugun(save, id, anahtar.gun) : it.fiyat;
+    if (save.cuzdan.ates < fiyat) return { ok: false, neden: 'yetersiz', eksik: fiyat - save.cuzdan.ates };
+    save.cuzdan.ates -= fiyat; save.cuzdan.harcanan += fiyat;
     save.dolap.sahip.push(id);
     save.dolap.kusan[it.tur] = id;
     return { ok: true };
   }
+  // ---------- Market (v0.77, İstişare 4 Aşama 3) ----------
+  // Günlük vitrin: herkes için aynı 4 ürün (tarihten): bir karakter, bir takı (baş/yüz/sırt), iki ürün daha; biri video ile %50.
+  // Haftanın ürünü: Destansı ya da Efsane, pazartesi döner. Efsane ürünler yalnız haftanın ürünü oldukları hafta satılır.
+  // Rastgele kutu yok: her ürünün içeriği ve fiyatı görünür. Video yalnız oyuncu seçerse.
+  function satilir(it) { return !!(it && it.fiyat > 0 && !it.isik && it.lig == null && !it.etkinlik); }
+  function tohumla(str) { var h = 2166136261; for (var i = 0; i < str.length; i++) { h ^= str.charCodeAt(i); h = Math.imul(h, 16777619); } return h >>> 0; }
+  function rasgele(seed) { var a = seed >>> 0; return function () { a = (a + 0x6D2B79F5) >>> 0; var t = Math.imul(a ^ (a >>> 15), 1 | a); t = (t + Math.imul(t ^ (t >>> 7), 61 | t)) ^ t; return ((t ^ (t >>> 14)) >>> 0) / 4294967296; }; }
+  function sec(r, liste) { return liste.length ? liste[Math.floor(r() * liste.length)] : null; }
+  // Haftanın ürünü: Efsane ürünler ve Destansı karakter/takılar sabit karışık bir sırayla döner (her hafta bir sonraki; havuz bitince başa)
+  function haftalikUrun(haftaKey) {
+    // havuz: Efsane her şey + Destansı karakter ve takılar (renk, ip, iz gibi küçük ürünler vitrinde kalır)
+    var havuz = KATALOG.filter(function (it) { var n = nadirlik(it), buyuk = it.tur === 'karakter' || it.tur === 'bas' || it.tur === 'yuz' || (it.tur === 'atki' && it.sekil); return satilir(it) && (n === 'efsane' || (n === 'destansi' && buyuk)); }).map(function (it) { return it.id; }).sort();
+    if (!havuz.length) return null;
+    var r = rasgele(tohumla('hoook-haftalik-sira'));
+    for (var i = havuz.length - 1; i > 0; i--) { var j = Math.floor(r() * (i + 1)), x = havuz[i]; havuz[i] = havuz[j]; havuz[j] = x; }
+    var hafta = Math.floor(Date.parse(haftaKey + 'T12:00:00Z') / (7 * 864e5));
+    return havuz[((hafta % havuz.length) + havuz.length) % havuz.length];
+  }
+  function haftaOf(gunKey) { var d = new Date(Date.parse(gunKey + 'T12:00:00Z')); d.setUTCDate(d.getUTCDate() - (d.getUTCDay() + 6) % 7); return d.toISOString().slice(0, 10); }
+  function oncekiGun(gunKey) { var d = new Date(Date.parse(gunKey + 'T12:00:00Z') - 864e5); return d.toISOString().slice(0, 10); }
+  // dün vitrinde olanlar bugün çıkmaz (dünün ham seçimi; zincir kurmaz)
+  function vitrin(gunKey, hamMi) {
+    var r = rasgele(tohumla('hoook-vitrin-' + gunKey)), secilen = [], dun = hamMi ? [] : vitrin(oncekiGun(gunKey), true).urunler;
+    var hu = haftalikUrun(haftaOf(gunKey)); // haftanın ürünü vitrinde ayrıca çıkmaz
+    var olur = function (it) { return satilir(it) && nadirlik(it) !== 'efsane' && it.id !== hu && secilen.indexOf(it.id) < 0 && dun.indexOf(it.id) < 0; };
+    var kar = sec(r, KATALOG.filter(function (it) { return olur(it) && it.tur === 'karakter'; })); if (kar) secilen.push(kar.id);
+    var tak = sec(r, KATALOG.filter(function (it) { return olur(it) && (it.tur === 'bas' || it.tur === 'yuz' || (it.tur === 'atki' && it.sekil)); })); if (tak) secilen.push(tak.id);
+    while (secilen.length < 4) { var x = sec(r, KATALOG.filter(function (it) { return olur(it) && it.tur !== 'karakter'; })); if (!x) break; secilen.push(x.id); }
+    return { urunler: secilen, indirimli: secilen[Math.floor(r() * secilen.length)] || null };
+  }
+  // Satışta mı: Efsane yalnız haftanın ürünüyken; diğerleri her zaman (satılırsa)
+  function satista(id, haftaKey) { var it = item(id); return satilir(it) && (nadirlik(it) !== 'efsane' || haftalikUrun(haftaKey) === id); }
+  function marketDurum(save) { ensure(save); if (!save.market) save.market = { video: {}, gorulen: null }; return save.market; }
+  // Bugünkü fiyat: vitrinin indirimli ürünü için video izlendiyse yarısı
+  function fiyatBugun(save, id, gunKey) {
+    var it = item(id); if (!it || !satilir(it)) return null;
+    var m = marketDurum(save);
+    return gunKey && m.video[gunKey] === id && vitrin(gunKey).indirimli === id ? Math.ceil(it.fiyat / 2) : it.fiyat;
+  }
+  function vitrinVideo(save, gunKey) {
+    var m = marketDurum(save), v = vitrin(gunKey).indirimli; if (!v) return null;
+    var y = {}; y[gunKey] = v; m.video = y; // yalnız bugün geçerli
+    return v;
+  }
+  function vitrinGordu(save, gunKey) { marketDurum(save).gorulen = gunKey; }
+
   function kusan(save, id) {
     var it = item(id);
     if (!it || !sahip(save, id)) return false;
@@ -359,6 +408,7 @@
     SERI_ODUL: SERI_ODUL, gecmisYaz: gecmisYaz,
     HAFTA_YILDIZ_ODUL: HAFTA_YILDIZ_ODUL, haftaHedef: haftaHedef, haftaYildizSay: haftaYildizSay, haftaYildizKaydet: haftaYildizKaydet, haftaYildizDurum: haftaYildizDurum,
     GIRIS: GIRIS, GOREV_ATES: GOREV_ATES, BASARIM_ATES: BASARIM_ATES, KATALOG: KATALOG, TURLER: TURLER, VARSAYILAN: VARSAYILAN, NADIRLIK: NADIRLIK, nadirlik: nadirlik,
+    satilir: satilir, satista: satista, vitrin: vitrin, haftalikUrun: haftalikUrun, fiyatBugun: fiyatBugun, vitrinVideo: vitrinVideo, vitrinGordu: vitrinGordu, marketDurum: marketDurum,
     ensure: ensure, kazan: kazan, bolumOde: bolumOde, girisDurum: girisDurum, girisAl: girisAl,
     LIG: LIG, ligOf: ligOf, ligOdul: ligOdul, haftalikDurum: haftalikDurum, haftalikKaydet: haftalikKaydet, haftalikKapat: haftalikKapat,
     ISIK: ISIK, isikSeviye: isikSeviye, isikOdul: isikOdul, isikSiradaki: isikSiradaki,

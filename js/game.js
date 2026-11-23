@@ -2103,13 +2103,13 @@
   // Dolap kısa yolu: bu koşunun kazancıyla İLK KEZ yetişilen en ucuz ürün (eşik bu koşuda aşıldıysa; her seferinde değil).
   function dolapKisaYol(once) {
     var simdi = save.cuzdan.ates, sahip = save.dolap.sahip;
-    var aday = EKO.KATALOG.filter(function (it) { return it.fiyat > once && it.fiyat <= simdi && sahip.indexOf(it.id) < 0; })
+    var aday = EKO.KATALOG.filter(function (it) { return it.fiyat > once && it.fiyat <= simdi && sahip.indexOf(it.id) < 0 && EKO.satista(it.id, haftaKey()); })
       .sort(function (a, b) { return a.fiyat - b.fiyat; })[0];
     if (!aday) return '';
-    var renk = aday.renk === 'gokkusagi' ? 'conic-gradient(#ff5d5d, #ffd35d, #7ce36a, #5dd6ff, #9b6bff, #ff5d5d)' : aday.renk === 'atki' ? scarfCol() : aday.renk;
+    var renk = aday.renk === 'gokkusagi' ? 'conic-gradient(#ff5d5d, #ffd35d, #7ce36a, #5dd6ff, #9b6bff, #ff5d5d)' : aday.renk === 'atki' ? scarfCol() : /^#/.test(aday.renk) ? aday.renk : 'radial-gradient(circle at 40% 35%, #fff0a0, #ff7a2f 70%)';
     return '<button type="button" class="dolap-kisayol" id="dolapKisaBtn" data-urun="' + aday.id + '">' +
       '<span class="renk" style="background:' + renk + '" aria-hidden="true"></span>' +
-      '<span><small>Dolap&#39;ta yeni</small>' + aday.ad + ' ' + EKO.TURLER[aday.tur].toLocaleLowerCase('tr-TR') + ' alınabilir</span><em>›</em></button>';
+      '<span><small>Market&#39;te yeni</small>' + aday.ad + ' ' + EKO.TURLER[aday.tur].toLocaleLowerCase('tr-TR') + ' alınabilir</span><em>›</em></button>';
   }
   function dolapKisaBagla() {
     var b = $('dolapKisaBtn'); if (!b) return;
@@ -2636,7 +2636,16 @@
     cuzdan: function () { return save.cuzdan; },
     giris: function () { return EKO.girisDurum(save, todayKey()); },
     girisAl: function (kat) { var r = EKO.girisAl(save, todayKey(), kat); persist(); return r; },
-    satinAl: function (id) { var r = EKO.satinAl(save, id); GORUNUM = null; persist(); return r; },
+    satinAl: function (id) { var r = EKO.satinAl(save, id, { gun: todayKey(), hafta: haftaKey() }); GORUNUM = null; persist(); return r; },
+    // Market (v0.77): günün vitrini, haftanın ürünü, bugünkü fiyat, video indirimi
+    vitrin: function () { return EKO.vitrin(todayKey()); },
+    haftaUrun: function () { return EKO.haftalikUrun(haftaKey()); },
+    fiyat: function (id) { return EKO.fiyatBugun(save, id, todayKey()); },
+    satista: function (id) { return EKO.satista(id, haftaKey()); },
+    vitrinVideo: function () { var v = EKO.vitrinVideo(save, todayKey()); persist(); return v; },
+    vitrinIndirimde: function (id) { return EKO.marketDurum(save).video[todayKey()] === id; },
+    vitrinGordu: function () { EKO.vitrinGordu(save, todayKey()); persist(); },
+    vitrinYeni: function () { return EKO.marketDurum(save).gorulen !== todayKey(); },
     kusan: function (id) { var r = EKO.kusan(save, id); GORUNUM = null; persist(); return r; },
     gorunum: function () { return look(); },
     korCiz: function (c, x, y, r, t, r1, r2, sade) { korCiz(c, x, y, r, t, r1, r2, sade); },

@@ -148,6 +148,13 @@ Yayına çıkmadan yerelde denemek için: bilgisayarda `python3 -m http.server 8
 - [ ] Renk yuvası: "Özgün" dışında bir renk seçince karakterler boyanıyor mu, hoş mu?
 - [ ] Kilitli eşyanın "nasıl açılır" yazısı (Market fiyatı, ışık, lig, etkinlik) açık mı?
 
+## 21. Market (v0.77, 5 dk)
+- [ ] Market sekmesindeki rozet günün ilk açılışında görünüp açınca kayboluyor mu?
+- [ ] Haftanın ürünü, günlük vitrin ve kategoriler bir bakışta anlaşılıyor mu? Kalan süreler doğru mu?
+- [ ] Ürüne dokununca ürün kartı: önizleme kendi karakterinle mi, Al/Giy doğru mu? Yeterli ateşböceği yoksa "eksik" yazıyor mu?
+- [ ] Vitrindeki ▶ %50: video izleyince o ürün yarı fiyata iniyor mu? Ertesi gün indirim kalkıyor mu?
+- [ ] Fiyatlar (Nadir karakter 240–280, Destansı 520–600, Efsane 1200) ulaşılabilir ama değerli hissettiriyor mu?
+
 ## 5. Genel izlenim (serbest)
 - En sevdiğim an:
 - En çok zorlandığım yer:
