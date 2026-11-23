@@ -37,6 +37,8 @@
 2. **Skor tablosunu açmak:** Supabase seçildi, şimdilik kapalı. Açma kararı ve hesap sonra (`docs/online-kurulum.md`).
 3. İstişare 2'nin kalanı: ✅ görsel akıcılık (v0.56) → **24 uzun bölüm: plan hazır (18/11), `docs/hikaye-bolumleri-plan.md`**. Tarifli üretim, fener kontrol noktası, ikinci yolculuk, bölgeye göre taşıma. Aşama 1 ✅ (v0.59): bölüm 1–3 oynanır (deneme kartları), fener ve fenerden devam, duvar ipuçları. Telefonda onaylandı (19/11). Aşama 2 ✅ (v0.60): bölüm 4–12. Aşama 3 ✅ (v0.61): bölüm 13–24. Aşama 4 ✅ (v0.62): geçiş. Aşama 5 ✅ (v0.63): denge (`tools/hikaye-denge.js`). **Plan tamam.** Sıradaki: telefon geri bildirimiyle ince ayar (süre, su, fener sıklığı, ikinci yolculuğun zorluğu); sonra açık sorular (Supabase, analitik, bekçinin adı, müzik).
 
+- **İstişare 3 (23/11): oynanış hissiyatı.** Plan `docs/istisare-3-his.md`: A his (vuruş, ses, titreşim, görsel ipuçları) → B tatmin anları (kova, fener, uzun akış, düşüş-dönüş) → C yeni mekanikler (kor halka, döner çark, akıntı sütunu). Kontrol değişmiyor. Sıradaki: Aşama A.
+
 ## Açık sorular (Törehan'a)
 
 - Supabase hesabı ne zaman, kimde açılacak (arka uç Supabase, 18/11).
