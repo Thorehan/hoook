@@ -21,7 +21,7 @@ Tek elle, dikey, çevrimdışı oynanan; zorla reklamı, enerjisi ve satılan g�
 
 ## Sıradaki işler (öneri, sırayla)
 1. **Telefonda deneme** (`docs/telefon-testi.md`, yeni 6. bölüm dahil). v0.50'den beri hiçbir ayar gerçek telefonda sınanmadı; bölge suyu mesafeleri (26/22/18 m) ilk bakılacak şey.
-2. **Skor tablosunu açmak:** Supabase hesabı + iki değer (`docs/online-kurulum.md`). Sonra girdi kaydı ve sunucuda yeniden oynatma (hile önleme).
+2. **Skor tablosunu açmak:** Firebase + Cloudflare hesapları (23/11, Supabase yerine; `docs/online-kurulum.md`). Sonra girdi kaydı ve sunucuda yeniden oynatma (hile önleme).
 3. **Ölçüm:** gerçek oyuncuların 1. ve 7. gün tutundurması. Gizlilik dostu bir hizmet seçimi (Törehan ile).
 4. **24 uzun, öğretici bölüm** (Törehan'ın planı). Bölge suyu ve kontrol noktası bu bölümlere taşınır.
 5. **Görsel akıcılık** (İstişare 2'nin kalanı): kamera, geçişler, paralaks, su ve ışık.

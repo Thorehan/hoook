@@ -2,70 +2,126 @@
 
    1) Meydan okuma (arka uç gerekmez): koşunun tohumu, puanı ve oyuncu adı bağlantıya yazılır
       (?meydan=s-<tohum>-<puan>-<ad>). Bağlantıyı açan aynı kuyuyu oynar; sonuç kartı iki puanı karşılaştırır.
-      Puan beyana dayanır (arkadaşlar arası); doğrulama skor tablosuyla birlikte sunucuda yapılacak.
+      Puan beyana dayanır (arkadaşlar arası).
 
-   2) Skor tablosu (arka uç gerekir, hazır ama KAPALI): AYAR boşken hiçbir istek atılmaz, arayüzde hiçbir şey görünmez.
-      Supabase (PostgREST) biçiminde iki çağrı: rpc/skor_gonder ve skorlar listesi. Kurulum: docs/online-kurulum.md.
-      Gönderilen: rastgele cihaz kimliği (hesap değil), oyuncu adı, puan, metre. Başka hiçbir şey gönderilmez.
-      Yerelde denemek için: node tools/sahte-sunucu.js, sonra oyunu ?online=yerel ile aç (kapatmak için ?online=kapat). */
+   2) Skor tablosu (hazır ama KAPALI): AYAR boşken hiçbir istek atılmaz, arayüzde hiçbir şey görünmez.
+      Kimlik Firebase'de anonim giriş (SDK yok, iki REST çağrısı), sunucu Cloudflare Worker + D1 (sunucu/src/index.js).
+      Gönderilen: Firebase kimlik belgesi, oyuncu adı, puan, metre, tahta adı. Başka hiçbir şey gönderilmez.
+      Oturum ayrı anahtarda ('kuyu.oturum') durur, kayda ve yedek koduna girmez.
+      Kurulum: docs/online-kurulum.md. Yerelde: node tools/sahte-sunucu.js, sonra oyunu ?online=yerel ile aç (?online=kapat). */
 (function (root) {
   'use strict';
-  // Supabase projesi açılınca bu iki alan doldurulur (anon anahtar herkese açık olacak şekilde tasarlanmıştır;
-  // yazma yalnızca rpc/skor_gonder ile, satır düzeyi güvenlik açık). Boşken online kapalıdır.
-  var AYAR = { url: '', anahtar: '' };
-  var YEREL = { url: 'http://localhost:8767', anahtar: 'yerel-deneme' };
-  var DEPO = 'kuyu.online';
+  // Hesaplar açılınca doldurulur. url: Worker adresi; firebase: Firebase web apiKey (herkese açık olacak şekilde
+  // tasarlanmıştır, gizli anahtar değildir). Boşken online kapalıdır.
+  var AYAR = { url: '', firebase: '' };
+  var YEREL = { url: 'http://localhost:8767', firebase: 'yerel-deneme', kimlikUrl: 'http://localhost:8767', yenileUrl: 'http://localhost:8767' };
+  var KIMLIK_URL = 'https://identitytoolkit.googleapis.com', YENILE_URL = 'https://securetoken.googleapis.com';
+  var DEPO = 'kuyu.online', OTURUM = 'kuyu.oturum';
 
   function depo() { try { return typeof localStorage !== 'undefined' ? localStorage : null; } catch (e) { return null; } }
-  function ayar() {
-    var d = depo();
-    try { var o = d && JSON.parse(d.getItem(DEPO) || 'null'); if (o && o.url && o.anahtar) return o; } catch (e) {}
-    return AYAR;
-  }
-  // ?online=yerel → yerel sahte sunucu; ?online=kapat → varsayılana dön
+  function oku(k) { var d = depo(); try { return d && JSON.parse(d.getItem(k) || 'null'); } catch (e) { return null; } }
+  function yaz(k, v) { var d = depo(); try { if (d) { if (v == null) d.removeItem(k); else d.setItem(k, JSON.stringify(v)); } } catch (e) {} }
+  function ayar() { var o = oku(DEPO); return o && o.url && o.firebase ? o : AYAR; }
+  // ?online=yerel → yerel sahte sunucu; ?online=kapat → varsayılana dön. Ayar değişince oturum da sıfırlanır.
   function ayarBaglanti(deger) {
-    var d = depo(); if (!d) return;
-    if (deger === 'yerel') d.setItem(DEPO, JSON.stringify(YEREL));
-    else if (deger === 'kapat') d.removeItem(DEPO);
+    if (deger === 'yerel') { yaz(DEPO, YEREL); yaz(OTURUM, null); }
+    else if (deger === 'kapat') { yaz(DEPO, null); yaz(OTURUM, null); }
   }
-  function acik() { var a = ayar(); return !!(a.url && a.anahtar); }
+  function acik() { var a = ayar(); return !!(a.url && a.firebase); }
 
   function uuid() {
     var c = typeof crypto !== 'undefined' ? crypto : null;
     if (c && c.randomUUID) return c.randomUUID();
     return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function (ch) { var r = Math.random() * 16 | 0; return (ch === 'x' ? r : (r & 3 | 8)).toString(16); });
   }
-  // Cihaz kimliği: hesap değil, yalnızca aynı oyuncunun satırını güncellemek için. Kayıtta durur.
-  function kimlik(save) { if (!save.online) save.online = {}; if (!save.online.kimlik) save.online.kimlik = uuid(); return save.online.kimlik; }
+  // Oyuncu kimliği: Firebase oturumu varsa onun kimliği; yoksa (online kapalı) cihazda üretilen eski rastgele kimlik.
+  function kimlik(save) {
+    var o = oku(OTURUM); if (o && o.uid) return o.uid;
+    if (!save.online) save.online = {}; if (!save.online.kimlik) save.online.kimlik = uuid(); return save.online.kimlik;
+  }
   function temizAd(s) { return String(s || '').replace(/[<>&"]/g, '').replace(/\s+/g, ' ').trim().slice(0, 16) || 'Tırmanıcı'; }
 
-  function istek(yol, govde) {
-    var a = ayar();
-    if (!acik() || typeof fetch !== 'function') return Promise.reject(new Error('online kapalı'));
+  function getir(url, secenek) {
+    if (typeof fetch !== 'function') return Promise.reject(new Error('fetch yok'));
     var kes = typeof AbortController === 'function' ? new AbortController() : null;
     var zaman = kes ? setTimeout(function () { kes.abort(); }, 6000) : null;
-    return fetch(a.url.replace(/\/$/, '') + yol, {
-      method: govde ? 'POST' : 'GET',
-      headers: { apikey: a.anahtar, Authorization: 'Bearer ' + a.anahtar, 'Content-Type': 'application/json' },
-      body: govde ? JSON.stringify(govde) : undefined, signal: kes ? kes.signal : undefined
-    }).then(function (r) { if (zaman) clearTimeout(zaman); if (!r.ok) throw new Error('sunucu ' + r.status); return r.json(); },
-      function (e) { if (zaman) clearTimeout(zaman); throw e; });
+    if (kes) secenek.signal = kes.signal;
+    return fetch(url, secenek).then(function (r) {
+      if (zaman) clearTimeout(zaman);
+      return r.json().catch(function () { return {}; }).then(function (veri) { return { kod: r.status, veri: veri || {} }; });
+    }, function (e) { if (zaman) clearTimeout(zaman); throw e; });
   }
-  // tahta: 'h-2026-11-09' (Haftalık Kuyu, pazartesi tarihi) ya da 'g-2026-11-11' (Günlük Kuyu)
+
+  // ---------- Firebase anonim oturum (REST) ----------
+  var bekleyen = null;
+  function kaydet(uid, belge, yenileBelge, sn) { var o = { uid: uid, belge: belge, yenile: yenileBelge, bitis: Date.now() + (+sn || 3600) * 1000 }; yaz(OTURUM, o); return o; }
+  function yeniHesap(a) {
+    return getir((a.kimlikUrl || KIMLIK_URL) + '/v1/accounts:signUp?key=' + encodeURIComponent(a.firebase), {
+      method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ returnSecureToken: true })
+    }).then(function (y) {
+      if (y.kod !== 200 || !y.veri.idToken) throw new Error('giriş ' + y.kod);
+      return kaydet(y.veri.localId, y.veri.idToken, y.veri.refreshToken, y.veri.expiresIn);
+    });
+  }
+  function yenile(a, o) {
+    return getir((a.yenileUrl || YENILE_URL) + '/v1/token?key=' + encodeURIComponent(a.firebase), {
+      method: 'POST', headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+      body: 'grant_type=refresh_token&refresh_token=' + encodeURIComponent(o.yenile)
+    }).then(function (y) {
+      if (y.kod === 200 && y.veri.id_token) return kaydet(y.veri.user_id, y.veri.id_token, y.veri.refresh_token, y.veri.expires_in);
+      if (y.kod >= 400 && y.kod < 500) { yaz(OTURUM, null); return yeniHesap(a); } // oturum geçersiz: yeni anonim hesap
+      throw new Error('yenileme ' + y.kod);
+    });
+  }
+  // Geçerli kimlik belgesi; gerekirse yeniler ya da ilk kez anonim hesap açar. Aynı anda tek istek.
+  function oturum() {
+    if (!acik()) return Promise.reject(new Error('online kapalı'));
+    var a = ayar(), o = oku(OTURUM);
+    if (o && o.belge && o.bitis - 60000 > Date.now()) return Promise.resolve(o);
+    if (!bekleyen) bekleyen = (o && o.yenile ? yenile(a, o) : yeniHesap(a)).then(function (x) { bekleyen = null; return x; }, function (e) { bekleyen = null; throw e; });
+    return bekleyen;
+  }
+
+  // ---------- skor tablosu ----------
+  var sonSen = {}; // tahta → sunucunun son gönderimde verdiği { sira, toplam, puan, ad }
+  function adres(yol) { return ayar().url.replace(/\/$/, '') + yol; }
+  // tahta: 'h-2026-11-09' (Haftalık Kuyu, pazartesi tarihi) ya da 'g-2026-11-11' (Günlük Kuyu).
+  // Sunucu kabul ederse true (puan eskisinden kötüyse yazılmaz ama yine true), reddederse false; ağ hatasında reddedilir.
   function gonder(save, tahta, ad, puan, metre) {
-    return istek('/rest/v1/rpc/skor_gonder', { p_tahta: tahta, p_oyuncu: kimlik(save), p_ad: temizAd(ad), p_puan: Math.max(0, Math.floor(puan)), p_metre: Math.max(0, Math.floor(metre || 0)) });
+    return oturum().then(function (o) {
+      return getir(adres('/skor'), {
+        method: 'POST', headers: { 'Content-Type': 'application/json', Authorization: 'Bearer ' + o.belge },
+        body: JSON.stringify({ tahta: tahta, ad: temizAd(ad), puan: Math.max(0, Math.floor(puan)), metre: Math.max(0, Math.floor(metre || 0)) })
+      });
+    }).then(function (y) {
+      if (y.kod === 200) { sonSen[tahta] = { sira: y.veri.sira, toplam: y.veri.toplam, puan: y.veri.puan, ad: y.veri.ad }; return true; }
+      if (y.kod === 401) { var o = oku(OTURUM); if (o) { o.bitis = 0; yaz(OTURUM, o); } } // belge reddedildi: sonra yenilenir
+      if (y.kod >= 500) throw new Error('sunucu ' + y.kod);
+      return false;
+    });
   }
+  // İlk n satır (en yüksek puan önce). Dizi; ayrıca .toplam (tahtadaki oyuncu sayısı) ve .sen (son gönderimin sırası).
   function tablo(tahta, n) {
-    return istek('/rest/v1/skorlar?tahta=eq.' + encodeURIComponent(tahta) + '&select=ad,puan,metre,oyuncu&order=puan.desc&limit=' + (n || 100))
-      .then(function (rows) { return Array.isArray(rows) ? rows : []; });
+    if (!acik()) return Promise.reject(new Error('online kapalı'));
+    return getir(adres('/tablo?tahta=' + encodeURIComponent(tahta) + '&n=' + (n || 100)), { method: 'GET' }).then(function (y) {
+      if (y.kod !== 200) throw new Error('sunucu ' + y.kod);
+      var rows = Array.isArray(y.veri.satirlar) ? y.veri.satirlar : [];
+      rows.toplam = +y.veri.toplam || rows.length; rows.sen = sonSen[tahta] || null;
+      return rows;
+    });
   }
-  // Listedeki yerin: { sira (1'den), toplam, liste: ilk 'ust' satır + sen }. Listede yoksan sira null (ilk n dışında).
+  // Listedeki yerin: { sira (1'den), toplam, liste: ilk 'ust' satır + sen }. Sıra sunucunun son gönderimde verdiğidir
+  // (rows.sen); yoksa satırdaki oyuncu kimliğiyle aranır. Bilinmiyorsa sira null.
   function ozet(rows, benim, ust) {
-    var sira = null;
-    for (var i = 0; i < rows.length; i++) if (rows[i].oyuncu === benim) { sira = i + 1; break; }
-    var liste = rows.slice(0, ust || 5).map(function (r, k) { return { sira: k + 1, ad: temizAd(r.ad), puan: r.puan, ben: r.oyuncu === benim }; });
-    if (sira && sira > liste.length) liste.push({ sira: sira, ad: temizAd(rows[sira - 1].ad), puan: rows[sira - 1].puan, ben: true }); // ilk 'ust' dışındaysan kendi satırın da eklenir
-    return { sira: sira, toplam: rows.length, liste: liste };
+    ust = ust || 5;
+    var sen = rows.sen, sira = sen ? sen.sira : null;
+    if (!sen) for (var i = 0; i < rows.length; i++) if (rows[i].oyuncu && rows[i].oyuncu === benim) { sira = i + 1; break; }
+    var liste = rows.slice(0, ust).map(function (r, k) { return { sira: k + 1, ad: temizAd(r.ad), puan: r.puan, ben: sira === k + 1 }; });
+    if (sira && sira > liste.length) {
+      var r = sen ? { ad: sen.ad, puan: sen.puan } : rows[sira - 1];
+      liste.push({ sira: sira, ad: temizAd(r.ad), puan: r.puan, ben: true }); // ilk 'ust' dışındaysan kendi satırın da eklenir
+    }
+    return { sira: sira, toplam: Math.max(rows.toplam || rows.length, sira || 0), liste: liste };
   }
 
   // ---------- meydan okuma ----------
@@ -81,7 +137,7 @@
   }
   function meydanBaglanti(taban, m) { return taban + '?meydan=' + meydanKodla(m); }
 
-  var api = { AYAR: AYAR, YEREL: YEREL, ayar: ayar, ayarBaglanti: ayarBaglanti, acik: acik, kimlik: kimlik, temizAd: temizAd,
+  var api = { AYAR: AYAR, YEREL: YEREL, ayar: ayar, ayarBaglanti: ayarBaglanti, acik: acik, kimlik: kimlik, temizAd: temizAd, oturum: oturum,
     gonder: gonder, tablo: tablo, ozet: ozet, meydanKodla: meydanKodla, meydanCoz: meydanCoz, meydanBaglanti: meydanBaglanti };
   if (typeof module !== 'undefined' && module.exports) module.exports = api; else root.KuyuOnline = api;
 })(typeof window !== 'undefined' ? window : this);

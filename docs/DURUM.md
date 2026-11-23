@@ -38,14 +38,14 @@
 
 - ✅ 18/11: Törehan v0.52–v0.55 kararlarını gözden geçirdi, hepsi kalıyor (bölge suyu, ekonomi, Haftalık + lig, Supabase istemcisi kapalı).
 1. **Telefonda deneme**, özellikle bölge suyu mesafeleri ve Haftalık Kuyu.
-2. **Skor tablosunu açmak:** Supabase seçildi, şimdilik kapalı. Açma kararı ve hesap sonra (`docs/online-kurulum.md`).
+2. **Skor tablosunu açmak (23/11):** arka uç Firebase + Cloudflare (Supabase yerine). Sunucu (`sunucu/`), istemci ve testler hazır, yerelde uçtan uca denendi; kapalı. Hesaplar stüdyonun Google hesabıyla açılacak, sonra kurulum `docs/online-kurulum.md`. Kalan arayüz: Haftalık menüsünde tam tablo.
 3. İstişare 2'nin kalanı: ✅ görsel akıcılık (v0.56) → **24 uzun bölüm: plan hazır (18/11), `docs/hikaye-bolumleri-plan.md`**. Tarifli üretim, fener kontrol noktası, ikinci yolculuk, bölgeye göre taşıma. Aşama 1 ✅ (v0.59): bölüm 1–3 oynanır (deneme kartları), fener ve fenerden devam, duvar ipuçları. Telefonda onaylandı (19/11). Aşama 2 ✅ (v0.60): bölüm 4–12. Aşama 3 ✅ (v0.61): bölüm 13–24. Aşama 4 ✅ (v0.62): geçiş. Aşama 5 ✅ (v0.63): denge (`tools/hikaye-denge.js`). **Plan tamam.** Sıradaki: telefon geri bildirimiyle ince ayar (süre, su, fener sıklığı, ikinci yolculuğun zorluğu); sonra açık sorular (Supabase, analitik, bekçinin adı, müzik).
 
 - **İstişare 3 (23/11): oynanış hissiyatı.** Plan `docs/istisare-3-his.md`: A his (vuruş, ses, titreşim, görsel ipuçları) → B tatmin anları (kova, fener, uzun akış, düşüş-dönüş) → C yeni mekanikler (kor halka, döner çark, akıntı sütunu). Kontrol değişmiyor. ✅ A (v0.67, telefonda denendi). ✅ B (v0.68, telefonda denendi). C: mevcut bölümlere bölme, sıra kor → çark → akıntı, sonra Günlük/Haftalık. ✅ Kor halka (v0.69). ✅ Döner çark (v0.70). Sıradaki: telefonda çark denemesi, sonra akıntı sütunu.
 
 ## Açık sorular (Törehan'a)
 
-- Supabase hesabı ne zaman, kimde açılacak (arka uç Supabase, 18/11).
+- Firebase ve Cloudflare hesapları (stüdyonun Google hesabıyla; 23/11). Puan doğrulama için Workers Paid (ayda 5 $) alınsın mı?
 - Ölçüm (analitik) eklensin mi, hangi hizmet?
 - Bekçinin adı. İki para birimi mi, tek mi. Müzik parçaları (Mustafa'dan).
 
