@@ -2340,7 +2340,9 @@
     ONLINE.gonder(save, tahta, ad, puan, metre).then(function () { persist(); return ONLINE.tablo(tahta, 100); }).then(function (rows) {
       var oz = ONLINE.ozet(rows, ONLINE.kimlik(save), 5);
       yaz('<b>Skor tablosu' + (oz.sira ? ' · ' + oz.sira + '. sıradasın (' + oz.toplam + ' oyuncu)' : ' · ilk 100 dışındasın') + '</b><ol>' +
-        oz.liste.map(function (r) { return '<li class="' + (r.ben ? 'ben' : '') + '"><span>' + r.sira + '. ' + r.ad + '</span><em>' + r.puan + '</em></li>'; }).join('') + '</ol>');
+        oz.liste.map(function (r) { return '<li class="' + (r.ben ? 'ben' : '') + '"><span>' + r.sira + '. ' + r.ad + '</span><em>' + r.puan + '</em></li>'; }).join('') + '</ol>' +
+        '<button type="button" class="metin-btn tablo-tam" id="tamTabloBtn">Tam tablo ›</button>');
+      var tb = $('tamTabloBtn'); if (tb) tb.onclick = function () { if (window.KuyuScreens && window.KuyuScreens.tablo) window.KuyuScreens.tablo(tahta.charAt(0) === 'h' ? 'haftalik' : 'gunluk'); };
     }).catch(function () { yaz('<small>Skor tablosuna ulaşılamadı. Puanın bu cihazda kayıtlı.</small>'); });
   }
 
@@ -2593,6 +2595,9 @@
 
   // Ekran yöneticisinin kullandığı arayüz
   window.KuyuGame = {
+    // skor tablosu (v0.73): bugünün ve bu haftanın tahta adı, bitişe kalan süre
+    tahtalar: function () { return { gunluk: 'g-' + todayKey(), haftalik: 'h-' + haftaKey(), haftaKalan: kalanYazi(msHaftaSonu()), gunKalan: kalanYazi(864e5 - (Date.now() + GUN_KAYMA) % 864e5) }; },
+    onlineAcik: function () { return !!(ONLINE && ONLINE.acik()); },
     startLevel: function (n) { ac(); startLevel(n); },
     startHikaye: function (n) { ac(); startHikaye(n); },
     startEndless: function () { ac(); startEndless(true); }, // v0.64: serbest Sonsuz kalktı; eski bağlantılar Günlük Kuyu'ya

@@ -588,3 +588,26 @@ button:active { filter: brightness(.94); }
 .duvar-hafta li em { font-style: normal; font-variant-numeric: tabular-nums; }
 .duvar-hafta li.bos { color: var(--soluk); }
 .duvar-hafta .duvar-yildiz { font-style: normal; color: #ffd36a; font-size: 11px; margin-left: 4px; }
+
+/* ---------- Skor tablosu (v0.73): Günlük ve Haftalık, ilk 50 ve senin yerin ---------- */
+.tablo-ac { margin-top: 6px; }
+.tablo-tam { margin-top: 4px; padding: 4px 0; font-size: 13px; }
+.tablo-kart { width: min(420px, 100%); max-height: calc(100dvh - 32px); display: flex; flex-direction: column; gap: 8px; }
+.tablo-kart h2 { margin: 0; }
+.tablo-sekme { display: grid; grid-template-columns: 1fr 1fr; gap: 4px; padding: 3px; border-radius: 12px; background: rgba(255,255,255,.06); }
+.tablo-sekme button { padding: 8px 0; border-radius: 9px; background: transparent; border: 0; color: var(--soluk); font-weight: 700; }
+.tablo-sekme button.secili { background: rgba(255,255,255,.12); color: var(--yazi); }
+.tablo-bilgi { margin: 0; font-size: 13px; color: var(--soluk); min-height: 1.4em; }
+.tablo-liste { list-style: none; margin: 0; padding: 0; overflow-y: auto; min-height: 120px; flex: 1 1 auto; border-radius: 12px; background: rgba(255,255,255,.04); }
+.tablo-liste li { display: grid; grid-template-columns: 2.6em 1fr auto auto; align-items: baseline; gap: 8px; padding: 7px 12px; border-bottom: 1px solid rgba(255,255,255,.05); font-size: 14px; font-variant-numeric: tabular-nums; }
+.tablo-liste li b { color: var(--soluk); font-weight: 700; }
+.tablo-liste li span { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.tablo-liste li small { color: var(--soluk); font-size: 12px; }
+.tablo-liste li em { font-style: normal; font-weight: 800; }
+.tablo-liste li.ilk1 b { color: #ffd36a; } .tablo-liste li.ilk2 b { color: #d7e0e3; } .tablo-liste li.ilk3 b { color: #e0a070; }
+.tablo-liste li.ben { background: rgba(232,242,124,.12); color: var(--atesbocegi); }
+.tablo-liste li.ben b { color: var(--atesbocegi); }
+.tablo-liste li.ayrac { display: block; text-align: center; color: var(--soluk); padding: 2px; border: 0; }
+.buyuk-yazi .tablo-liste li { font-size: 16px; }
+.tablo-kart .tablo-sekme, .tablo-kart .tablo-liste, .tablo-kart .tablo-bilgi, .tablo-kart .dur-iki { width: 100%; align-self: stretch; }
+.tablo-liste { text-align: left; }

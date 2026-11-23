@@ -16,7 +16,7 @@
   var AYAR = { url: 'https://hoook-skor.torehan-anbarli.workers.dev', firebase: 'AIzaSyB4PlqU2y8fzorDA8cDaGJt0_C0MboReJM' };
   var YEREL = { url: 'http://localhost:8767', firebase: 'yerel-deneme', kimlikUrl: 'http://localhost:8767', yenileUrl: 'http://localhost:8767' };
   var KIMLIK_URL = 'https://identitytoolkit.googleapis.com', YENILE_URL = 'https://securetoken.googleapis.com';
-  var DEPO = 'kuyu.online', OTURUM = 'kuyu.oturum';
+  var DEPO = 'kuyu.online', OTURUM = 'kuyu.oturum', SEN_DEPO = 'kuyu.online.sen'; // SEN_DEPO: tahta başına son gönderimin sırası ve puanı (v0.73)
 
   function depo() { try { return typeof localStorage !== 'undefined' ? localStorage : null; } catch (e) { return null; } }
   function oku(k) { var d = depo(); try { return d && JSON.parse(d.getItem(k) || 'null'); } catch (e) { return null; } }
@@ -24,8 +24,8 @@
   function ayar() { var o = oku(DEPO); return o && o.url && o.firebase ? o : AYAR; }
   // ?online=yerel → yerel sahte sunucu; ?online=kapat → varsayılana dön. Ayar değişince oturum da sıfırlanır.
   function ayarBaglanti(deger) {
-    if (deger === 'yerel') { yaz(DEPO, YEREL); yaz(OTURUM, null); }
-    else if (deger === 'kapat') { yaz(DEPO, null); yaz(OTURUM, null); }
+    if (deger === 'yerel') { yaz(DEPO, YEREL); yaz(OTURUM, null); yaz(SEN_DEPO, null); }
+    else if (deger === 'kapat') { yaz(DEPO, null); yaz(OTURUM, null); yaz(SEN_DEPO, null); }
   }
   function acik() { var a = ayar(); return !!(a.url && a.firebase); }
 
@@ -94,7 +94,7 @@
         body: JSON.stringify({ tahta: tahta, ad: temizAd(ad), puan: Math.max(0, Math.floor(puan)), metre: Math.max(0, Math.floor(metre || 0)) })
       });
     }).then(function (y) {
-      if (y.kod === 200) { sonSen[tahta] = { sira: y.veri.sira, toplam: y.veri.toplam, puan: y.veri.puan, ad: y.veri.ad }; return true; }
+      if (y.kod === 200) { sonSen[tahta] = { sira: y.veri.sira, toplam: y.veri.toplam, puan: y.veri.puan, ad: y.veri.ad }; senSakla(tahta, sonSen[tahta]); return true; }
       if (y.kod === 401) { var o = oku(OTURUM); if (o) { o.bitis = 0; yaz(OTURUM, o); } } // belge reddedildi: sonra yenilenir
       if (y.kod >= 500) throw new Error('sunucu ' + y.kod);
       return false;
@@ -108,6 +108,25 @@
       var rows = Array.isArray(y.veri.satirlar) ? y.veri.satirlar : [];
       rows.toplam = +y.veri.toplam || rows.length; rows.sen = sonSen[tahta] || null;
       return rows;
+    });
+  }
+  // Son gönderim cihazda saklanır (v0.73): tam tablo sayfa yenilense de senin satırını bulur. En son 6 tahta tutulur.
+  function senSakla(tahta, sen) {
+    var d = oku(SEN_DEPO) || {}; d[tahta] = sen;
+    var k = Object.keys(d).sort(); while (k.length > 6) delete d[k.shift()];
+    yaz(SEN_DEPO, d);
+  }
+  function benim(tahta) { return sonSen[tahta] || (oku(SEN_DEPO) || {})[tahta] || null; }
+  // Tam tablo (v0.73): ilk n satır (en çok 200) ve senin yerin. Sunucu listede kimlik döndürmez; senin satırın, son
+  // gönderimindeki ad ve puanla eşleşen ilk satırdır (güncel sıra). Listede yoksa son gönderimdeki sıra (eski: true).
+  function tamTablo(tahta, n) {
+    return tablo(tahta, Math.min(200, n || 200)).then(function (rows) {
+      var b = benim(tahta), ben = null;
+      if (b) {
+        for (var i = 0; i < rows.length; i++) if (temizAd(rows[i].ad) === temizAd(b.ad) && +rows[i].puan === +b.puan) { ben = { sira: i + 1, ad: b.ad, puan: b.puan, eski: false }; break; }
+        if (!ben) ben = { sira: b.sira, ad: b.ad, puan: b.puan, eski: true };
+      }
+      return { satirlar: rows.map(function (r) { return { ad: temizAd(r.ad), puan: +r.puan || 0, metre: +r.metre || 0 }; }), toplam: Math.max(rows.toplam || 0, ben ? ben.sira : 0), ben: ben };
     });
   }
   // Listedeki yerin: { sira (1'den), toplam, liste: ilk 'ust' satır + sen }. Sıra sunucunun son gönderimde verdiğidir
@@ -138,6 +157,6 @@
   function meydanBaglanti(taban, m) { return taban + '?meydan=' + meydanKodla(m); }
 
   var api = { AYAR: AYAR, YEREL: YEREL, ayar: ayar, ayarBaglanti: ayarBaglanti, acik: acik, kimlik: kimlik, temizAd: temizAd, oturum: oturum,
-    gonder: gonder, tablo: tablo, ozet: ozet, meydanKodla: meydanKodla, meydanCoz: meydanCoz, meydanBaglanti: meydanBaglanti };
+    gonder: gonder, tablo: tablo, ozet: ozet, tamTablo: tamTablo, benim: benim, meydanKodla: meydanKodla, meydanCoz: meydanCoz, meydanBaglanti: meydanBaglanti };
   if (typeof module !== 'undefined' && module.exports) module.exports = api; else root.KuyuOnline = api;
 })(typeof window !== 'undefined' ? window : this);

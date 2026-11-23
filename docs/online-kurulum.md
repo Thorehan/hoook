@@ -52,7 +52,7 @@ Hesaplar stüdyonun Google hesabıyla açılır (hesap sahibi açar; e-posta ve 
 Firebase kimlik belgesi (anonim hesap; e-posta yok), oyuncu adı, puan, metre ve tahta adı (`h-2026-11-23` gibi). Oturum cihazda ayrı anahtarda (`kuyu.oturum`) durur; kayda ve yedek koduna girmez. Mağazaya çıkmadan önce gizlilik metnine bu satır eklenmeli.
 
 ## Sıradaki aşamalar
-- **Aşama 1 kalanı (arayüz):** Haftalık menüsünde tam tablo (ilk 50 + senin çevren), sonuç kartında "100+ oyuncu" yazısının gerçek sayıya dönmesi. `js/game.js` ve `index.html`'e dokunur.
+- ✅ **Aşama 1 arayüz (v0.74):** skor tablosu ekranı (ana menü ve sonuç kartından; Günlük ve Haftalık, ilk 50 ve senin yerin). Senin satırın son gönderimindeki ad ve puanla bulunur (`KuyuOnline.tamTablo`). Yerelde ayrı çalışma ağacından denemek için sahte sunucu `--koken http://localhost:<port>` alır.
 - **Aşama 2 · puan doğrulama:** istemci tohum + dokunuş günlüğü gönderir, Worker `js/engine.js` ile koşuyu yeniden oynatıp puanı kendi hesaplar. Ölçüm (23/11): motor oyun dakikası başına ~30 ms işlemci harcıyor; 3–6 dk'lık koşu 100–200 ms. Ücretsiz Workers'ta sınır 10 ms, bu yüzden **Workers Paid (ayda 5 $)** gerekir. Risk: motor `sin/cos/tan/atan2/hypot` kullanıyor; iPhone Safari ile Cloudflare'in JS motoru son basamakta farklı sonuç verebilir, koşu kayar. Çözüm: küçük bir payla kabul ya da bu işlevleri motorda kendimiz yazmak.
 - **Aşama 3:** Google/Apple ile bağlama (skor cihaz değişince kaybolmaz), ad değiştirme, gizlilik metni.
 

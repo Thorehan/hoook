@@ -135,6 +135,7 @@
   }
   function home() {
     var s = save();
+    $('tabloAcBtn').hidden = !G.onlineAcik(); // skor tablosu (v0.73): yalnız sunucu açıkken
     $('selamAd').textContent = (s.profile && s.profile.name) || 'Tırmanıcı';
     // dokun ve başla (v0.64): Hikâye'de sıradaki bölüm (geçilmemiş ilk bölüm); bölge ve bölgedeki ilerleme yazar
     var cur = G.siradaki(), bitti = G.hikayeBitti(), curDef = G.levelDef(cur), cb = (s.best || {})[cur] || {};
@@ -239,6 +240,55 @@
   });
   $('hakHikayeBtn').addEventListener('click', function () { $('hakKatman').hidden = true; if (G.hikayeBitti()) openLevels(); else G.startLevel(G.siradaki()); });
   $('hakKapat').addEventListener('click', function () { $('hakKatman').hidden = true; if (current === 'ekAna') home(); });
+  // ---------- skor tablosu (v0.73) ----------
+  // Günlük ve Haftalık sekmeleri; ilk 50 oyuncu, senin satırın vurgulu (50 dışındaysan altta). Sunucu kapalıysa düğme görünmez.
+  var tabloTur = 'haftalik', tabloIstek = 0;
+  function sayi(n) { return (+n || 0).toLocaleString('tr-TR'); }
+  function tabloSatir(sira, ad, puan, metre, ben) {
+    var li = document.createElement('li');
+    li.className = (ben ? 'ben ' : '') + (sira <= 3 ? 'ilk' + sira : '');
+    var a = document.createElement('b'); a.textContent = sira + '.';
+    var b = document.createElement('span'); b.textContent = ad + (ben ? ' (sen)' : '');
+    var c = document.createElement('em'); c.textContent = sayi(puan);
+    var d = document.createElement('small'); d.textContent = metre ? sayi(metre) + ' m' : '';
+    li.appendChild(a); li.appendChild(b); li.appendChild(d); li.appendChild(c);
+    return li;
+  }
+  function tabloCiz() {
+    var tur = tabloTur, istek = ++tabloIstek, T = G.tahtalar(), tahta = T[tur], liste = $('tabloListe'), bilgi = $('tabloBilgi');
+    $('tabloHaftalik').setAttribute('aria-selected', tur === 'haftalik'); $('tabloGunluk').setAttribute('aria-selected', tur === 'gunluk');
+    $('tabloHaftalik').classList.toggle('secili', tur === 'haftalik'); $('tabloGunluk').classList.toggle('secili', tur === 'gunluk');
+    liste.innerHTML = ''; bilgi.textContent = 'Yükleniyor…';
+    window.KuyuOnline.tamTablo(tahta, 200).then(function (t) {
+      if (istek !== tabloIstek) return;
+      var kalan = tur === 'haftalik' ? 'Hafta bitimine ' + T.haftaKalan : 'Gün bitimine ' + T.gunKalan;
+      if (!t.satirlar.length) { bilgi.textContent = (tur === 'haftalik' ? 'Bu hafta' : 'Bugün') + ' henüz kimse yok. İlk sen ol! · ' + kalan; return; }
+      var ben = t.ben;
+      bilgi.textContent = sayi(t.toplam) + ' oyuncu · ' + kalan + (ben ? ' · Sen: ' + ben.sira + '. (' + sayi(ben.puan) + ' puan)' + (ben.eski ? ', son gönderimindeki sıra' : '') : ' · ' + (tur === 'haftalik' ? 'Bu hafta' : 'Bugün') + ' henüz puanın yok');
+      var n = Math.min(50, t.satirlar.length);
+      for (var i = 0; i < n; i++) { var r = t.satirlar[i]; liste.appendChild(tabloSatir(i + 1, r.ad, r.puan, r.metre, !!(ben && !ben.eski && ben.sira === i + 1))); }
+      if (ben && (ben.eski || ben.sira > n)) {
+        var ay = document.createElement('li'); ay.className = 'ayrac'; ay.textContent = '…'; liste.appendChild(ay);
+        var bs = ben.eski ? null : t.satirlar[ben.sira - 1];
+        liste.appendChild(tabloSatir(ben.sira, ben.ad, ben.puan, bs ? bs.metre : 0, true));
+      }
+      var benLi = liste.querySelector('li.ben'); if (benLi && benLi.scrollIntoView) benLi.scrollIntoView({ block: 'nearest' });
+    }).catch(function () { if (istek === tabloIstek) bilgi.textContent = 'Skor tablosuna ulaşılamadı. Bağlantını kontrol edip Yenile\'ye bas.'; });
+  }
+  function openTablo(tur) {
+    if (!G.onlineAcik()) return;
+    tabloTur = tur === 'gunluk' ? 'gunluk' : 'haftalik';
+    $('tabloKatman').hidden = false;
+    tabloCiz();
+    $('tabloKapat').focus({ preventScroll: true });
+  }
+  $('tabloHaftalik').addEventListener('click', function () { tabloTur = 'haftalik'; tabloCiz(); });
+  $('tabloGunluk').addEventListener('click', function () { tabloTur = 'gunluk'; tabloCiz(); });
+  $('tabloYenile').addEventListener('click', tabloCiz);
+  $('tabloKapat').addEventListener('click', function () { $('tabloKatman').hidden = true; });
+  $('tabloKatman').addEventListener('keydown', function (e) { if (e.key === 'Escape') { e.stopPropagation(); $('tabloKatman').hidden = true; } });
+  $('tabloAcBtn').addEventListener('click', function () { openTablo('haftalik'); });
+
   $('gunlukBtn').addEventListener('click', function () { G.startDaily(); });
   $('haftalikBtn').addEventListener('click', function () { G.startWeekly(); });
   $('profilBtn').addEventListener('click', function () { openProfile(); });
@@ -919,6 +969,7 @@
   window.KuyuScreens = {
     home: home,
     hak: openHak,
+    tablo: openTablo, // skor tablosu (v0.73)
     // sonuç kartındaki kısa yol: Dolap o ürünün önizlemesiyle açılır
     dolap: function (id) {
       var it = window.KuyuEkonomi.item(id);

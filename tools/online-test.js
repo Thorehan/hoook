@@ -82,6 +82,11 @@ O.gonder({}, H, 'A', 10, 5).then(() => ok(false, 'kapalıyken gönderilmemeli'),
   oyuncu(ob); await O.gonder(b, H, 'Bora', 5000, 100); oyuncu(oa);
   rows = await O.tablo(H, 50);
   ok(rows[0].ad === 'Ayşe' && rows[1].puan === 5000, 'eşit puanda önce yazan üstte');
+  // tam tablo (v0.73): senin satırın son gönderimin ad ve puanıyla bulunur (güncel sıra); son gönderim cihazda saklanır
+  const tt = await O.tamTablo(H, 200);
+  ok(tt.satirlar.length === 2 && tt.toplam === 2 && tt.ben && tt.ben.sira === 2 && !tt.ben.eski && tt.ben.ad === 'Bora', 'tam tablo: senin güncel sıran');
+  ok((JSON.parse(localStorage.getItem('kuyu.online.sen') || '{}')[H] || {}).puan === 5000, 'son gönderim cihazda saklanır');
+  ok(O.benim('g-1999-01-01') === null && (await O.tamTablo('g-2026-01-05', 50)).ben === null, 'gönderim yoksa senin yerin yok');
   // ilk sıraların dışındaysan kendi satırın eklenir
   const r3 = [{ ad: 'X', puan: 9 }, { ad: 'Y', puan: 8 }, { ad: 'Ben', puan: 1 }]; r3.sen = { sira: 3, toplam: 3, puan: 1, ad: 'Ben' };
   const o2 = O.ozet(r3, 'ben', 2);

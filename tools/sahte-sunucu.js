@@ -30,7 +30,9 @@ function kur(secenek) {
   secenek = secenek || {};
   const db = new DatabaseSync(':memory:');
   db.exec(fs.readFileSync(path.join(__dirname, '../sunucu/schema.sql'), 'utf8'));
-  const env = { DB: d1(db), FIREBASE_PROJE: 'yerel', KOKENLER: 'http://localhost:8766,http://127.0.0.1:8766' };
+  // --koken <adres>: başka bir yerel sayfaya da izin (ör. ayrı çalışma ağacı http://localhost:8768)
+  const ek = process.argv.indexOf('--koken') > 0 ? ',' + process.argv[process.argv.indexOf('--koken') + 1] : '';
+  const env = { DB: d1(db), FIREBASE_PROJE: 'yerel', KOKENLER: 'http://localhost:8766,http://127.0.0.1:8766' + ek };
   const saat = secenek.saat || Date.now;
   let sayac = 0;
   // Sahte Firebase: belge "sahte.<uid>", yenileme belgesi "yenile.<uid>"

@@ -128,6 +128,12 @@ Yayına çıkmadan yerelde denemek için: bilgisayarda `python3 -m http.server 8
 - [ ] Süzülürken istediğin an halkaya atılabiliyor musun, kontrol sende mi?
 - [ ] Sütun yanlışlıkla düşürüyor ya da şaşırtıyor mu?
 
+## 18. Skor tablosu ekranı (v0.74, 5 dk)
+- [ ] Ana menüde "Skor tablosu ›" görünüyor mu? Açılınca Haftalık listesi, oyuncu sayısı ve kalan süre doğru mu?
+- [ ] Haftalık ya da Günlük oynadıktan sonra sonuç kartındaki "Tam tablo ›" seni tabloda vurgulu gösteriyor mu?
+- [ ] Günlük sekmesi bugünün tablosunu gösteriyor mu? İnternet kapalıyken "ulaşılamadı" yazıyor, Yenile çalışıyor mu?
+- [ ] Liste 375 px'te okunaklı mı, uzun adlar taşıyor mu?
+
 ## 5. Genel izlenim (serbest)
 - En sevdiğim an:
 - En çok zorlandığım yer:
