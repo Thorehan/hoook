@@ -52,6 +52,9 @@
   // ---------- dolap görünümü (js/ekonomi.js) ----------
   var GORUNUM = null;
   function look() { if (!GORUNUM) GORUNUM = EKO.gorunum(save); return GORUNUM; }
+  // Karakter ve takı çizimi (v0.76, js/karakter.js): Çıra'nın gövdesi korCiz; diğer karakterler ve takılar modülde
+  var KK = window.KuyuKarakter;
+  if (KK) KK.kur({ korCiz: function (c, x, y, r, t, r1, r2) { korCiz(c, x, y, r, t, r1, r2); }, renk: renk });
   function renk(c, t) { return c === 'gokkusagi' ? 'hsl(' + Math.round((t || performance.now()) / 12 % 360) + ',85%,62%)' : c; }
   function scarfCol(t) { return renk(look().atki, t); }
   function trailCol(t) { var c = look().iz; return c === 'atki' ? scarfCol(t) : renk(c, t); }
@@ -1416,7 +1419,7 @@
     if (k >= 1) return;
     ctx.save(); ctx.globalAlpha = 1 - k * 0.9;
     ctx.translate(d.x, d.y + (d.su ? k * 6 : 0)); ctx.scale(1 - 0.5 * k, 1 - 0.5 * k);
-    korCiz(ctx, 0, 0, CFG.R, t / 1000, look().govde || COL.kahraman, look().govde2 || COL.kahramanKoyu);
+    if (KK) KK.ciz(ctx, 0, 0, CFG.R, t / 1000, look(), null, 'govde'); else korCiz(ctx, 0, 0, CFG.R, t / 1000, look().govde || COL.kahraman, look().govde2 || COL.kahramanKoyu);
     ctx.globalAlpha = k * 0.7; ctx.fillStyle = '#3a3a36'; ctx.beginPath(); ctx.arc(0, 0, CFG.R, 0, Math.PI * 2); ctx.fill();
     ctx.restore();
   }
@@ -1621,6 +1624,8 @@
       }
     }
     var st = Math.min(0.25, sp / 40), ang = Math.atan2(vy, vx);
+    var kirp = Math.floor(t / 2600) % 3 === 0 && t % 2600 < 110;
+    if (KK && yS > 0.5) KK.ciz(ctx, p.x, p.y, CFG.R, t / 1000, look(), aim, 'arka'); // pelerin, kanat
     ctx.save(); ctx.translate(p.x, p.y);
     if (sp > 1) { ctx.rotate(ang); ctx.scale(1 + st, 1 - st * 0.6); ctx.rotate(-ang); }
     if (ezil) { // tutunma anı: ipe doğru esneyip yaylanarak oturur
@@ -1629,20 +1634,22 @@
       else { var kz = Math.exp(-ee * 9) * Math.cos(ee * 26) * 0.26; ctx.rotate(ezil.ang); ctx.scale(1 + kz, 1 - kz * 0.75); ctx.rotate(-ezil.ang); }
     }
     if (yS !== 1) ctx.scale(yS, yS);
-    korCiz(ctx, 0, 0, CFG.R, t / 1000, look().govde || COL.kahraman, look().govde2 || COL.kahramanKoyu);
+    if (KK) KK.ciz(ctx, 0, 0, CFG.R, t / 1000, look(), aim, 'govde');
+    else korCiz(ctx, 0, 0, CFG.R, t / 1000, look().govde || COL.kahraman, look().govde2 || COL.kahramanKoyu);
     ctx.restore();
     // ara ara yükselen kıvılcım (hareket azaltma açıksa yok)
     if (!reduceMotion && t - kivilcimT > (sp > 3 ? 90 : 220)) {
       kivilcimT = t;
       parts.push({ x: p.x + (Math.random() - 0.5) * CFG.R, y: p.y - CFG.R * 0.6, vx: (Math.random() - 0.5) * 30 - vx * 4, vy: -50 - Math.random() * 40, g: -20, r: 1 + Math.random() * 0.9, life: 0.6, max: 0.6, color: Math.random() < 0.5 ? '#ffd36a' : '#ff9a3c' });
     }
+    if (KK) { if (yS > 0.5) KK.ciz(ctx, p.x, p.y, CFG.R, t / 1000, look(), aim, 'ust', { kirp: kirp }); return; } // atkı, göz, yüz, baş
     ctx.fillStyle = scarfCol(t); ctx.fillRect(p.x - 8, p.y + 2, 16, 4);
     var lx = aim.x, ly = aim.y;
     ctx.fillStyle = '#fff';
     ctx.beginPath(); ctx.arc(p.x + lx * 3, p.y - 2 + ly * 2, 4.4, 0, Math.PI * 2); ctx.fill();
     ctx.fillStyle = '#1a1210';
     ctx.beginPath(); ctx.arc(p.x + lx * 5, p.y - 2 + ly * 3.4, 2, 0, Math.PI * 2); ctx.fill();
-    if (Math.floor(t / 2600) % 3 === 0 && t % 2600 < 110) { ctx.fillStyle = look().govde2 || COL.kahramanKoyu; ctx.fillRect(p.x + lx * 3 - 5, p.y - 7 + ly * 2, 10, 5); }
+    if (kirp) { ctx.fillStyle = look().govde2 || COL.kahramanKoyu; ctx.fillRect(p.x + lx * 3 - 5, p.y - 7 + ly * 2, 10, 5); }
   }
 
   // Sol ve sağ dokunuşun kancayı nereye atacağı: sol hedef turkuaz, sağ hedef sarı halka ve ok.
@@ -1978,7 +1985,7 @@
     // Çıra
     if (cy > 0) {
       parilti(cx, cy, (34 + (finalBi === 2 ? 30 * kolay((p - 0.8) / 2) : 0)) * u, '255,150,80', 0.6);
-      korCiz(ctx, cx, cy, 9 * u, t, look().govde || COL.kahraman, look().govde2 || COL.kahramanKoyu);
+      if (KK) KK.ciz(ctx, cx, cy, 9 * u, t, look(), { x: 0, y: -1 }); else korCiz(ctx, cx, cy, 9 * u, t, look().govde || COL.kahraman, look().govde2 || COL.kahramanKoyu);
     }
     // metin
     var buyuk = document.documentElement.classList.contains('buyuk-yazi'), ya = kolay((p - 2.8) / 0.6);
@@ -2633,6 +2640,9 @@
     kusan: function (id) { var r = EKO.kusan(save, id); GORUNUM = null; persist(); return r; },
     gorunum: function () { return look(); },
     korCiz: function (c, x, y, r, t, r1, r2, sade) { korCiz(c, x, y, r, t, r1, r2, sade); },
+    // v0.76: seçili (ya da ek ile değiştirilmiş) görünümle kahramanın tamamı; ek: { tur: id } önizleme
+    kahramanCiz: function (c, x, y, r, t, L, bak, katman, s) { if (KK) KK.ciz(c, x, y, r, t, L || look(), bak, katman, s); else korCiz(c, x, y, r, t, (L || look()).govde, (L || look()).govde2); },
+    gorunumIle: function (ek) { return EKO.gorunum(save, ek); },
     renk: renk,
     kancaCiz: kancaCiz,
     alevCiz: alevCiz,

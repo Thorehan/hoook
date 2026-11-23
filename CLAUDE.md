@@ -25,7 +25,7 @@ Devir elindeyken iş bitirme ve devretme adımları `docs/DEVIR-MUSTAFA.md` §6'
 | `docs/hikaye.md` | Hikâye "Çıra": tek kaynak, metin kuralları |
 | `docs/telefon-testi.md` | Telefonda deneme listesi |
 
-Kod: `js/engine.js` (deterministik fizik ve kurallar, DT 1/120), `js/gen.js` (bölüm, Sonsuz ve Günlük üreticisi), `js/game.js` (çizim, ses, oyun döngüsü, sonuç kartları), `js/screens.js` (menüler), `js/ekonomi.js`, `js/gorev.js`, `js/hayalet.js`, `js/notlar.js`, `js/muzik.js`, `js/online.js` (meydan okuma bağlantısı, skor tablosu istemcisi; `AYAR` boşken kapalı); stil `css/`.
+Kod: `js/engine.js` (deterministik fizik ve kurallar, DT 1/120), `js/gen.js` (bölüm, Sonsuz ve Günlük üreticisi), `js/game.js` (çizim, ses, oyun döngüsü, sonuç kartları), `js/screens.js` (menüler), `js/ekonomi.js`, `js/gorev.js`, `js/hayalet.js`, `js/notlar.js`, `js/muzik.js`, `js/online.js` (meydan okuma bağlantısı, skor tablosu istemcisi), `js/karakter.js` (karakter ve takı çizimi, v0.76); stil `css/` (`css/arayuz.css`: İstişare 4 tasarım dili).
 
 ## 3 · Kalıcı tasarım kararları (Törehan'ın kararları; değiştirmeden önce sor)
 

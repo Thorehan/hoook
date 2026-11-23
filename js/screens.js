@@ -5,7 +5,7 @@
   var G = window.KuyuGame;
   var $ = function (id) { return document.getElementById(id); };
   var reduceMotion = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-  var EKRANLAR = ['ekAcilis', 'ekGiris', 'ekTanitim', 'ekAna', 'ekBolumler', 'ekAyarlar', 'ekProfil', 'ekGorevler', 'ekDolap', 'ekIstat', 'ekYarisma'];
+  var EKRANLAR = ['ekAcilis', 'ekGiris', 'ekTanitim', 'ekAna', 'ekBolumler', 'ekAyarlar', 'ekProfil', 'ekGorevler', 'ekDolap', 'ekIstat', 'ekYarisma', 'ekKoleksiyon'];
   var current = 'ekAcilis';
   var q = new URLSearchParams(location.search);
   var ONL = window.KuyuOnline;
@@ -14,7 +14,7 @@
   var deepLink = meydanLink ? { mode: 'meydan', m: meydanLink } : q.get('mod') === 'gunluk' ? { mode: 'daily' } : q.get('mod') === 'haftalik' ? { mode: 'weekly' } : q.get('mod') === 'sonsuz' ? { mode: 'endless' } : q.get('bolum') ? { mode: 'level', n: parseInt(q.get('bolum'), 10) || 1 } : q.get('hikaye') ? { mode: 'hikaye', n: parseInt(q.get('hikaye'), 10) || 1 } : null;
   var save = function () { return G.save(); };
 
-  var SEKMELER = ['ekAna', 'ekBolumler', 'ekGorevler', 'ekDolap', 'ekProfil', 'ekAyarlar', 'ekIstat', 'ekYarisma'];
+  var SEKMELER = ['ekAna', 'ekBolumler', 'ekGorevler', 'ekDolap', 'ekProfil', 'ekAyarlar', 'ekIstat', 'ekYarisma', 'ekKoleksiyon'];
   function show(id) {
     current = id;
     EKRANLAR.forEach(function (e) { $(e).hidden = e !== id; });
@@ -26,6 +26,7 @@
     });
     if (id === 'ekAna' || id === 'ekTanitim') startScene(); else stopScene();
     if (id === 'ekDolap') startPreview(); else stopPreview();
+    if (id === 'ekKoleksiyon') kolBaslat(); else kolDur();
     if (id !== 'oyun' && id !== 'ekAcilis') G.muzikSahne('menu'); // menülerde sakin müzik
     if (SEKMELER.indexOf(id) >= 0) $('gorevNokta').hidden = !G.gorevBekleyen();
   }
@@ -380,7 +381,7 @@
     b.addEventListener('click', function () {
       var t = b.dataset.sekme;
       if (t === current && (t !== 'ekDolap' || b.dataset.mod === dolapMod)) return;
-      if (t === 'ekAna') home(); else if (t === 'ekBolumler') openLevels(); else if (t === 'ekGorevler') openTasks(); else if (t === 'ekDolap') openDolap(b.dataset.mod); else if (t === 'ekProfil') openProfile(); else if (t === 'ekYarisma') openYarisma(); else openSettings();
+      if (t === 'ekAna') home(); else if (t === 'ekBolumler') openLevels(); else if (t === 'ekGorevler') openTasks(); else if (t === 'ekDolap') openDolap(b.dataset.mod); else if (t === 'ekProfil') openProfile(); else if (t === 'ekYarisma') openYarisma(); else if (t === 'ekKoleksiyon') openKol(); else openSettings();
     });
   });
 
@@ -475,11 +476,12 @@
   // ---------- dolap ----------
   // Sahip olunmayan ürüne ilk dokunuş ÖNİZLEMEdir: kahraman o renge bürünür, altta "Al · fiyat" çubuğu açılır.
   // Satın alma yalnızca o çubuktaki "Al" ile olur. Sahip olunan ürüne dokunmak doğrudan kuşanır.
-  var dolapTur = 'govde', previewRaf = 0, onizleme = null, onizlemeGorunum = null;
+  var dolapTur = 'karakter', previewRaf = 0, onizleme = null, onizlemeGorunum = null;
   // v0.75: Dolap iki kipte açılır: Market (sende olmayanlar, fiyat ve kilit) · Koleksiyon (sende olanlar, kuşan). Aşama 2–3'te ayrı ekranlar olur.
   var dolapMod = 'market';
   function openDolap(mod) { dolapMod = mod === 'koleksiyon' ? 'koleksiyon' : 'market'; onizleme = null; renderDolap(); show('ekDolap'); $('ekDolap').scrollTop = 0; }
   function swatch(it) {
+    if (it.tur === 'karakter' || it.tur === 'bas' || it.tur === 'yuz' || (it.tur === 'atki' && it.sekil)) return '<span class="renk resimli" style="background:url(' + resim(it) + ') center/cover" aria-hidden="true"></span>';
     if (it.tur === 'kanca') {
       var cv = document.createElement('canvas'), d = 2; cv.width = cv.height = 34 * d;
       var c = cv.getContext('2d'); c.scale(d, d); c.fillStyle = '#24302d'; c.beginPath(); c.arc(17, 17, 17, 0, 6.29); c.fill();
@@ -520,6 +522,11 @@
     $('satinCubuk').hidden = !it;
     if (!it) return;
     $('scUrun').innerHTML = swatch(it) + '<span><b>' + it.ad + '</b><small>' + window.KuyuEkonomi.TURLER[it.tur] + '</small></span>';
+    if (it.etkinlik) { // etkinlik ödülü (v0.76): satın alınmaz
+      $('scAl').disabled = true; $('scAl').textContent = it.etkinlik;
+      $('scAl').setAttribute('aria-label', it.ad + ', ' + it.etkinlik + ' olarak açılır');
+      return;
+    }
     if (it.lig != null) { // Haftalık lig ödülü: satın alınmaz
       var lad = window.KuyuEkonomi.LIG[it.lig].ad;
       $('scAl').disabled = true; $('scAl').textContent = lad + ' liginde açılır';
@@ -540,7 +547,7 @@
   $('scAl').addEventListener('click', function () {
     var it = onizleme && window.KuyuEkonomi.item(onizleme); if (!it) return;
     var r = G.satinAl(it.id);
-    if (r.ok) { onizleme = null; if (G.sfx) G.sfx.won(); toast(it.ad + ' alındı ve kuşanıldı'); }
+    if (r.ok) { onizleme = null; resimBellek = {}; if (G.sfx) G.sfx.won(); toast(it.ad + ' alındı ve kuşanıldı'); }
     else if (r.neden === 'yetersiz') toast(r.eksik + ' ateşböceği eksik. Bölüm, Günlük ve Haftalık Kuyu, görev ve günlük girişten toplanır.');
     renderDolap();
   });
@@ -548,24 +555,16 @@
   $('dolapListe').addEventListener('click', function (e) {
     var b = e.target.closest('[data-urun]'); if (!b) return;
     var id = b.dataset.urun;
-    if (save().dolap.sahip.indexOf(id) >= 0) { onizleme = null; G.kusan(id); renderDolap(); return; }
+    if (save().dolap.sahip.indexOf(id) >= 0) { onizleme = null; G.kusan(id); resimBellek = {}; renderDolap(); return; }
     onizleme = id; // ilk dokunuş: yalnızca önizleme
     renderDolap();
   });
   // önizleme: halkada sallanan kahraman, kuşanılan atkı, ip ve iz
-  function startPreview() {
-    var cv = $('dolapOnizleme'), dpr = Math.min(2, window.devicePixelRatio || 1);
-    var w = cv.clientWidth || 300, h = 150;
-    cv.width = w * dpr; cv.height = h * dpr; cv.style.height = h + 'px';
-    var c = cv.getContext('2d');
-    cancelAnimationFrame(previewRaf);
-    (function tick(now) {
-      var t = now / 1000, L = Object.assign({}, G.gorunum()), oz = onizleme && window.KuyuEkonomi.item(onizleme);
-      if (oz) { L[oz.tur] = oz.renk; if (oz.renk2) L[oz.tur + '2'] = oz.renk2; }
-      onizlemeGorunum = L;
-      c.setTransform(dpr, 0, 0, dpr, 0, 0);
-      c.fillStyle = '#121b1a'; c.fillRect(0, 0, w, h);
-      var cx = w / 2, ringY = 26, rope = 78, r = 16;
+  // Önizleme (Market ve Koleksiyon, v0.76): halkada sallanan kahraman; L görünüm, alevGoster alev basamaklarını döndürür
+  function onizlemeCiz(c, w, h, now, L, alevGoster, zemin, olcek) {
+      var t = now / 1000;
+      c.fillStyle = zemin || '#121b1a'; c.fillRect(0, 0, w, h);
+      var cx = w / 2, ringY = 26, rope = h * 0.52, r = h * 0.107 * (olcek || 1);
       var ang = Math.sin(t * 1.7) * 0.5, hx = cx + Math.sin(ang) * rope, hy = ringY + Math.cos(ang) * rope;
       // iz: sallanmanın gerisinde kalan kısa çizgi
       var izc = L.iz === 'atki' ? G.renk(L.atki, now) : G.renk(L.iz, now);
@@ -580,11 +579,98 @@
       c.strokeStyle = G.renk(L.ip, now); c.lineWidth = 2.5; c.beginPath(); c.moveTo(cx, ringY); c.lineTo(hx, hy - r * 0.2); c.stroke();
       c.save(); c.translate(cx, ringY - 13); c.scale(1.7, 1.7); G.kancaCiz(c, L.kanca, null, -Math.PI / 2); c.restore();
       // alev sekmesinde (ya da alev önizlenirken) Çıra alevli görünür; basamaklar sırayla döner
-      if (dolapTur === 'alev' || (oz && oz.tur === 'alev')) G.alevCiz(c, hx, hy, r, now, 1 + Math.floor(t / 1.6) % 3, L.alev, L.alev2);
-      hero(c, hx, hy, r, { x: Math.sin(t * 0.8) * 0.6, y: -0.5 }, G.renk(L.atki, now));
+      if (alevGoster) G.alevCiz(c, hx, hy, r, now, 1 + Math.floor(t / 1.6) % 3, L.alev, L.alev2);
+      hero(c, hx, hy, r, { x: Math.sin(t * 0.8) * 0.6, y: -0.5 }, null, L);
+  }
+  function startPreview() {
+    var cv = $('dolapOnizleme'), dpr = Math.min(2, window.devicePixelRatio || 1);
+    var w = cv.clientWidth || 300, h = 150;
+    cv.width = w * dpr; cv.height = h * dpr; cv.style.height = h + 'px';
+    var c = cv.getContext('2d');
+    cancelAnimationFrame(previewRaf);
+    (function tick(now) {
+      var oz = onizleme && window.KuyuEkonomi.item(onizleme), ek = {};
+      if (oz) ek[oz.tur] = oz.id;
+      var L = G.gorunumIle(ek);
+      onizlemeGorunum = L;
+      c.setTransform(dpr, 0, 0, dpr, 0, 0);
+      onizlemeCiz(c, w, h, now, L, dolapTur === 'alev' || (oz && oz.tur === 'alev'));
       previewRaf = requestAnimationFrame(tick);
     })(performance.now());
   }
+
+  // ---------- Koleksiyon (v0.76, İstişare 4 Aşama 2) ----------
+  // Karakterler ve takılar: nadirlik çerçeveli ızgara, büyük önizleme; sende olanı GİY, olmayanın nasıl açıldığı yazar.
+  var kolTur = 'karakter', kolSecili = null, kolRaf = 0, resimBellek = {};
+  var NAD_SIRA = { baslangic: 0, sira: 1, nadir: 2, destansi: 3, efsane: 4 };
+  function kolEk(it) { var ek = {}; ek[it.tur] = it.id; if (it.tur === 'karakter') { ek.govde = 'govde-turuncu'; ek.bas = 'bas-yok'; ek.yuz = 'yuz-yok'; ek.atki = 'atki-turkuaz'; } return ek; }
+  // küçük resim (data URL); görünüm değişince bellek temizlenir (takılar seçili karakterin üstünde görünür)
+  function resim(it) {
+    if (resimBellek[it.id]) return resimBellek[it.id];
+    var cv = document.createElement('canvas'), d = 2, S = 76; cv.width = cv.height = S * d;
+    var c = cv.getContext('2d'); c.scale(d, d);
+    if (it.tur === 'kanca') { c.translate(S / 2, S / 2 + 4); c.scale(3, 3); G.kancaCiz(c, it.renk, '#e6eeec', -Math.PI / 2); }
+    else if (it.tur === 'ip') { c.strokeStyle = G.renk(it.renk, 900); c.lineWidth = 6; c.lineCap = 'round'; c.beginPath(); c.moveTo(16, 14); c.bezierCurveTo(60, 26, 16, 50, 60, 62); c.stroke(); }
+    else if (it.tur === 'iz') { var iz = it.renk === 'atki' ? G.renk(G.gorunum().atki, 900) : G.renk(it.renk, 900); c.strokeStyle = iz; c.lineCap = 'round'; for (var q = 0; q < 5; q++) { c.globalAlpha = 1 - q * 0.17; c.lineWidth = 12 - q * 2; c.beginPath(); c.moveTo(14 + q * 10, 60 - q * 9); c.lineTo(24 + q * 10, 50 - q * 9); c.stroke(); } c.globalAlpha = 1; }
+    else if (it.tur === 'alev') G.alevCiz(c, S / 2, S / 2 + 8, 15, 400, 2, it.renk, it.renk2);
+    else G.kahramanCiz(c, S / 2, S / 2 + (it.tur === 'bas' ? 10 : 6), it.tur === 'bas' ? 19 : 21, 0.6, G.gorunumIle(kolEk(it)), { x: 0.25, y: -0.3 });
+    return (resimBellek[it.id] = cv.toDataURL());
+  }
+  function sahipMi(id) { return save().dolap.sahip.indexOf(id) >= 0; }
+  function openKol(tur, id) {
+    if (tur) kolTur = tur;
+    kolSecili = id || null;
+    renderKol(); show('ekKoleksiyon'); $('ekKoleksiyon').scrollTop = 0;
+  }
+  function renderKol() {
+    var EK = window.KuyuEkonomi, sv = save(), kus = sv.dolap.kusan, KAT = EK.KATALOG;
+    var ozel = KAT.filter(function (it) { return it.fiyat !== 0; });
+    $('kolSay').textContent = ozel.filter(function (it) { return sahipMi(it.id); }).length + ' / ' + ozel.length;
+    $('kolSekmeler').innerHTML = Object.keys(EK.TURLER).map(function (t) { return '<button type="button" role="tab" data-kol="' + t + '" aria-selected="' + (t === kolTur) + '">' + EK.TURLER[t] + '</button>'; }).join('');
+    var liste = KAT.filter(function (it) { return it.tur === kolTur; }).sort(function (a, b) { return (NAD_SIRA[EK.nadirlik(a)] - NAD_SIRA[EK.nadirlik(b)]) || ((a.fiyat || 0) - (b.fiyat || 0)); });
+    if (!kolSecili || !EK.item(kolSecili) || EK.item(kolSecili).tur !== kolTur) kolSecili = kus[kolTur];
+    $('kolIzgara').innerHTML = liste.map(function (it) {
+      var has = sahipMi(it.id), on = kus[it.tur] === it.id, nad = EK.nadirlik(it);
+      return '<button type="button" class="kol-kart n-' + nad + (has ? '' : ' kilit') + (it.id === kolSecili ? ' secili' : '') + '" data-kol-id="' + it.id + '" aria-label="' + it.ad + ', ' + EK.NADIRLIK[nad] + (on ? ', kuşanıldı' : has ? ', sende' : ', kilitli') + '">' +
+        '<img src="' + resim(it) + '" alt="">' + (on ? '<span class="tik" aria-hidden="true">✓</span>' : '') + (has ? '' : '<span class="kilit-ik" aria-hidden="true">🔒</span>') + (it.etkinlik ? '<span class="etk" aria-hidden="true">ETKİNLİK</span>' : '') + '<b>' + it.ad + '</b></button>';
+    }).join('');
+    kolBilgi();
+  }
+  function kolBilgi() {
+    var EK = window.KuyuEkonomi, it = EK.item(kolSecili); if (!it) return;
+    var has = sahipMi(it.id), on = save().dolap.kusan[it.tur] === it.id, nad = EK.nadirlik(it), b = $('kolGiy'), ac = '';
+    $('kolAd').textContent = it.ad;
+    $('kolNadir').textContent = EK.NADIRLIK[nad] + ' · ' + EK.TURLER[it.tur]; $('kolNadir').className = 'n-yazi n-' + nad;
+    b.disabled = false;
+    if (on) { b.textContent = 'KUŞANILDI'; b.disabled = true; }
+    else if (has) b.textContent = 'GİY';
+    else if (it.etkinlik) { b.textContent = 'ETKİNLİK'; b.disabled = true; ac = it.etkinlik + ' olarak açılır; Market\'te satılmaz.'; }
+    else if (it.isik) { b.textContent = 'IŞIK ' + it.isik; b.disabled = true; ac = 'Kuyunun ışığı ' + it.isik + '. seviyeye gelince kendiliğinden açılır.'; }
+    else if (it.lig != null) { b.textContent = EK.LIG[it.lig].ad.toLocaleUpperCase('tr-TR') + ' LİG'; b.disabled = true; ac = 'Haftalık Kuyu\'da ' + EK.LIG[it.lig].ad + ' ligine ulaşınca açılır.'; }
+    else { b.innerHTML = 'MARKET · <i class="ikon-ates" aria-hidden="true"></i>' + it.fiyat; ac = 'Market\'te ' + it.fiyat + ' ateşböceği.'; }
+    $('kolAcilis').textContent = ac;
+  }
+  $('kolSekmeler').addEventListener('click', function (e) { var b = e.target.closest('[data-kol]'); if (!b) return; kolTur = b.dataset.kol; kolSecili = null; renderKol(); });
+  $('kolIzgara').addEventListener('click', function (e) { var b = e.target.closest('[data-kol-id]'); if (!b) return; kolSecili = b.dataset.kolId; renderKol(); });
+  $('kolGiy').addEventListener('click', function () {
+    var EK = window.KuyuEkonomi, it = EK.item(kolSecili); if (!it) return;
+    if (sahipMi(it.id)) { G.kusan(it.id); resimBellek = {}; if (G.sfx) G.sfx.won(); toast(it.ad + ' kuşanıldı', 1600); renderKol(); return; }
+    if (!it.etkinlik && !it.isik && it.lig == null) { openDolap('market'); dolapTur = it.tur; onizleme = it.id; renderDolap(); } // Market'te önizlemeyle açılır
+  });
+  function kolBaslat() {
+    var cv = $('kolOnizleme'), dpr = Math.min(2, window.devicePixelRatio || 1), w = cv.clientWidth || 320, h = 200;
+    cv.width = w * dpr; cv.height = h * dpr; cv.style.height = h + 'px';
+    var c = cv.getContext('2d');
+    cancelAnimationFrame(kolRaf);
+    (function tick(now) {
+      var it = window.KuyuEkonomi.item(kolSecili), ek = {};
+      if (it) ek[it.tur] = it.id;
+      c.setTransform(dpr, 0, 0, dpr, 0, 0);
+      onizlemeCiz(c, w, h, now, G.gorunumIle(ek), kolTur === 'alev', '#2a1f5c', 1.35);
+      kolRaf = requestAnimationFrame(tick);
+    })(performance.now());
+  }
+  function kolDur() { cancelAnimationFrame(kolRaf); }
   function stopPreview() { cancelAnimationFrame(previewRaf); }
 
   // ---------- bölümler ----------
@@ -819,12 +905,11 @@
     return brick;
   }
 
-  function hero(ctx, x, y, r, look, scarf) {
-    var L0 = (current === 'ekDolap' && onizlemeGorunum) || G.gorunum();
-    G.korCiz(ctx, x, y, r, performance.now() / 1000, L0.govde || '#f26a3a', L0.govde2 || '#b8401b');
-    ctx.fillStyle = scarf || G.renk(G.gorunum().atki); ctx.fillRect(x - r * 0.75, y + r * 0.2, r * 1.5, r * 0.36);
-    ctx.fillStyle = '#fff'; ctx.beginPath(); ctx.arc(x + look.x * r * 0.27, y - r * 0.18 + look.y * r * 0.18, r * 0.4, 0, 6.29); ctx.fill();
-    ctx.fillStyle = '#1a1210'; ctx.beginPath(); ctx.arc(x + look.x * r * 0.45, y - r * 0.18 + look.y * r * 0.3, r * 0.18, 0, 6.29); ctx.fill();
+  // v0.76: kahraman seçili karakter ve takılarla (js/karakter.js); scarf: tanıtımdaki parlayan atkı rengi
+  function hero(ctx, x, y, r, look, scarf, L) {
+    var L0 = L || (current === 'ekDolap' && onizlemeGorunum) || G.gorunum();
+    if (scarf) L0 = Object.assign({}, L0, { atki: scarf });
+    G.kahramanCiz(ctx, x, y, r, performance.now() / 1000, L0, look);
   }
   function ring(ctx, x, y, r) {
     ctx.fillStyle = '#1b1310'; ctx.fillRect(x - r * 0.4, y - r * 1.4, r * 0.8, r * 0.6);
@@ -999,6 +1084,7 @@
     hak: openHak,
     tablo: openTablo, // skor tablosu (v0.73)
     // sonuç kartındaki kısa yol: Dolap o ürünün önizlemesiyle açılır
+    koleksiyon: function (tur, id) { openKol(tur, id); },
     dolap: function (id) {
       var it = window.KuyuEkonomi.item(id);
       openDolap();

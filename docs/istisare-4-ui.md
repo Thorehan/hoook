@@ -69,8 +69,8 @@ Kaynaklar: [Pixune: hypercasual UI/UX](https://pixune.com/blog/hypercasual-games
 
 ## Aşamalar (her biri ayrı sürüm, sonunda telefonda deneme)
 
-1. ✅ (v0.75, telefonda deneme bekliyor) **Tasarım dili + ana ekran + alt gezinme:** yeni düğme, kart ve çubuk bileşenleri; OYNA ekranı; 5 sekme (eski ekranlar geçici olarak sekmelerin altında).
-2. **Eşya modeli + Koleksiyon:** karakter ve aksesuar veri yapısı, nadirlik, eski görünümlerin taşınması, önizleme sahnesi.
+1. ✅ (v0.75, telefonda denendi) **Tasarım dili + ana ekran + alt gezinme:** yeni düğme, kart ve çubuk bileşenleri; OYNA ekranı; 5 sekme (eski ekranlar geçici olarak sekmelerin altında).
+2. ✅ (v0.76, telefonda deneme bekliyor) **Eşya modeli + Koleksiyon:** (kadro: karakterlerde 3 nadirlik Nadir · Destansı · Efsane + Etkinlik özel; Renk yuvası; seçilen karakter oyunda da görünür) karakter ve aksesuar veri yapısı, nadirlik, eski görünümlerin taşınması, önizleme sahnesi.
 3. **Market:** günlük vitrin, haftalık sınırlı, kategoriler, fiyatlar ve ekonomi ölçümü.
 4. **Sezon şeridi + görevler:** sezon puanı, 30 kademe, görevlerin sezona bağlanması.
 5. **Yarışma ve Profil sekmeleri:** Günlük, Haftalık, lig, skor tablosu ve rekor duvarı tek yerde.

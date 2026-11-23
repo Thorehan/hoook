@@ -14,8 +14,30 @@
 
   // Dolap. Fiyatlar tools/ekonomi-olcum.js ile ölçülen kazanca göre (README → Ekonomi).
   var KATALOG = [
-    // kahraman gövdesi (renk2: alt gölge)
-    { id: 'govde-turuncu', tur: 'govde', ad: 'Turuncu', renk: '#f26a3a', renk2: '#b8401b', fiyat: 0 },
+    // Karakterler (v0.76, İstişare 4 Aşama 2): renk alanı çizim anahtarıdır (js/karakter.js). Hepsi aynı boyut ve fizik, yalnız görünüş.
+    // Nadirlik: Nadir · Destansı · Efsane; etkinlik karakterleri Market'te satılmaz (etkinlik: nereden geldiği).
+    { id: 'kr-cira', tur: 'karakter', ad: 'Çıra', renk: 'cira', fiyat: 0, nadir: 'baslangic' },
+    { id: 'kr-kibrit', tur: 'karakter', ad: 'Kibrit', renk: 'kibrit', fiyat: 320, nadir: 'nadir' },
+    { id: 'kr-mum', tur: 'karakter', ad: 'Mum', renk: 'mum', fiyat: 360, nadir: 'nadir' },
+    { id: 'kr-komur', tur: 'karakter', ad: 'Kömür', renk: 'komur', fiyat: 400, nadir: 'nadir' },
+    { id: 'kr-bocek', tur: 'karakter', ad: 'Ateş böceği', renk: 'bocek', fiyat: 780, nadir: 'destansi' },
+    { id: 'kr-ruh', tur: 'karakter', ad: 'Fener ruhu', renk: 'ruh', fiyat: 850, nadir: 'destansi' },
+    { id: 'kr-volkan', tur: 'karakter', ad: 'Volkan taşı', renk: 'volkan', fiyat: 900, nadir: 'destansi' },
+    { id: 'kr-yildiz', tur: 'karakter', ad: 'Yıldız kayması', renk: 'yildiz', fiyat: 1800, nadir: 'efsane' },
+    { id: 'kr-anka', tur: 'karakter', ad: 'Anka yavrusu', renk: 'anka', nadir: 'efsane', etkinlik: 'Sezon 1 ödülü' },
+    // Baş ve Yüz takıları (v0.76); "Yok" bedava varsayılan
+    { id: 'bas-yok', tur: 'bas', ad: 'Yok', renk: '', fiyat: 0 },
+    { id: 'bas-bere', tur: 'bas', ad: 'Bere', renk: 'bere', fiyat: 90 },
+    { id: 'bas-kask', tur: 'bas', ad: 'Madenci kaskı', renk: 'kask', fiyat: 320 },
+    { id: 'bas-silindir', tur: 'bas', ad: 'Silindir şapka', renk: 'silindir', fiyat: 420 },
+    { id: 'bas-tac', tur: 'bas', ad: 'Taç', renk: 'tac', fiyat: 950 },
+    { id: 'yuz-yok', tur: 'yuz', ad: 'Yok', renk: '', fiyat: 0 },
+    { id: 'yuz-gozluk', tur: 'yuz', ad: 'Güneş gözlüğü', renk: 'gozluk', fiyat: 120 },
+    { id: 'yuz-biyik', tur: 'yuz', ad: 'Bıyık', renk: 'biyik', fiyat: 140 },
+    { id: 'yuz-monokl', tur: 'yuz', ad: 'Monokl', renk: 'monokl', fiyat: 280 },
+    { id: 'yuz-maske', tur: 'yuz', ad: 'Kahraman maskesi', renk: 'maske', fiyat: 380 },
+    // Renk (eski "Kahraman" gövdeleri, v0.76): her karaktere uygulanan boya. Özgün: her karakterin kendi rengi (Çıra'da turuncu).
+    { id: 'govde-turuncu', tur: 'govde', ad: 'Özgün', renk: '#f26a3a', renk2: '#b8401b', fiyat: 0 },
     { id: 'govde-deniz', tur: 'govde', ad: 'Deniz', renk: '#3aa0f2', renk2: '#1b5fb8', fiyat: 60 },
     { id: 'govde-cimen', tur: 'govde', ad: 'Çimen', renk: '#5cc45a', renk2: '#2f7d2d', fiyat: 60 },
     { id: 'govde-lavanta', tur: 'govde', ad: 'Lavanta', renk: '#a77cf2', renk2: '#6a45b8', fiyat: 90 },
@@ -45,6 +67,10 @@
     { id: 'atki-zumrut', tur: 'atki', ad: 'Zümrüt', renk: '#35c27a', fiyat: 160 },
     { id: 'atki-gokkusagi', tur: 'atki', ad: 'Gökkuşağı', renk: 'gokkusagi', fiyat: 300 },
     { id: 'atki-fener', tur: 'atki', ad: 'Fener', renk: '#ffb84a', isik: 6 },
+    // Sırt (v0.76): atkıların yanında pelerin ve kanat (sekil); renk takının rengi
+    { id: 'atki-pelerin', tur: 'atki', ad: 'Mor pelerin', renk: '#9b5cff', sekil: 'pelerin', fiyat: 380 },
+    { id: 'atki-pelerin-kor', tur: 'atki', ad: 'Kor pelerin', renk: '#e2392f', sekil: 'pelerin', fiyat: 520 },
+    { id: 'atki-kanat', tur: 'atki', ad: 'Melek kanadı', renk: '#e8f6ff', sekil: 'kanat', fiyat: 880 },
     { id: 'ip-keten', tur: 'ip', ad: 'Keten', renk: '#eadfc4', fiyat: 0 },
     { id: 'ip-gok', tur: 'ip', ad: 'Gök', renk: '#8fd6ff', fiyat: 30 },
     { id: 'ip-zumrut', tur: 'ip', ad: 'Zümrüt', renk: '#5fd39a', fiyat: 50 },
@@ -75,8 +101,19 @@
     { id: 'iz-elmas', tur: 'iz', ad: 'Elmas', renk: '#9fe8ff', lig: 3 },
     { id: 'alev-fener-lig', tur: 'alev', ad: 'Fener alevi', renk: '#ffe08a', renk2: '#ffffff', lig: 4 }
   ];
-  var TURLER = { govde: 'Kahraman', atki: 'Atkı', ip: 'İp', kanca: 'Kanca', iz: 'Uçuş izi', alev: 'Alev' };
-  var VARSAYILAN = { govde: 'govde-turuncu', atki: 'atki-turkuaz', ip: 'ip-keten', kanca: 'kanca-ok', iz: 'iz-atki', alev: 'alev-kor' };
+  // Yuvalar (v0.76): sıra Koleksiyon ve Market sekmelerinin sırasıdır. İç adlar (govde, atki) eski kayıtlar için aynı kaldı.
+  var TURLER = { karakter: 'Karakter', govde: 'Renk', bas: 'Baş', yuz: 'Yüz', atki: 'Sırt', kanca: 'Kanca', ip: 'İp', iz: 'Uçuş izi', alev: 'Alev' };
+  var VARSAYILAN = { karakter: 'kr-cira', govde: 'govde-turuncu', bas: 'bas-yok', yuz: 'yuz-yok', atki: 'atki-turkuaz', ip: 'ip-keten', kanca: 'kanca-ok', iz: 'iz-atki', alev: 'alev-kor' };
+  // Nadirlik (v0.76): açıkça verilmediyse fiyattan, ışık seviyesinden ya da ligden çıkar
+  var NADIRLIK = { baslangic: 'Başlangıç', sira: 'Sıradan', nadir: 'Nadir', destansi: 'Destansı', efsane: 'Efsane' };
+  function nadirlik(it) {
+    if (!it) return 'sira';
+    if (it.nadir) return it.nadir;
+    if (it.lig != null) return it.lig >= 3 ? 'efsane' : 'destansi';
+    if (it.isik) return it.isik >= 14 ? 'efsane' : it.isik >= 8 ? 'destansi' : 'nadir';
+    var f = it.fiyat || 0;
+    return f <= 150 ? 'sira' : f <= 420 ? 'nadir' : f <= 950 ? 'destansi' : 'efsane';
+  }
   // Işık yolu (v0.53): ömür boyu kazanılan ateşböceği (harcamak düşürmez) 20 ışık seviyesine bölünür. İlk 10 seviye
   // v0.40'taki "Kuyunun ışığı"; 11–20 uzun vadeli hedef. Bazı seviyeler satın alınamayan bir görünüm açar (isik: N).
   var ISIK = [0, 25, 60, 120, 200, 320, 480, 700, 1000, 1400, 2000, 2700, 3500, 4400, 5400, 6500, 7700, 9000, 10500, 12000, 14000];
@@ -202,6 +239,7 @@
     if (sahip(save, id)) return { ok: false, neden: 'sahip' };
     if (it.isik) return { ok: false, neden: 'isik', seviye: it.isik }; // satın alınmaz: ışık seviyesiyle açılır
     if (it.lig != null) return { ok: false, neden: 'lig', lig: it.lig }; // satın alınmaz: Haftalık ligle açılır
+    if (it.etkinlik) return { ok: false, neden: 'etkinlik', etkinlik: it.etkinlik }; // satın alınmaz: etkinlikten gelir
     if (save.cuzdan.ates < it.fiyat) return { ok: false, neden: 'yetersiz', eksik: it.fiyat - save.cuzdan.ates };
     save.cuzdan.ates -= it.fiyat; save.cuzdan.harcanan += it.fiyat;
     save.dolap.sahip.push(id);
@@ -215,10 +253,16 @@
     return true;
   }
   // Çizim için kuşanılan renkler: { atki, ip, iz } ('gokkusagi' canlı renk, iz 'atki' ise atkıyı izler)
-  function gorunum(save) {
+  // ek (v0.76): { tur: id } kuşanılanın yerine (önizleme). Karakter, baş ve yüz çizim anahtarı; Sırt'ta sekil (atki/pelerin/kanat);
+  // Renk "Özgün" (govde-turuncu) iken ozgun: her karakter kendi rengiyle çizilir.
+  function gorunum(save, ek) {
     ensure(save);
     var k = save.dolap.kusan, out = {};
-    Object.keys(VARSAYILAN).forEach(function (t) { var it = item(k[t]) || item(VARSAYILAN[t]); out[t] = it.renk; if (it.renk2) out[t + '2'] = it.renk2; });
+    Object.keys(VARSAYILAN).forEach(function (t) {
+      var id = ek && ek[t] ? ek[t] : k[t], it = item(id) || item(VARSAYILAN[t]);
+      out[t] = it.renk; if (it.renk2) out[t + '2'] = it.renk2; if (it.sekil) out[t + 'Sekil'] = it.sekil;
+      if (t === 'govde') out.ozgun = it.id === 'govde-turuncu';
+    });
     return out;
   }
 
@@ -314,7 +358,7 @@
     YILDIZ_ODUL: YILDIZ_ODUL, gunHedef: gunHedef, yildizSay: yildizSay, gunYildizKaydet: gunYildizKaydet, gunYildizDurum: gunYildizDurum,
     SERI_ODUL: SERI_ODUL, gecmisYaz: gecmisYaz,
     HAFTA_YILDIZ_ODUL: HAFTA_YILDIZ_ODUL, haftaHedef: haftaHedef, haftaYildizSay: haftaYildizSay, haftaYildizKaydet: haftaYildizKaydet, haftaYildizDurum: haftaYildizDurum,
-    GIRIS: GIRIS, GOREV_ATES: GOREV_ATES, BASARIM_ATES: BASARIM_ATES, KATALOG: KATALOG, TURLER: TURLER, VARSAYILAN: VARSAYILAN,
+    GIRIS: GIRIS, GOREV_ATES: GOREV_ATES, BASARIM_ATES: BASARIM_ATES, KATALOG: KATALOG, TURLER: TURLER, VARSAYILAN: VARSAYILAN, NADIRLIK: NADIRLIK, nadirlik: nadirlik,
     ensure: ensure, kazan: kazan, bolumOde: bolumOde, girisDurum: girisDurum, girisAl: girisAl,
     LIG: LIG, ligOf: ligOf, ligOdul: ligOdul, haftalikDurum: haftalikDurum, haftalikKaydet: haftalikKaydet, haftalikKapat: haftalikKapat,
     ISIK: ISIK, isikSeviye: isikSeviye, isikOdul: isikOdul, isikSiradaki: isikSiradaki,

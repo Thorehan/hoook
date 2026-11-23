@@ -141,6 +141,13 @@ Yayına çıkmadan yerelde denemek için: bilgisayarda `python3 -m http.server 8
 - [ ] Bölüm çipine dokununca Hikâye haritası, çarka dokununca Ayarlar açılıyor mu?
 - [ ] Yeni düğme stili (bombeli, basınca iniyor) hoş mu? Küçük ekranda (iPhone SE) bir şey sıkışıyor mu?
 
+## 20. Karakterler ve Koleksiyon (v0.76, 10 dk)
+- [ ] Koleksiyon sekmesi: karakter kartları, nadirlik renkleri ve kilitliler anlaşılıyor mu? Önizleme yeterince büyük mü?
+- [ ] Market'ten bir karakter ve bir takı al, Koleksiyon'da GİY: oyunda o karakter ve takı görünüyor mu, oynanış aynı mı?
+- [ ] Karakterler (Kibrit, Mum, Kömür, Ateş böceği, Fener ruhu, Volkan taşı, Yıldız kayması) küçük boyda (oyunda) seçilebiliyor mu?
+- [ ] Renk yuvası: "Özgün" dışında bir renk seçince karakterler boyanıyor mu, hoş mu?
+- [ ] Kilitli eşyanın "nasıl açılır" yazısı (Market fiyatı, ışık, lig, etkinlik) açık mı?
+
 ## 5. Genel izlenim (serbest)
 - En sevdiğim an:
 - En çok zorlandığım yer:

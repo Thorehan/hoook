@@ -8,8 +8,9 @@
 - Devir noktası: v0.55 (yayında). Bu dönemin başı: v0.51, etiket `geri-donus-v0.51`; v0.52–v0.55'in her biri ayrı commit, `git revert` ile tek tek geri alınabilir.
 - Devir Törehan'dayken Mustafa projede geliştirme yapmaz; devir `docs/DEVIR-MUSTAFA.md` §6'daki adımlarla yapılır.
 
-## Son durum (v0.75)
+## Son durum (v0.76)
 
+- **v0.76** (23/11/2026, Törehan): İstişare 4 Aşama 2, karakterler ve takılar (9 karakter, Baş/Yüz/Sırt, nadirlik), Koleksiyon ekranı, oyunda seçili karakter. Telefonda denenecek: `docs/telefon-testi.md` §20. Not: katalog büyüdü, ortalama oyuncu için Dolap 83 günde biter (hedef ~8 hafta); fiyat dengesi Aşama 3'te.
 - **v0.75** (23/11/2026, Törehan): İstişare 4 Aşama 1, yeni arayüz: tasarım dili, hybrid-casual ana ekran, 5 sekmeli alt gezinme, Yarışma ekranı. Telefonda denenecek: `docs/telefon-testi.md` §19.
 - **v0.74** (23/11/2026, Törehan): skor tablosu ekranı (Günlük ve Haftalık sekmeleri, ilk 50 ve senin yerin; ana menüden ve sonuç kartından). Telefonda denenecek: `docs/telefon-testi.md` §18.
 - **v0.73** (23/11/2026, Törehan): oyunun adı **Hoook**. Depo `Thorehan/hoook`, adres https://thorehan.github.io/hoook/. Eski adres yönlendiriyor. Mustafa'nın klonunda: `git remote set-url origin https://github.com/Thorehan/hoook.git`.
@@ -48,7 +49,7 @@
 
 - **İstişare 3 (23/11): oynanış hissiyatı.** Plan `docs/istisare-3-his.md`: A his (vuruş, ses, titreşim, görsel ipuçları) → B tatmin anları (kova, fener, uzun akış, düşüş-dönüş) → C yeni mekanikler (kor halka, döner çark, akıntı sütunu). Kontrol değişmiyor. ✅ A (v0.67, telefonda denendi). ✅ B (v0.68, telefonda denendi). C: mevcut bölümlere bölme, sıra kor → çark → akıntı, sonra Günlük/Haftalık. ✅ Kor halka (v0.69). ✅ Döner çark (v0.70). ✅ Akıntı sütunu (v0.71). **İstişare 3 tamam** ve telefonda onaylandı (23/11: kor, çark, akıntı, bölüm süreleri, su, fener, his efektleri ve kontrol iyi; ince ayar gerekmedi). Sıradaki: açık sorular.
 
-- **İstişare 4 (23/11): arayüz baştan.** Plan `docs/istisare-4-ui.md`, taslak `docs/istisare-4/taslak.html`. Hybrid-casual ana ekran (OYNA ortada, 5 sekme), parlak çizgi film stili (oyun içi dahil), tek para ile günlük vitrin + haftalık sınırlı + nadirlik + ücretsiz sezon şeridi, karakterler + aksesuarlar. 6 aşama. ✅ Aşama 1 (v0.75). Sıradaki: telefonda Aşama 1 denemesi, sonra Aşama 2 (eşya modeli + Koleksiyon; önce karakter listesi ve adları).
+- **İstişare 4 (23/11): arayüz baştan.** Plan `docs/istisare-4-ui.md`, taslak `docs/istisare-4/taslak.html`. Hybrid-casual ana ekran (OYNA ortada, 5 sekme), parlak çizgi film stili (oyun içi dahil), tek para ile günlük vitrin + haftalık sınırlı + nadirlik + ücretsiz sezon şeridi, karakterler + aksesuarlar. 6 aşama. ✅ Aşama 1 (v0.75, telefonda denendi). ✅ Aşama 2 (v0.76). Sıradaki: telefonda Aşama 2 denemesi, sonra Aşama 3 (Market: vitrin, haftalık sınırlı, fiyat dengesi).
 
 ## Açık sorular (Törehan'a)
 

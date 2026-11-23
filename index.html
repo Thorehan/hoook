@@ -16,9 +16,9 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@600;800&family=Figtree:wght@400;600&display=swap">
-<link rel="stylesheet" href="css/kuyu.css?v=0.75">
-<link rel="stylesheet" href="css/ekranlar.css?v=0.75">
-<link rel="stylesheet" href="css/arayuz.css?v=0.75">
+<link rel="stylesheet" href="css/kuyu.css?v=0.76">
+<link rel="stylesheet" href="css/ekranlar.css?v=0.76">
+<link rel="stylesheet" href="css/arayuz.css?v=0.76">
 </head>
 <body>
 <div class="app" id="oyunEkrani" hidden>
@@ -73,7 +73,7 @@
   <img id="acilisLogo" class="marka-logo" src="assets/funday-morning-logo.webp" alt="Funday Morning Games">
   <div class="yukleme" aria-hidden="true"><div id="yuklemeDolgu"></div></div>
   <div class="yukleme-not" id="yuklemeNot">Yükleniyor…</div>
-  <div class="ek-surum">Hoook v0.75</div>
+  <div class="ek-surum">Hoook v0.76</div>
 </section>
 
 <!-- Giriş: yalnızca ilk açılışta -->
@@ -187,16 +187,34 @@
       <button type="button" class="metin-btn" id="scVazgec">Vazgeç</button>
       <button type="button" class="ana" id="scAl">Al</button>
     </div>
-    <div class="filtre" role="tablist" aria-label="Dolap bölümü">
-      <button type="button" role="tab" data-dolap="govde" aria-selected="true">Kahraman</button>
-      <button type="button" role="tab" data-dolap="atki" aria-selected="false">Atkı</button>
-      <button type="button" role="tab" data-dolap="ip" aria-selected="false">İp</button>
+    <div class="filtre" role="tablist" aria-label="Market bölümü">
+      <button type="button" role="tab" data-dolap="karakter" aria-selected="true">Karakter</button>
+      <button type="button" role="tab" data-dolap="govde" aria-selected="false">Renk</button>
+      <button type="button" role="tab" data-dolap="bas" aria-selected="false">Baş</button>
+      <button type="button" role="tab" data-dolap="yuz" aria-selected="false">Yüz</button>
+      <button type="button" role="tab" data-dolap="atki" aria-selected="false">Sırt</button>
       <button type="button" role="tab" data-dolap="kanca" aria-selected="false">Kanca</button>
+      <button type="button" role="tab" data-dolap="ip" aria-selected="false">İp</button>
       <button type="button" role="tab" data-dolap="iz" aria-selected="false">Uçuş izi</button>
       <button type="button" role="tab" data-dolap="alev" aria-selected="false">Alev</button>
     </div>
     <div class="dolap-liste" id="dolapListe"></div>
     <p class="not">Hepsi yalnızca görünüş; oyunda güçlendirme satılmaz. Ateşböceği bölümlerde ilk kez topladıklarından, Günlük ve Haftalık Kuyu'da topladığın her ateşböceğinden, görevlerden, başarımlardan ve günlük girişten gelir. "Işık" yazan görünümler satılmaz: kazandığın ateşböcekleri kuyuyu aydınlattıkça kendiliğinden açılır.</p>
+  </div>
+</section>
+
+<!-- Koleksiyon (v0.76, İstişare 4 Aşama 2): karakterler ve takılar; önizle, giy ya da nasıl açılır -->
+<section class="ekran sayfa-ekran sekmeli" id="ekKoleksiyon" hidden>
+  <div class="sayfa-ust"><h2>Koleksiyon</h2><span class="kol-say" id="kolSay"></span></div>
+  <div class="sayfa-ic">
+    <div class="kol-onizleme">
+      <canvas id="kolOnizleme" aria-hidden="true"></canvas>
+      <div class="kol-isim"><small id="kolNadir"></small><b id="kolAd"></b></div>
+      <button type="button" class="ana kol-giy" id="kolGiy">GİY</button>
+    </div>
+    <p class="kol-acilis" id="kolAcilis" aria-live="polite"></p>
+    <div class="kol-sekmeler" role="tablist" aria-label="Koleksiyon bölümü" id="kolSekmeler"></div>
+    <div class="kol-izgara" id="kolIzgara"></div>
   </div>
 </section>
 
@@ -291,14 +309,14 @@
     <button type="button" id="istatBtn">Oyun istatistikleri</button>
     <button type="button" id="tanitimBtn">Tanıtımı yeniden izle</button>
     <button type="button" id="ipucuSifirBtn">Tanıtım kartlarını yeniden göster</button>
-    <p class="surum">Hoook v0.75 · prototip · Funday Morning Games</p>
+    <p class="surum">Hoook v0.76 · prototip · Funday Morning Games</p>
   </div>
 </section>
 
 <!-- Alt gezinme (v0.75): Market · Koleksiyon · OYNA · Yarışma · Profil (başparmak bölgesinde; OYNA ortada ve büyük) -->
 <nav class="alt-menu" id="altMenu" aria-label="Ana gezinme" hidden>
   <button type="button" data-sekme="ekDolap" data-mod="market"><span class="am-ik"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 9l2-5h12l2 5M4 9h16v11H4z" fill="#ff7a2f" stroke="#1a0f2e" stroke-width="2" stroke-linejoin="round"/><path d="M4 9q2 3 4 0 2 3 4 0 2 3 4 0 2 3 4 0" fill="#fff" stroke="#1a0f2e" stroke-width="1.6"/></svg></span><span>Market</span></button>
-  <button type="button" data-sekme="ekDolap" data-mod="koleksiyon"><span class="am-ik"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2.5c2 3 5.5 4.5 4.4 8.6 1.6.9 3.1 3 3.1 5.4 0 3.7-3.4 6-7.5 6s-7.5-2.3-7.5-6c0-2.6 1.4-4.5 3-5.5 0 1.5.8 2.6.8 2.6S8 11 9.5 8.6C10.9 6.4 12.6 5.6 12 2.5z" fill="#ff7a2f" stroke="#1a0f2e" stroke-width="1.8" stroke-linejoin="round"/><circle cx="9.8" cy="16" r="1.4" fill="#1a0f2e"/><circle cx="14.2" cy="16" r="1.4" fill="#1a0f2e"/></svg></span><span>Koleksiyon</span></button>
+  <button type="button" data-sekme="ekKoleksiyon"><span class="am-ik"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2.5c2 3 5.5 4.5 4.4 8.6 1.6.9 3.1 3 3.1 5.4 0 3.7-3.4 6-7.5 6s-7.5-2.3-7.5-6c0-2.6 1.4-4.5 3-5.5 0 1.5.8 2.6.8 2.6S8 11 9.5 8.6C10.9 6.4 12.6 5.6 12 2.5z" fill="#ff7a2f" stroke="#1a0f2e" stroke-width="1.8" stroke-linejoin="round"/><circle cx="9.8" cy="16" r="1.4" fill="#1a0f2e"/><circle cx="14.2" cy="16" r="1.4" fill="#1a0f2e"/></svg></span><span>Koleksiyon</span></button>
   <button type="button" data-sekme="ekAna" class="oyna-sekme"><span class="am-ik"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M8 5v14l11-7z" fill="#fff" stroke="#1a0f2e" stroke-width="2" stroke-linejoin="round"/></svg></span><span>OYNA</span><i class="nokta" id="gorevNokta" hidden></i></button>
   <button type="button" data-sekme="ekYarisma"><span class="am-ik"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M7 4h10v4a5 5 0 0 1-10 0z" fill="#ffd23f" stroke="#1a0f2e" stroke-width="2"/><path d="M7 6H4a3 3 0 0 0 3 4M17 6h3a3 3 0 0 1-3 4" fill="none" stroke="#1a0f2e" stroke-width="1.8"/><path d="M10 13h4v4h-4zM8 20h8" stroke="#1a0f2e" stroke-width="2" fill="#ffd23f"/></svg></span><span>Yarışma</span></button>
   <button type="button" data-sekme="ekProfil"><span class="am-ik"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="9" r="4" fill="#35d0e8" stroke="#1a0f2e" stroke-width="2"/><path d="M4 21c1-5 4-7 8-7s7 2 8 7z" fill="#35d0e8" stroke="#1a0f2e" stroke-width="2" stroke-linejoin="round"/></svg></span><span>Profil</span></button>
@@ -352,18 +370,19 @@
 <div class="hikaye-kart" id="hikayeKart" role="status" hidden><b id="hkBaslik"></b><span id="hkMetin"></span></div>
 <div class="bildirim" id="bildirim" role="status" hidden></div>
 
-<script src="js/engine.js?v=0.75"></script>
-<script src="js/levels.js?v=0.75"></script>
-<script src="js/bolumler.js?v=0.75"></script>
-<script src="js/gen.js?v=0.75"></script>
-<script src="js/gorevler.js?v=0.75"></script>
-<script src="js/ekonomi.js?v=0.75"></script>
-<script src="js/istatistik.js?v=0.75"></script>
-<script src="js/muzik.js?v=0.75"></script>
-<script src="js/notlar.js?v=0.75"></script>
-<script src="js/hayalet.js?v=0.75"></script>
-<script src="js/online.js?v=0.75"></script>
-<script src="js/game.js?v=0.75"></script>
-<script src="js/screens.js?v=0.75"></script>
+<script src="js/engine.js?v=0.76"></script>
+<script src="js/levels.js?v=0.76"></script>
+<script src="js/bolumler.js?v=0.76"></script>
+<script src="js/gen.js?v=0.76"></script>
+<script src="js/gorevler.js?v=0.76"></script>
+<script src="js/ekonomi.js?v=0.76"></script>
+<script src="js/istatistik.js?v=0.76"></script>
+<script src="js/muzik.js?v=0.76"></script>
+<script src="js/notlar.js?v=0.76"></script>
+<script src="js/hayalet.js?v=0.76"></script>
+<script src="js/online.js?v=0.76"></script>
+<script src="js/karakter.js?v=0.76"></script>
+<script src="js/game.js?v=0.76"></script>
+<script src="js/screens.js?v=0.76"></script>
 </body>
 </html>

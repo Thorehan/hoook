@@ -14,7 +14,7 @@ const MEDIA = 'hoook-media-v1';
 const CORE = [
   './', 'index.html', 'manifest.webmanifest',
   'css/kuyu.css', 'css/ekranlar.css', 'css/arayuz.css',
-  'js/engine.js', 'js/levels.js', 'js/bolumler.js', 'js/gen.js', 'js/gorevler.js', 'js/ekonomi.js', 'js/istatistik.js', 'js/muzik.js', 'js/notlar.js', 'js/hayalet.js', 'js/online.js', 'js/game.js', 'js/screens.js',
+  'js/engine.js', 'js/levels.js', 'js/bolumler.js', 'js/gen.js', 'js/gorevler.js', 'js/ekonomi.js', 'js/istatistik.js', 'js/muzik.js', 'js/notlar.js', 'js/hayalet.js', 'js/online.js', 'js/karakter.js', 'js/game.js', 'js/screens.js',
 ];
 const CORE_MEDIA = [
   'assets/funday-morning-logo.webp',
