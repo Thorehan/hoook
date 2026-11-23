@@ -11,7 +11,7 @@
 | Yeni mekanik | Üçü de: kor halka, döner çark, akıntı sütunu (Hikâye'de kendi öğretici bölmesiyle) |
 | Tatmin anları | Dördü de: kovaya varış, fener yanması, uzun akış, düşüş ve dönüş |
 
-## Aşama A · His (fiziğe dokunmaz)
+## Aşama A · His (fiziğe dokunmaz) ✅ v0.67 (23/11; telefonda deneme bekliyor, `docs/telefon-testi.md` §13)
 
 **Vuruş hissi**
 - Tutunma anında halka parlar ve hafifçe titrer; Çıra ezilip esner (squash & stretch).

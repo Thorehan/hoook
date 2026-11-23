@@ -8,9 +8,10 @@
 - Devir noktası: v0.55 (yayında). Bu dönemin başı: v0.51, etiket `geri-donus-v0.51`; v0.52–v0.55'in her biri ayrı commit, `git revert` ile tek tek geri alınabilir.
 - Devir Törehan'dayken Mustafa projede geliştirme yapmaz; devir `docs/DEVIR-MUSTAFA.md` §6'daki adımlarla yapılır.
 
-## Son durum (v0.66)
+## Son durum (v0.67)
 
-- **Yayında v0.66** (23/11/2026, Törehan): haftanın hedefi (Haftalık Kuyu puan hedefi, 1–3 yıldız).
+- **Yayında v0.67** (23/11/2026, Törehan): İstişare 3 Aşama A, his (vuruş hissi, ses ve müzik, titreşim desenleri, görsel ipuçları). Fizik ve botlar aynı. Telefonda denenecek: `docs/telefon-testi.md` §13.
+- v0.66 (23/11/2026): haftanın hedefi (Haftalık Kuyu puan hedefi, 1–3 yıldız).
 - v0.65 (22/11/2026): denge; ikinci yolculuk ilk yolculuk kadar uzun ve su daha yakın. Spam önlemi sınırında: daha sert önlem düşünen oyuncuyu bozuyor.
 - v0.64 (19/11/2026): Hikâye ana oyun (dokun → sıradaki bölüm); serbest Sonsuz kalktı; Günlük 3/gün, Haftalık 5/hafta deneme, video ile artan yenileme; günün hedefi, seri ödülü, lig görünümleri, rekor duvarı. Telefonda denenecek: `docs/telefon-testi.md` §12.
 - v0.63: Hikâye denge (Aşama 5): spam ortalama oyuncu düzeyine indi (boş atış kilidi, Maden'den sonra yanlış taraf ipi bırakır, halkalar %40 aynı yanda). 24 bölüm planı tamam. Telefonda denenecek: `docs/telefon-testi.md` §11.
@@ -37,7 +38,7 @@
 2. **Skor tablosunu açmak:** Supabase seçildi, şimdilik kapalı. Açma kararı ve hesap sonra (`docs/online-kurulum.md`).
 3. İstişare 2'nin kalanı: ✅ görsel akıcılık (v0.56) → **24 uzun bölüm: plan hazır (18/11), `docs/hikaye-bolumleri-plan.md`**. Tarifli üretim, fener kontrol noktası, ikinci yolculuk, bölgeye göre taşıma. Aşama 1 ✅ (v0.59): bölüm 1–3 oynanır (deneme kartları), fener ve fenerden devam, duvar ipuçları. Telefonda onaylandı (19/11). Aşama 2 ✅ (v0.60): bölüm 4–12. Aşama 3 ✅ (v0.61): bölüm 13–24. Aşama 4 ✅ (v0.62): geçiş. Aşama 5 ✅ (v0.63): denge (`tools/hikaye-denge.js`). **Plan tamam.** Sıradaki: telefon geri bildirimiyle ince ayar (süre, su, fener sıklığı, ikinci yolculuğun zorluğu); sonra açık sorular (Supabase, analitik, bekçinin adı, müzik).
 
-- **İstişare 3 (23/11): oynanış hissiyatı.** Plan `docs/istisare-3-his.md`: A his (vuruş, ses, titreşim, görsel ipuçları) → B tatmin anları (kova, fener, uzun akış, düşüş-dönüş) → C yeni mekanikler (kor halka, döner çark, akıntı sütunu). Kontrol değişmiyor. Sıradaki: Aşama A.
+- **İstişare 3 (23/11): oynanış hissiyatı.** Plan `docs/istisare-3-his.md`: A his (vuruş, ses, titreşim, görsel ipuçları) → B tatmin anları (kova, fener, uzun akış, düşüş-dönüş) → C yeni mekanikler (kor halka, döner çark, akıntı sütunu). Kontrol değişmiyor. ✅ A (v0.67). Sıradaki: telefonda A denemesi, sonra Aşama B.
 
 ## Açık sorular (Törehan'a)
 

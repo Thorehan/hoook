@@ -212,3 +212,6 @@ button.anahtar-dugme[aria-checked="false"] { color: var(--soluk); }
 .dolap-kisayol > span:not(.renk) { flex: 1; min-width: 0; display: flex; flex-direction: column; line-height: 1.2; }
 .dolap-kisayol small { color: #a9dcff; font-size: 11px; }
 .dolap-kisayol em { font-style: normal; color: #a9dcff; font-size: 20px; }
+/* v0.67: alev göstergesi (akış çipinde, bir sonraki alev basamağına kalan TAM) */
+.cip .alev-pip { display: inline-flex; gap: 2px; margin-left: 2px; }
+.cip .alev-pip i { width: 5px; height: 5px; border-radius: 50%; background: #3a3f2a; display: block; }

@@ -94,6 +94,16 @@ Yayına çıkmadan yerelde denemek için: bilgisayarda `python3 -m http.server 8
 - [ ] Günün hedefi (yıldız) ulaşılabilir mi, çok mu kolay? Seri ve donma hakkı anlaşılıyor mu?
 - [ ] Profil → Rekor duvarı: takvim ve haftalar okunuyor mu?
 
+## 13. His (v0.67, 10 dk)
+- [ ] Tutununca halka parlıyor, Çıra esniyor: tok mu, fazla mı?
+- [ ] TAM'da kısa donma ve kamera nefesi: "oturdu" hissi veriyor mu, akışı bölüyor mu?
+- [ ] x10 akışta ağır çekim: hoş mu, kontrolü şaşırtıyor mu?
+- [ ] Akış melodisi, TAM akoru, kopuş sesi ve müzik katmanları: kulağa nasıl geliyor? Yorucu mu?
+- [ ] Titreşimler (tutunma, TAM, alev, suya düşüş, düşüş) ayırt ediliyor mu? Ayarlardan kapatınca hepsi susuyor mu?
+- [ ] İp kısalırken daralan altın çember: ne zaman bırakacağını gösteriyor mu? TAM sayın arttı mı?
+- [ ] Asılıyken sonraki halkanın soluk önizlemesi işe yarıyor mu, kalabalık mı?
+- [ ] Akış çipindeki alev noktaları anlaşılıyor mu?
+
 ## 5. Genel izlenim (serbest)
 - En sevdiğim an:
 - En çok zorlandığım yer:

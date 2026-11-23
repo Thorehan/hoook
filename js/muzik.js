@@ -3,7 +3,7 @@
    Gerçek müzik (ör. Mustafa'nın parçaları) gelince PARCALAR'a bölge başına bir ses dosyası yazılır;
    o bölgede dosya çalar, üretilen müzik susar. Dosya yoksa ya da yüklenemezse üretilen müzik çalar.
 
-   Katmanlar: yumuşak ses halısı (akor), alçak zemin notası, akış sürerken açılan arpej, bölgeye özel renk
+   Katmanlar: yumuşak ses halısı (akor), alçak zemin notası, akış sürerken açılan arpej (akış uzadıkça vuruşlu zemin ve çan), bölgeye özel renk
    (maden: damla, kristal: yankılı çan, kule: org). Notalar ~100 ms aralıkla biraz ileriye planlanır. */
 (function (root) {
   'use strict';
@@ -65,8 +65,11 @@
     // arpej: akış sürerken (yoğunluk) açılır
     if (T.arp && yog > 0.05 && olcu % 2 === 0) {
       var dizi = [akor[0], akor[1], akor[2], akor[1] + 12, akor[2], akor[1]], m2 = dizi[(olcu / 2) % dizi.length] + 12;
-      nota(m2, t, vurus * 1.6, T.tini === 'can' ? 'sine' : 'triangle', 0.045 * yog, 0.005, T.tini === 'can' ? yanki : filtre);
+      nota(m2, t, vurus * 1.6, T.tini === 'can' ? 'sine' : 'triangle', 0.045 * Math.min(1, yog * 2), 0.005, T.tini === 'can' ? yanki : filtre);
     }
+    // akış uzadıkça katman (v0.67): ~x6'da vuruşlu zemin, ~x11'de yukarıda çan pırıltısı
+    if (yog > 0.45 && olcu % 4 === 0) nota(akor[0] - 12, t, vurus * 1.2, 'triangle', 0.05 * Math.min(1, (yog - 0.45) * 4), 0.005);
+    if (yog > 0.85 && (olcu === 3 || olcu === 11)) nota(akor[2] + 24, t, vurus * 2.5, 'sine', 0.022, 0.005, yanki);
     // bölge rengi
     if (T.tini === 'can' && olcu === 8) nota(akor[2] + 24, t, 2.2, 'sine', 0.03, 0.005, yanki);
     if (T.tini === 'sicak' && (olcu === 5 || olcu === 13) && Math.random() < 0.6) damla(t);
