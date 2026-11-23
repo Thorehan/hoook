@@ -47,6 +47,8 @@
 
 - **İstişare 3 (23/11): oynanış hissiyatı.** Plan `docs/istisare-3-his.md`: A his (vuruş, ses, titreşim, görsel ipuçları) → B tatmin anları (kova, fener, uzun akış, düşüş-dönüş) → C yeni mekanikler (kor halka, döner çark, akıntı sütunu). Kontrol değişmiyor. ✅ A (v0.67, telefonda denendi). ✅ B (v0.68, telefonda denendi). C: mevcut bölümlere bölme, sıra kor → çark → akıntı, sonra Günlük/Haftalık. ✅ Kor halka (v0.69). ✅ Döner çark (v0.70). ✅ Akıntı sütunu (v0.71). **İstişare 3 tamam** ve telefonda onaylandı (23/11: kor, çark, akıntı, bölüm süreleri, su, fener, his efektleri ve kontrol iyi; ince ayar gerekmedi). Sıradaki: açık sorular.
 
+- **İstişare 4 (23/11): arayüz baştan.** Plan `docs/istisare-4-ui.md`, taslak `docs/istisare-4/taslak.html`. Hybrid-casual ana ekran (OYNA ortada, 5 sekme), parlak çizgi film stili (oyun içi dahil), tek para ile günlük vitrin + haftalık sınırlı + nadirlik + ücretsiz sezon şeridi, karakterler + aksesuarlar. 6 aşama; sıradaki: Aşama 1 (tasarım dili + ana ekran + alt gezinme).
+
 ## Açık sorular (Törehan'a)
 
 - Puan doğrulama için Workers Paid (ayda 5 $) alınsın mı?

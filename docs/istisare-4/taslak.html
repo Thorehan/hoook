@@ -1,0 +1,324 @@
+<!doctype html>
+<html lang="tr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Hoook arayüz taslağı</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@600;800&family=Figtree:wght@500;700;800&display=swap" rel="stylesheet">
+<style>
+/* İstişare 4 · görsel taslak (parlak çizgi film). Yalnız tasarım önizlemesi; oyunun kodu değildir. */
+:root {
+  --zemin1: #2a1f5c; --zemin2: #141033; --kontur: #1a0f2e;
+  --ates: #ff7a2f; --ates2: #e2531a; --sari: #ffd23f; --sari2: #e0a800;
+  --cam: #35d0e8; --cam2: #1a93b8; --mor: #9b5cff; --mor2: #6a32d6; --yesil: #4fd16a; --yesil2: #2a9a43;
+  --yazi: #ffffff; --soluk: #c8bfff;
+  --sira: #5ed27a; --nadir: #3fa9ff; --destan: #b46bff; --efsane: #ffc233;
+}
+* { box-sizing: border-box; }
+body { margin: 0; background: #0d0a1f; color: var(--yazi); font-family: 'Figtree', system-ui, sans-serif; }
+header.ust { max-width: 1680px; margin: 0 auto; padding: 24px 16px 8px; }
+header.ust h1 { font-family: 'Baloo 2', sans-serif; font-weight: 800; font-size: 32px; margin: 0; }
+header.ust p { margin: 4px 0 0; color: var(--soluk); max-width: 760px; }
+.izgara { display: flex; flex-wrap: wrap; gap: 28px; justify-content: center; padding: 20px 16px 48px; }
+.cerceve { width: 375px; max-width: 100%; }
+.cerceve > h2 { font-family: 'Baloo 2', sans-serif; font-size: 18px; margin: 0 0 8px; color: var(--soluk); font-weight: 600; }
+.tel { position: relative; width: 100%; height: 760px; border-radius: 36px; overflow: hidden; border: 6px solid #000;
+  background: radial-gradient(120% 70% at 50% 35%, #3d2c86 0%, var(--zemin1) 45%, var(--zemin2) 100%); display: flex; flex-direction: column; }
+/* ortak bileşenler */
+.baslik { font-family: 'Baloo 2', sans-serif; font-weight: 800; letter-spacing: .5px; -webkit-text-stroke: 1.5px var(--kontur); paint-order: stroke fill; text-shadow: 0 3px 0 var(--kontur); }
+.cubuk { display: flex; align-items: center; gap: 8px; padding: 14px 14px 6px; }
+.para { display: inline-flex; align-items: center; gap: 6px; height: 34px; padding: 0 12px 0 4px; border-radius: 18px; background: rgba(0,0,0,.35); border: 2.5px solid var(--kontur); font-weight: 800; font-size: 16px; }
+.para i { width: 26px; height: 26px; border-radius: 50%; background: radial-gradient(circle at 40% 35%, #fff9c2, var(--sari) 45%, var(--sari2)); border: 2.5px solid var(--kontur); box-shadow: 0 0 10px rgba(255,210,63,.6); }
+.para .arti { margin-left: 4px; width: 20px; height: 20px; border-radius: 6px; background: var(--yesil); border: 2px solid var(--kontur); display: grid; place-items: center; font-size: 15px; line-height: 1; }
+.rozet-sezon { display: inline-flex; align-items: center; gap: 6px; height: 34px; padding: 0 10px; border-radius: 18px; background: linear-gradient(180deg, var(--mor), var(--mor2)); border: 2.5px solid var(--kontur); font-weight: 800; font-size: 14px; box-shadow: 0 3px 0 var(--kontur); }
+.cark { margin-left: auto; width: 38px; height: 38px; border-radius: 12px; background: #4b3f8c; border: 2.5px solid var(--kontur); box-shadow: 0 3px 0 var(--kontur); display: grid; place-items: center; }
+.dugme { position: relative; display: inline-flex; align-items: center; justify-content: center; gap: 8px; border: 3px solid var(--kontur); border-radius: 18px; color: #fff; font-family: 'Baloo 2', sans-serif; font-weight: 800; cursor: pointer; box-shadow: 0 5px 0 var(--kontur), inset 0 -6px 0 rgba(0,0,0,.18), inset 0 4px 0 rgba(255,255,255,.35); transition: transform .08s, box-shadow .08s; }
+.dugme:active { transform: translateY(4px); box-shadow: 0 1px 0 var(--kontur), inset 0 -6px 0 rgba(0,0,0,.18), inset 0 4px 0 rgba(255,255,255,.35); }
+.d-ates { background: linear-gradient(180deg, #ffa24f, var(--ates) 55%, var(--ates2)); }
+.d-yesil { background: linear-gradient(180deg, #7fe58e, var(--yesil) 55%, var(--yesil2)); }
+.d-cam { background: linear-gradient(180deg, #7ae6f5, var(--cam) 55%, var(--cam2)); }
+.d-mor { background: linear-gradient(180deg, #c19bff, var(--mor) 55%, var(--mor2)); }
+.kart-yan { width: 78px; border-radius: 16px; border: 2.5px solid var(--kontur); box-shadow: 0 4px 0 var(--kontur); padding: 6px 4px 7px; text-align: center; font-weight: 800; font-size: 11px; line-height: 1.15; position: relative; }
+.kart-yan b { display: block; font-family: 'Baloo 2', sans-serif; font-size: 13px; }
+.kart-yan .ik { height: 34px; display: grid; place-items: center; }
+.kart-yan small { display: block; margin-top: 2px; opacity: .9; font-weight: 700; }
+.nokta { position: absolute; top: -7px; right: -7px; min-width: 20px; height: 20px; padding: 0 5px; border-radius: 10px; background: #ff3b4e; border: 2px solid var(--kontur); font-size: 11px; display: grid; place-items: center; }
+.ilerleme { height: 10px; border-radius: 6px; background: rgba(0,0,0,.4); border: 2px solid var(--kontur); overflow: hidden; margin-top: 4px; }
+.ilerleme i { display: block; height: 100%; background: linear-gradient(90deg, var(--sari), #fff07a); }
+/* alt gezinme */
+.alt { margin-top: auto; display: grid; grid-template-columns: 1fr 1fr 1.25fr 1fr 1fr; align-items: end; gap: 2px; padding: 8px 6px 14px; background: linear-gradient(180deg, #2f2566, #1c1645); border-top: 3px solid var(--kontur); }
+.alt a { display: flex; flex-direction: column; align-items: center; gap: 2px; font-size: 11px; font-weight: 800; color: var(--soluk); text-decoration: none; position: relative; }
+.alt a .ik { width: 44px; height: 40px; display: grid; place-items: center; border-radius: 14px; }
+.alt a.secili { color: #fff; }
+.alt a.secili .ik { background: #4b3f8c; border: 2.5px solid var(--kontur); box-shadow: 0 3px 0 var(--kontur); }
+.alt a.oyna .ik { width: 66px; height: 66px; margin-top: -30px; border-radius: 22px; background: linear-gradient(180deg, #ffa24f, var(--ates) 55%, var(--ates2)); border: 3px solid var(--kontur); box-shadow: 0 5px 0 var(--kontur), inset 0 4px 0 rgba(255,255,255,.35); }
+/* ana ekran */
+.sahne { position: relative; flex: 1; display: flex; flex-direction: column; align-items: center; }
+.yanlar { position: absolute; top: 8px; left: 10px; right: 10px; display: flex; justify-content: space-between; pointer-events: none; }
+.yanlar > div { display: flex; flex-direction: column; gap: 12px; pointer-events: auto; }
+.kuyu-arka { position: absolute; inset: 40px 70px 140px; border-radius: 120px 120px 30px 30px; background: radial-gradient(ellipse at 50% 85%, rgba(255,140,60,.35), transparent 60%), repeating-linear-gradient(0deg, rgba(255,255,255,.04) 0 18px, transparent 18px 36px); border: 3px solid rgba(26,15,46,.6); }
+.karakter { position: relative; margin-top: 140px; animation: zipla 1.6s ease-in-out infinite; }
+@keyframes zipla { 0%,100% { transform: translateY(0) scale(1,1); } 45% { transform: translateY(-14px) scale(.96,1.04); } 55% { transform: translateY(-14px) scale(.96,1.04); } 90% { transform: translateY(0) scale(1.06,.94); } }
+@media (prefers-reduced-motion: reduce) { .karakter { animation: none; } }
+.golge { width: 110px; height: 16px; border-radius: 50%; background: rgba(0,0,0,.35); margin-top: 6px; }
+.bolum { margin-top: 18px; text-align: center; }
+.bolum .baslik { font-size: 26px; }
+.bolum small { display: inline-flex; gap: 6px; align-items: center; margin-top: 2px; padding: 3px 10px; border-radius: 10px; background: rgba(0,0,0,.3); border: 2px solid var(--kontur); font-weight: 800; font-size: 12px; color: var(--soluk); }
+.oyna-buyuk { margin-top: 18px; width: 240px; height: 76px; font-size: 38px; }
+/* market */
+.sayfa-bas { display: flex; align-items: center; gap: 10px; padding: 6px 16px 10px; }
+.sayfa-bas .baslik { font-size: 30px; }
+.kaydir { flex: 1; overflow: hidden; padding: 0 14px; display: flex; flex-direction: column; gap: 12px; }
+.bolme-bas { display: flex; align-items: baseline; justify-content: space-between; }
+.bolme-bas .baslik { font-size: 20px; }
+.bolme-bas small { font-weight: 800; color: var(--sari); font-size: 12px; }
+.vitrin { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+.urun { position: relative; border-radius: 16px; border: 3px solid var(--kontur); box-shadow: 0 4px 0 var(--kontur); padding: 8px 8px 8px; text-align: center; overflow: hidden; }
+.urun::before { content: ''; position: absolute; inset: 0; background: radial-gradient(circle at 50% 30%, rgba(255,255,255,.35), transparent 60%); pointer-events: none; }
+.urun .nad { position: absolute; top: 6px; left: 6px; font-size: 9px; font-weight: 800; letter-spacing: .4px; padding: 2px 6px; border-radius: 6px; background: rgba(0,0,0,.35); border: 1.5px solid var(--kontur); }
+.urun .gorsel { height: 72px; display: grid; place-items: center; }
+.urun b { display: block; font-family: 'Baloo 2', sans-serif; font-size: 15px; -webkit-text-stroke: 1px var(--kontur); paint-order: stroke fill; }
+.urun .fiyat { margin-top: 6px; width: 100%; height: 34px; font-size: 16px; border-radius: 12px; }
+.urun .fiyat i { width: 18px; height: 18px; border-radius: 50%; background: radial-gradient(circle at 40% 35%, #fff9c2, var(--sari) 45%, var(--sari2)); border: 2px solid var(--kontur); }
+.n-sira { background: linear-gradient(180deg, #8ee59f, #3fae58); }
+.n-nadir { background: linear-gradient(180deg, #8cc9ff, #2f7fe0); }
+.n-destan { background: linear-gradient(180deg, #d3a6ff, #8a3fe6); }
+.n-efsane { background: linear-gradient(180deg, #ffe08a, #f09a1a); }
+.haftalik { display: flex; align-items: center; gap: 10px; padding: 10px; border-radius: 18px; border: 3px solid var(--kontur); box-shadow: 0 4px 0 var(--kontur); background: linear-gradient(135deg, #ffe08a, #f09a1a 60%, #d8701a); }
+.haftalik .gorsel { width: 96px; height: 96px; border-radius: 14px; background: rgba(0,0,0,.18); border: 2.5px solid var(--kontur); display: grid; place-items: center; }
+.haftalik .bilgi { flex: 1; }
+.haftalik .bilgi .baslik { font-size: 20px; display: block; }
+.haftalik .bilgi small { font-weight: 800; color: #4a2200; }
+.sure { display: inline-block; margin-top: 4px; padding: 2px 8px; border-radius: 8px; background: rgba(0,0,0,.35); border: 2px solid var(--kontur); font-size: 12px; font-weight: 800; }
+.sekmeler { display: flex; gap: 6px; overflow: hidden; }
+.sekmeler span { flex: none; padding: 6px 12px; border-radius: 12px; border: 2.5px solid var(--kontur); background: #3a2f78; font-weight: 800; font-size: 13px; box-shadow: 0 3px 0 var(--kontur); }
+.sekmeler span.secili { background: var(--ates); }
+/* koleksiyon */
+.onizleme { margin: 0 14px; height: 210px; border-radius: 22px; border: 3px solid var(--kontur); box-shadow: 0 4px 0 var(--kontur); background: radial-gradient(circle at 50% 60%, #6a4fd6, #3a2a8a 70%); position: relative; display: grid; place-items: center; overflow: hidden; }
+.onizleme .isim { position: absolute; left: 12px; bottom: 10px; }
+.onizleme .isim .baslik { font-size: 22px; display: block; }
+.onizleme .giy { position: absolute; right: 12px; bottom: 12px; width: 110px; height: 44px; font-size: 20px; }
+.izgara-k { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; }
+.k-kare { position: relative; aspect-ratio: 1; border-radius: 14px; border: 2.5px solid var(--kontur); box-shadow: 0 3px 0 var(--kontur); display: grid; place-items: center; }
+.k-kare.kilit { filter: grayscale(.85) brightness(.6); }
+.k-kare.kilit::after { content: '🔒'; position: absolute; font-size: 18px; }
+.k-kare.secili { outline: 3px solid #fff; outline-offset: 1px; }
+.k-kare .tik { position: absolute; right: -5px; bottom: -5px; width: 20px; height: 20px; border-radius: 50%; background: var(--yesil); border: 2px solid var(--kontur); font-size: 12px; display: grid; place-items: center; }
+/* sezon */
+.sezon-bas { margin: 0 14px; padding: 12px; border-radius: 20px; border: 3px solid var(--kontur); box-shadow: 0 4px 0 var(--kontur); background: linear-gradient(135deg, #8a4bff, #4a2ac0); display: flex; gap: 12px; align-items: center; }
+.sezon-bas .sk { width: 92px; height: 92px; border-radius: 16px; background: rgba(0,0,0,.2); border: 2.5px solid var(--kontur); display: grid; place-items: center; }
+.sezon-bas .baslik { font-size: 20px; display: block; }
+.sezon-bas small { font-weight: 800; opacity: .9; }
+.serit { position: relative; display: flex; flex-direction: column; gap: 10px; padding-left: 34px; }
+.serit::before { content: ''; position: absolute; left: 15px; top: 10px; bottom: 10px; width: 8px; border-radius: 4px; background: rgba(0,0,0,.4); border: 2px solid var(--kontur); }
+.serit::after { content: ''; position: absolute; left: 17px; top: 12px; height: 46%; width: 4px; border-radius: 2px; background: var(--sari); }
+.kademe { position: relative; display: flex; align-items: center; gap: 10px; padding: 8px 10px; border-radius: 16px; border: 2.5px solid var(--kontur); background: #34297a; box-shadow: 0 3px 0 var(--kontur); }
+.kademe .no { position: absolute; left: -32px; width: 28px; height: 28px; border-radius: 50%; background: #4b3f8c; border: 2.5px solid var(--kontur); display: grid; place-items: center; font-weight: 800; font-size: 12px; }
+.kademe.alindi .no { background: var(--sari); color: #4a2200; }
+.kademe.alindi { opacity: .65; }
+.kademe .od { width: 46px; height: 46px; border-radius: 12px; border: 2px solid var(--kontur); display: grid; place-items: center; }
+.kademe .ad { flex: 1; font-weight: 800; font-size: 14px; }
+.kademe .ad small { display: block; color: var(--soluk); font-size: 11px; }
+.kademe .al { height: 34px; padding: 0 14px; font-size: 16px; border-radius: 12px; }
+.gorev { display: flex; align-items: center; gap: 8px; padding: 8px 10px; border-radius: 14px; background: rgba(0,0,0,.25); border: 2px solid var(--kontur); font-weight: 700; font-size: 13px; }
+.gorev .ilerleme { flex: 1; margin: 0; }
+.gorev em { font-style: normal; font-weight: 800; color: var(--sari); font-size: 12px; }
+.not { max-width: 1680px; margin: 0 auto; padding: 0 16px 40px; color: var(--soluk); font-size: 14px; }
+</style>
+</head>
+<body>
+<header class="ust">
+  <h1 class="baslik">Hoook · arayüz taslağı</h1>
+  <p>İstişare 4 kararları: hybrid-casual ana ekran, parlak çizgi film stili, günlük vitrin + haftalık sınırlı + nadirlik + ücretsiz sezon şeridi, karakterler + aksesuarlar. Yalnız tasarım önizlemesi (375 px); dokunmatik davranış ve gerçek veriler oyunda gelecek.</p>
+</header>
+
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+  <defs>
+    <!-- Çıra (kor): yuvarlak, yüzlü, tepede alev -->
+    <symbol id="cira" viewBox="0 0 120 130">
+      <path d="M60 6c10 16 30 22 24 44-2 8-8 12-8 12s8-2 12-10c10 14 12 26 12 34 0 24-18 40-40 40S20 114 20 90c0-14 6-26 14-34 0 8 4 14 4 14s-2-14 6-26c8-12 18-18 16-38z" fill="#ff7a2f" stroke="#1a0f2e" stroke-width="5" stroke-linejoin="round"/>
+      <path d="M60 40c6 10 16 14 12 28 8 4 16 14 16 26 0 16-12 26-28 26S32 110 32 94c0-12 8-20 14-24 0 6 4 10 4 10s-2-10 4-18c4-6 8-12 6-22z" fill="#ffc04f"/>
+      <ellipse cx="48" cy="92" rx="7" ry="9" fill="#fff" stroke="#1a0f2e" stroke-width="3"/><ellipse cx="72" cy="92" rx="7" ry="9" fill="#fff" stroke="#1a0f2e" stroke-width="3"/>
+      <circle cx="50" cy="94" r="3.5" fill="#1a0f2e"/><circle cx="74" cy="94" r="3.5" fill="#1a0f2e"/>
+      <path d="M52 106q8 7 16 0" fill="none" stroke="#1a0f2e" stroke-width="3.5" stroke-linecap="round"/>
+      <ellipse cx="38" cy="102" rx="5" ry="3" fill="#ff5a6a" opacity=".6"/><ellipse cx="82" cy="102" rx="5" ry="3" fill="#ff5a6a" opacity=".6"/>
+    </symbol>
+    <!-- Kibrit -->
+    <symbol id="kibrit" viewBox="0 0 120 130">
+      <rect x="48" y="44" width="24" height="80" rx="8" fill="#f3d39a" stroke="#1a0f2e" stroke-width="5"/>
+      <ellipse cx="60" cy="40" rx="22" ry="20" fill="#e2392f" stroke="#1a0f2e" stroke-width="5"/>
+      <path d="M60 2c6 8 14 12 10 22-2 4-6 6-10 6s-10-4-10-10c0-8 8-10 10-18z" fill="#ffc04f" stroke="#1a0f2e" stroke-width="4" stroke-linejoin="round"/>
+      <circle cx="52" cy="40" r="4" fill="#fff"/><circle cx="68" cy="40" r="4" fill="#fff"/><circle cx="53" cy="41" r="2" fill="#1a0f2e"/><circle cx="69" cy="41" r="2" fill="#1a0f2e"/>
+      <path d="M54 50q6 5 12 0" fill="none" stroke="#1a0f2e" stroke-width="3" stroke-linecap="round"/>
+    </symbol>
+    <!-- Mum -->
+    <symbol id="mum" viewBox="0 0 120 130">
+      <path d="M34 54h52v62a8 8 0 0 1-8 8H42a8 8 0 0 1-8-8z" fill="#f6efe2" stroke="#1a0f2e" stroke-width="5" stroke-linejoin="round"/>
+      <path d="M34 60c8 6 12-2 18 6 4 6 8-4 14 2 6 6 12-4 20 0" fill="none" stroke="#1a0f2e" stroke-width="4" stroke-linecap="round"/>
+      <path d="M60 10c8 10 16 16 12 30-2 6-6 10-12 10s-12-4-12-12c0-12 12-16 12-28z" fill="#ffb03f" stroke="#1a0f2e" stroke-width="4" stroke-linejoin="round"/>
+      <circle cx="50" cy="88" r="5" fill="#1a0f2e"/><circle cx="70" cy="88" r="5" fill="#1a0f2e"/><path d="M54 102q6 4 12 0" fill="none" stroke="#1a0f2e" stroke-width="3" stroke-linecap="round"/>
+    </symbol>
+    <!-- Ateş böceği -->
+    <symbol id="bocek" viewBox="0 0 120 130">
+      <ellipse cx="38" cy="58" rx="22" ry="14" fill="#bfefff" stroke="#1a0f2e" stroke-width="4" transform="rotate(-30 38 58)" opacity=".9"/>
+      <ellipse cx="82" cy="58" rx="22" ry="14" fill="#bfefff" stroke="#1a0f2e" stroke-width="4" transform="rotate(30 82 58)" opacity=".9"/>
+      <ellipse cx="60" cy="96" rx="22" ry="26" fill="#fff36a" stroke="#1a0f2e" stroke-width="5"/>
+      <circle cx="60" cy="62" r="22" fill="#3a2f78" stroke="#1a0f2e" stroke-width="5"/>
+      <circle cx="52" cy="60" r="6" fill="#fff"/><circle cx="68" cy="60" r="6" fill="#fff"/><circle cx="53" cy="61" r="3" fill="#1a0f2e"/><circle cx="69" cy="61" r="3" fill="#1a0f2e"/>
+      <path d="M50 40l-8-14M70 40l8-14" stroke="#1a0f2e" stroke-width="4" stroke-linecap="round"/><circle cx="41" cy="24" r="4" fill="#fff36a" stroke="#1a0f2e" stroke-width="2.5"/><circle cx="79" cy="24" r="4" fill="#fff36a" stroke="#1a0f2e" stroke-width="2.5"/>
+    </symbol>
+    <!-- Anka yavrusu -->
+    <symbol id="anka" viewBox="0 0 120 130">
+      <path d="M20 70c-14-10-12-30 4-34 0 12 10 18 18 18M100 70c14-10 12-30-4-34 0 12-10 18-18 18" fill="#ff5a2a" stroke="#1a0f2e" stroke-width="4" stroke-linejoin="round"/>
+      <ellipse cx="60" cy="84" rx="34" ry="36" fill="#ffb03f" stroke="#1a0f2e" stroke-width="5"/>
+      <path d="M48 20c4 10 8 14 12 22 4-8 8-12 12-22-4 4-8 6-12 6s-8-2-12-6z" fill="#ff5a2a" stroke="#1a0f2e" stroke-width="4" stroke-linejoin="round"/>
+      <circle cx="49" cy="76" r="7" fill="#fff" stroke="#1a0f2e" stroke-width="3"/><circle cx="71" cy="76" r="7" fill="#fff" stroke="#1a0f2e" stroke-width="3"/><circle cx="50" cy="77" r="3.5" fill="#1a0f2e"/><circle cx="72" cy="77" r="3.5" fill="#1a0f2e"/>
+      <path d="M54 88l6 8 6-8z" fill="#ffd23f" stroke="#1a0f2e" stroke-width="3" stroke-linejoin="round"/>
+    </symbol>
+    <!-- aksesuarlar -->
+    <symbol id="bere" viewBox="0 0 60 50"><path d="M8 38c0-18 10-30 22-30s22 12 22 30z" fill="#ff3b4e" stroke="#1a0f2e" stroke-width="4"/><rect x="4" y="34" width="52" height="10" rx="5" fill="#fff" stroke="#1a0f2e" stroke-width="4"/><circle cx="30" cy="8" r="6" fill="#fff" stroke="#1a0f2e" stroke-width="3"/></symbol>
+    <symbol id="tac" viewBox="0 0 60 50"><path d="M6 40l4-26 12 12 8-18 8 18 12-12 4 26z" fill="#ffd23f" stroke="#1a0f2e" stroke-width="4" stroke-linejoin="round"/><circle cx="30" cy="30" r="4" fill="#35d0e8" stroke="#1a0f2e" stroke-width="2"/></symbol>
+    <symbol id="gozluk" viewBox="0 0 60 50"><rect x="4" y="16" width="22" height="16" rx="6" fill="#1a0f2e"/><rect x="34" y="16" width="22" height="16" rx="6" fill="#1a0f2e"/><path d="M26 22h8" stroke="#1a0f2e" stroke-width="4"/><path d="M8 20l6 0" stroke="#fff" stroke-width="2.5" stroke-linecap="round"/></symbol>
+    <symbol id="kanca" viewBox="0 0 60 50"><path d="M30 4v26a10 10 0 1 1-14-9" fill="none" stroke="#1a0f2e" stroke-width="9" stroke-linecap="round"/><path d="M30 4v26a10 10 0 1 1-14-9" fill="none" stroke="#c9d6e8" stroke-width="5" stroke-linecap="round"/></symbol>
+    <symbol id="pelerin" viewBox="0 0 60 50"><path d="M14 6h32l10 40H4z" fill="#9b5cff" stroke="#1a0f2e" stroke-width="4" stroke-linejoin="round"/><path d="M14 6q16 10 32 0" fill="none" stroke="#1a0f2e" stroke-width="4"/></symbol>
+    <symbol id="iz" viewBox="0 0 60 50"><path d="M6 40c14-4 20-26 46-30" fill="none" stroke="#35d0e8" stroke-width="8" stroke-linecap="round"/><circle cx="52" cy="10" r="6" fill="#fff" stroke="#1a0f2e" stroke-width="3"/><circle cx="18" cy="34" r="3" fill="#fff"/></symbol>
+    <symbol id="ib-ates" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9" fill="#ffd23f" stroke="#1a0f2e" stroke-width="2.5"/></symbol>
+  </defs>
+</svg>
+
+<main class="izgara">
+  <!-- 1 · OYNA (ana ekran) -->
+  <section class="cerceve" aria-label="Ana ekran taslağı">
+    <h2>1 · Ana ekran (OYNA)</h2>
+    <div class="tel">
+      <div class="cubuk">
+        <span class="para"><i></i>1.240<span class="arti">+</span></span>
+        <span class="rozet-sezon">★ 7</span>
+        <span class="cark"><svg width="20" height="20" viewBox="0 0 24 24"><path d="M12 8.5a3.5 3.5 0 1 0 0 7 3.5 3.5 0 0 0 0-7zm8 3.5l2-1.5-2-3.5-2.4.8a7 7 0 0 0-1.6-1L15.5 4h-4l-.5 2.8a7 7 0 0 0-1.6 1L7 7 5 10.5 7 12l-2 1.5L7 17l2.4-.8a7 7 0 0 0 1.6 1l.5 2.8h4l.5-2.8a7 7 0 0 0 1.6-1L20 17l2-3.5z" fill="#fff" stroke="#1a0f2e" stroke-width="1.5"/></svg></span>
+      </div>
+      <div class="sahne">
+        <div class="kuyu-arka"></div>
+        <div class="yanlar">
+          <div>
+            <div class="kart-yan d-cam"><span class="nokta">3</span><div class="ik"><svg width="30" height="30" viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="16" rx="3" fill="#fff" stroke="#1a0f2e" stroke-width="2"/><path d="M3 10h18" stroke="#1a0f2e" stroke-width="2"/><path d="M8 3v4M16 3v4" stroke="#1a0f2e" stroke-width="2.5" stroke-linecap="round"/><text x="12" y="18.5" text-anchor="middle" font-size="7.5" font-weight="800" fill="#1a0f2e" font-family="Figtree">24</text></svg></div><b>Günlük</b><small>★★☆ · 3/3</small></div>
+            <div class="kart-yan d-mor"><div class="ik"><svg width="30" height="30" viewBox="0 0 24 24"><path d="M7 4h10v4a5 5 0 0 1-10 0z" fill="#ffd23f" stroke="#1a0f2e" stroke-width="2"/><path d="M7 6H4a3 3 0 0 0 3 4M17 6h3a3 3 0 0 1-3 4" fill="none" stroke="#1a0f2e" stroke-width="2"/><path d="M10 13h4v4h-4zM8 20h8" stroke="#1a0f2e" stroke-width="2" fill="#ffd23f"/></svg></div><b>Haftalık</b><small>Altın lig · 5/5</small></div>
+          </div>
+          <div>
+            <div class="kart-yan d-yesil"><span class="nokta">!</span><div class="ik"><svg width="30" height="30" viewBox="0 0 24 24"><path d="M12 3l2.6 5.6 6.1.7-4.5 4.2 1.2 6L12 16.6 6.6 19.5l1.2-6L3.3 9.3l6.1-.7z" fill="#ffd23f" stroke="#1a0f2e" stroke-width="2" stroke-linejoin="round"/></svg></div><b>Sezon</b><small>7 / 30</small><div class="ilerleme"><i style="width:62%"></i></div></div>
+            <div class="kart-yan d-ates"><div class="ik"><svg width="34" height="34" viewBox="0 0 120 130"><use href="#mum"/></svg></div><b>Vitrin</b><small>2 sa kaldı</small></div>
+          </div>
+        </div>
+        <div class="karakter"><svg width="150" height="162" viewBox="0 0 120 130"><use href="#cira"/></svg><svg width="62" height="52" viewBox="0 0 60 50" style="position:absolute;left:44px;top:-6px;transform:rotate(-8deg)"><use href="#bere"/></svg></div>
+        <div class="golge"></div>
+        <div class="bolum"><span class="baslik">12 · Maden Ağzı</span><br><small>Maden · ⛏ 6/6 · dokun: harita</small></div>
+        <button class="dugme d-ates oyna-buyuk" type="button"><span class="baslik">OYNA</span></button>
+      </div>
+      <nav class="alt">
+        <a href="#"><span class="ik"><svg width="28" height="28" viewBox="0 0 24 24"><path d="M4 9l2-5h12l2 5M4 9h16v11H4z" fill="#ff7a2f" stroke="#1a0f2e" stroke-width="2" stroke-linejoin="round"/><path d="M4 9q2 3 4 0 2 3 4 0 2 3 4 0 2 3 4 0" fill="#fff" stroke="#1a0f2e" stroke-width="1.6"/></svg></span>Market<span class="nokta" style="top:-4px;right:8px">1</span></a>
+        <a href="#"><span class="ik"><svg width="28" height="28" viewBox="0 0 120 130"><use href="#cira"/></svg></span>Koleksiyon</a>
+        <a href="#" class="oyna secili"><span class="ik"><svg width="30" height="30" viewBox="0 0 24 24"><path d="M8 5v14l11-7z" fill="#fff" stroke="#1a0f2e" stroke-width="2" stroke-linejoin="round"/></svg></span>OYNA</a>
+        <a href="#"><span class="ik"><svg width="28" height="28" viewBox="0 0 24 24"><path d="M7 4h10v4a5 5 0 0 1-10 0z" fill="#ffd23f" stroke="#1a0f2e" stroke-width="2"/><path d="M10 13h4v4h-4zM8 20h8" stroke="#1a0f2e" stroke-width="2" fill="#ffd23f"/></svg></span>Yarışma</a>
+        <a href="#"><span class="ik"><svg width="28" height="28" viewBox="0 0 24 24"><circle cx="12" cy="9" r="4" fill="#35d0e8" stroke="#1a0f2e" stroke-width="2"/><path d="M4 21c1-5 4-7 8-7s7 2 8 7z" fill="#35d0e8" stroke="#1a0f2e" stroke-width="2" stroke-linejoin="round"/></svg></span>Profil</a>
+      </nav>
+    </div>
+  </section>
+
+  <!-- 2 · Market -->
+  <section class="cerceve" aria-label="Market taslağı">
+    <h2>2 · Market</h2>
+    <div class="tel">
+      <div class="cubuk"><span class="para"><i></i>1.240<span class="arti">+</span></span><span class="cark"><svg width="20" height="20" viewBox="0 0 24 24"><path d="M6 6l12 12M18 6L6 18" stroke="#fff" stroke-width="3" stroke-linecap="round"/></svg></span></div>
+      <div class="sayfa-bas"><span class="baslik">Market</span></div>
+      <div class="kaydir">
+        <div class="haftalik">
+          <div class="gorsel"><svg width="84" height="90" viewBox="0 0 120 130"><use href="#anka"/></svg></div>
+          <div class="bilgi"><small>HAFTANIN EFSANESİ</small><span class="baslik">Anka yavrusu</span><span class="sure">⏱ 4 gün 6 sa</span><br>
+            <button class="dugme d-yesil" style="margin-top:8px;height:36px;padding:0 14px;font-size:17px" type="button"><svg width="18" height="18" viewBox="0 0 24 24"><use href="#ib-ates"/></svg>1.800</button></div>
+        </div>
+        <div class="bolme-bas"><span class="baslik">Günlük vitrin</span><small>⏱ 8 sa 12 dk</small></div>
+        <div class="vitrin">
+          <div class="urun n-nadir"><span class="nad">NADİR</span><div class="gorsel"><svg width="64" height="70" viewBox="0 0 120 130"><use href="#kibrit"/></svg></div><b>Kibrit</b><button class="dugme d-yesil fiyat" type="button"><i></i>320</button></div>
+          <div class="urun n-destan"><span class="nad">DESTANSI</span><div class="gorsel"><svg width="64" height="70" viewBox="0 0 120 130"><use href="#bocek"/></svg></div><b>Ateş böceği</b><button class="dugme d-yesil fiyat" type="button"><i></i>780</button></div>
+          <div class="urun n-sira"><span class="nad">SIRADAN</span><div class="gorsel"><svg width="60" height="50" viewBox="0 0 60 50"><use href="#bere"/></svg></div><b>Kırmızı bere</b><button class="dugme d-cam fiyat" type="button">▶ %50 · 45</button></div>
+          <div class="urun n-nadir"><span class="nad">NADİR</span><div class="gorsel"><svg width="60" height="50" viewBox="0 0 60 50"><use href="#iz"/></svg></div><b>Buz izi</b><button class="dugme d-yesil fiyat" type="button"><i></i>260</button></div>
+        </div>
+        <div class="sekmeler"><span class="secili">Karakter</span><span>Baş</span><span>Yüz</span><span>Sırt</span><span>Kanca</span></div>
+      </div>
+      <nav class="alt">
+        <a href="#" class="secili"><span class="ik"><svg width="28" height="28" viewBox="0 0 24 24"><path d="M4 9l2-5h12l2 5M4 9h16v11H4z" fill="#ff7a2f" stroke="#1a0f2e" stroke-width="2" stroke-linejoin="round"/></svg></span>Market</a>
+        <a href="#"><span class="ik"><svg width="28" height="28" viewBox="0 0 120 130"><use href="#cira"/></svg></span>Koleksiyon</a>
+        <a href="#" class="oyna"><span class="ik"><svg width="30" height="30" viewBox="0 0 24 24"><path d="M8 5v14l11-7z" fill="#fff" stroke="#1a0f2e" stroke-width="2" stroke-linejoin="round"/></svg></span>OYNA</a>
+        <a href="#"><span class="ik"><svg width="28" height="28" viewBox="0 0 24 24"><path d="M7 4h10v4a5 5 0 0 1-10 0z" fill="#ffd23f" stroke="#1a0f2e" stroke-width="2"/><path d="M10 13h4v4h-4zM8 20h8" stroke="#1a0f2e" stroke-width="2" fill="#ffd23f"/></svg></span>Yarışma</a>
+        <a href="#"><span class="ik"><svg width="28" height="28" viewBox="0 0 24 24"><circle cx="12" cy="9" r="4" fill="#35d0e8" stroke="#1a0f2e" stroke-width="2"/><path d="M4 21c1-5 4-7 8-7s7 2 8 7z" fill="#35d0e8" stroke="#1a0f2e" stroke-width="2"/></svg></span>Profil</a>
+      </nav>
+    </div>
+  </section>
+
+  <!-- 3 · Koleksiyon -->
+  <section class="cerceve" aria-label="Koleksiyon taslağı">
+    <h2>3 · Koleksiyon</h2>
+    <div class="tel">
+      <div class="cubuk"><span class="para"><i></i>1.240<span class="arti">+</span></span><span class="cark"><svg width="20" height="20" viewBox="0 0 24 24"><path d="M6 6l12 12M18 6L6 18" stroke="#fff" stroke-width="3" stroke-linecap="round"/></svg></span></div>
+      <div class="sayfa-bas"><span class="baslik">Koleksiyon</span><small style="margin-left:auto;font-weight:800;color:var(--soluk)">14 / 62</small></div>
+      <div class="onizleme">
+        <svg width="128" height="138" viewBox="0 0 120 130" style="margin-top:-10px"><use href="#mum"/></svg>
+        <div class="isim"><small style="font-weight:800;color:#8cc9ff">NADİR · KARAKTER</small><span class="baslik">Mum</span></div>
+        <button class="dugme d-yesil giy" type="button"><span class="baslik">GİY</span></button>
+      </div>
+      <div class="kaydir" style="margin-top:12px">
+        <div class="sekmeler"><span class="secili">Karakterler</span><span>Baş</span><span>Yüz</span><span>Sırt</span><span>Kanca</span></div>
+        <div class="izgara-k">
+          <div class="k-kare n-sira"><svg width="52" height="56" viewBox="0 0 120 130"><use href="#cira"/></svg><span class="tik">✓</span></div>
+          <div class="k-kare n-nadir secili"><svg width="52" height="56" viewBox="0 0 120 130"><use href="#mum"/></svg></div>
+          <div class="k-kare n-nadir"><svg width="52" height="56" viewBox="0 0 120 130"><use href="#kibrit"/></svg></div>
+          <div class="k-kare n-destan kilit"><svg width="52" height="56" viewBox="0 0 120 130"><use href="#bocek"/></svg></div>
+          <div class="k-kare n-efsane kilit"><svg width="52" height="56" viewBox="0 0 120 130"><use href="#anka"/></svg></div>
+          <div class="k-kare n-sira"><svg width="44" height="36" viewBox="0 0 60 50"><use href="#bere"/></svg></div>
+          <div class="k-kare n-destan"><svg width="44" height="36" viewBox="0 0 60 50"><use href="#tac"/></svg></div>
+          <div class="k-kare n-nadir kilit"><svg width="44" height="36" viewBox="0 0 60 50"><use href="#pelerin"/></svg></div>
+        </div>
+        <div class="gorev" style="margin-top:2px">🔒 Ateş böceği: Sezon 20. kademe ya da Market<em>780</em></div>
+      </div>
+      <nav class="alt">
+        <a href="#"><span class="ik"><svg width="28" height="28" viewBox="0 0 24 24"><path d="M4 9l2-5h12l2 5M4 9h16v11H4z" fill="#ff7a2f" stroke="#1a0f2e" stroke-width="2" stroke-linejoin="round"/></svg></span>Market</a>
+        <a href="#" class="secili"><span class="ik"><svg width="28" height="28" viewBox="0 0 120 130"><use href="#cira"/></svg></span>Koleksiyon</a>
+        <a href="#" class="oyna"><span class="ik"><svg width="30" height="30" viewBox="0 0 24 24"><path d="M8 5v14l11-7z" fill="#fff" stroke="#1a0f2e" stroke-width="2" stroke-linejoin="round"/></svg></span>OYNA</a>
+        <a href="#"><span class="ik"><svg width="28" height="28" viewBox="0 0 24 24"><path d="M7 4h10v4a5 5 0 0 1-10 0z" fill="#ffd23f" stroke="#1a0f2e" stroke-width="2"/><path d="M10 13h4v4h-4zM8 20h8" stroke="#1a0f2e" stroke-width="2" fill="#ffd23f"/></svg></span>Yarışma</a>
+        <a href="#"><span class="ik"><svg width="28" height="28" viewBox="0 0 24 24"><circle cx="12" cy="9" r="4" fill="#35d0e8" stroke="#1a0f2e" stroke-width="2"/><path d="M4 21c1-5 4-7 8-7s7 2 8 7z" fill="#35d0e8" stroke="#1a0f2e" stroke-width="2"/></svg></span>Profil</a>
+      </nav>
+    </div>
+  </section>
+
+  <!-- 4 · Sezon -->
+  <section class="cerceve" aria-label="Sezon şeridi taslağı">
+    <h2>4 · Sezon şeridi (ücretsiz)</h2>
+    <div class="tel">
+      <div class="cubuk"><span class="para"><i></i>1.240<span class="arti">+</span></span><span class="cark"><svg width="20" height="20" viewBox="0 0 24 24"><path d="M6 6l12 12M18 6L6 18" stroke="#fff" stroke-width="3" stroke-linecap="round"/></svg></span></div>
+      <div class="sezon-bas">
+        <div class="sk"><svg width="80" height="86" viewBox="0 0 120 130"><use href="#anka"/></svg></div>
+        <div><small>SEZON 1 · KÜL VE KIVILCIM</small><span class="baslik">Kademe 7 / 30</span><small>⏱ 18 gün · son ödül Anka yavrusu</small><div class="ilerleme" style="width:170px"><i style="width:40%"></i></div></div>
+      </div>
+      <div class="kaydir" style="margin-top:12px">
+        <div class="gorev">Bugün 3 bölüm geç<div class="ilerleme"><i style="width:66%"></i></div><em>+40 SP</em></div>
+        <div class="gorev">Günlük Kuyu'da 2 yıldız<div class="ilerleme"><i style="width:50%"></i></div><em>+60 SP</em></div>
+        <div class="serit">
+          <div class="kademe alindi"><span class="no">6</span><div class="od n-sira"><svg width="34" height="28" viewBox="0 0 60 50"><use href="#bere"/></svg></div><div class="ad">Kırmızı bere<small>Sıradan · Baş</small></div><span style="font-weight:800">✓</span></div>
+          <div class="kademe"><span class="no">7</span><div class="od" style="background:#ffd23f"><svg width="28" height="28" viewBox="0 0 24 24"><use href="#ib-ates"/></svg></div><div class="ad">150 ateşböceği<small>hazır</small></div><button class="dugme d-yesil al" type="button">AL</button></div>
+          <div class="kademe"><span class="no">8</span><div class="od n-nadir"><svg width="34" height="28" viewBox="0 0 60 50"><use href="#gozluk"/></svg></div><div class="ad">Güneş gözlüğü<small>Nadir · Yüz · 120 SP kaldı</small></div></div>
+          <div class="kademe"><span class="no">9</span><div class="od n-nadir"><svg width="34" height="28" viewBox="0 0 60 50"><use href="#kanca"/></svg></div><div class="ad">Gümüş kanca<small>Nadir · Kanca</small></div></div>
+        </div>
+      </div>
+      <nav class="alt">
+        <a href="#"><span class="ik"><svg width="28" height="28" viewBox="0 0 24 24"><path d="M4 9l2-5h12l2 5M4 9h16v11H4z" fill="#ff7a2f" stroke="#1a0f2e" stroke-width="2" stroke-linejoin="round"/></svg></span>Market</a>
+        <a href="#"><span class="ik"><svg width="28" height="28" viewBox="0 0 120 130"><use href="#cira"/></svg></span>Koleksiyon</a>
+        <a href="#" class="oyna"><span class="ik"><svg width="30" height="30" viewBox="0 0 24 24"><path d="M8 5v14l11-7z" fill="#fff" stroke="#1a0f2e" stroke-width="2" stroke-linejoin="round"/></svg></span>OYNA</a>
+        <a href="#"><span class="ik"><svg width="28" height="28" viewBox="0 0 24 24"><path d="M7 4h10v4a5 5 0 0 1-10 0z" fill="#ffd23f" stroke="#1a0f2e" stroke-width="2"/><path d="M10 13h4v4h-4zM8 20h8" stroke="#1a0f2e" stroke-width="2" fill="#ffd23f"/></svg></span>Yarışma</a>
+        <a href="#"><span class="ik"><svg width="28" height="28" viewBox="0 0 24 24"><circle cx="12" cy="9" r="4" fill="#35d0e8" stroke="#1a0f2e" stroke-width="2"/><path d="M4 21c1-5 4-7 8-7s7 2 8 7z" fill="#35d0e8" stroke="#1a0f2e" stroke-width="2"/></svg></span>Profil</a>
+      </nav>
+    </div>
+  </section>
+</main>
+<p class="not">Karakter ve eşya adları, fiyatlar ve sezon adı taslaktır (aşama 2–4 başında kesinleşir). Sezon şeridi ücretsizdir, rastgele kutu yoktur; video yalnız oyuncu seçerse oynar.</p>
+</body>
+</html>
