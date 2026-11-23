@@ -122,6 +122,12 @@ Yayına çıkmadan yerelde denemek için: bilgisayarda `python3 -m http.server 8
 - [ ] Halka yükselirken bırakınca "ÇARK!" itişi: doğru anı (turkuaz parlama) yakalayabiliyor musun?
 - [ ] Çarkta asılıyken kanca hiç yanlışlıkla çarkın başka halkasına takılıyor mu?
 
+## 17. Akıntı sütunu (v0.71, 5 dk)
+- [ ] 21. bölüm: tanıtım kartı ve duvar yazıları akıntıyı anlatıyor mu? Akış yokken sönük, akışla parlak olduğu fark ediliyor mu?
+- [ ] Akışla sütuna girip atılmadan süzülmek hoş mu? Kestirme hissi var mı?
+- [ ] Süzülürken istediğin an halkaya atılabiliyor musun, kontrol sende mi?
+- [ ] Sütun yanlışlıkla düşürüyor ya da şaşırtıyor mu?
+
 ## 5. Genel izlenim (serbest)
 - En sevdiğim an:
 - En çok zorlandığım yer:

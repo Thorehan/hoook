@@ -37,6 +37,9 @@
     CARK_R: 50,         // döner çark (v0.70): halkaların merkeze uzaklığı (birim)
     CARK_T: 4.5,        // bir tam tur (sn); yön çarkın yerinden (deterministik)
     CARK_N: 3,          // çarktaki halka sayısı
+    AKINTI_A: 3200,     // akıntı sütunu (v0.71): akış sürerken (x2+) içindeyken yukarı ivme (yerçekimini yener; birim/s²)
+    AKINTI_V: 600,      // ...en çok bu hızla yükseltir (birim/sn)
+    AKINTI_W: 80,       // sütun genişliği (birim)
     CARK_ITIS: 300,     // halka yükselirken bırakınca ek yukarı itiş (en çok; halkanın yükselme payıyla orantılı)     // sönen kor halka bu kadar süre tutulamaz (kanca geçer, nişan saymaz), sonra yeniden kızarır
     UP_RISE: 60,        // nişan: bundan az yükselen hedef "yanda" sayılır (3 m)
     UP_ANGLE: 45,       // nişan: bundan düz açıdaki hedef "yanda" sayılır (derece)
@@ -145,6 +148,7 @@
       // akış ve skor
       hang: 0, air: 0, chain: false, combo: 0, maxCombo: 0, hooks: 0, shots: 0, slips: 0,
       startY: sy, topY: sy, bonus: 0, fireflyPts: 0, maxSpeed: 0, rescues: 0, misses: 0, boosts: 0, gates: 0, springs: 0, float: 0, portals: 0, swings: 0, ffGot: 0, tam: 0, tamSeri: 0, alev: 0, alevPuan: 0, itisler: 0,
+      akintilar: (def.akintilar || []).map(function (a) { return { x: a[0], y: a[1], w: a[2], h: a[3] }; }), // akıntı sütunları (v0.71): sol, üst, genişlik, boy
       gucler: (def.gucler || []).map(function (g) { return { x: g[0], y: g[1], tur: g[2], got: false }; }), guc: { fener: 0, kanat: 0, kalkan: false }, gucSay: 0
     };
     // geçit çiftlerini bağla
@@ -649,6 +653,22 @@
         s.float -= dt;
         if (p.y - p.py > CFG.YAY_FALL * dt) p.py = p.y - CFG.YAY_FALL * dt;
       }
+    }
+    // Akıntı sütunu (v0.71): akış sürerken (x2 ve üstü) ipsiz içinden geçen Çıra yukarı süzülür; akış yokken sütun sönüktür.
+    // İçindeyken havada kalma süresi saymaz (akış kopmaz). Yolu kestirmek içindir; ip, kanca hızı ve nişan aynı.
+    if (s.akintilar && s.akintilar.length) {
+      var akIc = null;
+      for (i = 0; i < s.akintilar.length; i++) { var ak = s.akintilar[i]; if (p.x > ak.x && p.x < ak.x + ak.w && p.y > ak.y && p.y < ak.y + ak.h) { akIc = ak; break; } }
+      var akAcik = akIc && !s.rope && !s.hook && s.combo >= 2 && !(s.guc && s.guc.kanat > 0); // kanca atılınca akıntı bırakır
+      if (akAcik) {
+        var akVy = (p.y - p.py) / dt;
+        if (akVy > -CFG.AKINTI_V) { var akDv = Math.min(CFG.AKINTI_A * dt, akVy + CFG.AKINTI_V); p.py += akDv * dt; }
+        // yana hız söner, sütunun ortasına hafifçe çekilir (süzülürken sütundan savrulup çıkma)
+        var akVx = (p.x - p.px) * (1 - 6 * dt) + ((ak.x + ak.w / 2) - p.x) * 8 * dt * dt;
+        p.px = p.x - akVx;
+        s.air = 0;
+        if (s.akintiSon !== akIc) { s.akintiSon = akIc; s.akintiSay = (s.akintiSay || 0) + 1; s.events.push({ type: 'akinti', x: p.x, y: p.y }); }
+      } else if (!akIc) s.akintiSon = null;
     }
     var rp = s.rope;
     if (rp && rp.kind === 'anchor') {

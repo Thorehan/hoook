@@ -16,6 +16,7 @@
      guc:     yolda bulunan güçlendirmeler, ör. ['kalkan'] (v0.61)
      kor:     kor halka sayısı (v0.69): tutununca 1,5 sn sonra söner ve bırakır
      cark:    döner çark sayısı (v0.70): ana yoldaki halka üç halkalı dönen çarka döner
+     akinti:  akıntı sütunu sayısı (v0.71): akış sürerken içinden geçen yukarı süzülür
      yazilar: duvar ipuçları (bekçinin tebeşiri): [düğüm sırası | 'fener' | 'kova', metin]
    }
    Bölümde ayrıca: su (yükselme hızı, birim/sn), suFener (su kaç fener yanınca başlar; yoksa ilk tutunuşta), not (bekçinin notu, 1–12),
@@ -326,14 +327,17 @@
     },
     {
       no: 21, ad: 'Uzun Akış', bolge: 3, akis: 20, takip: 18,
-      ipucu: 'Rüzgâr şeritleri ve zincirler akışı uzatır. Asılı kalmadan, TAM bırakarak tırman; alevi koru.',
+      ipucu: 'Rüzgâr şeritleri ve zincirler akışı uzatır. Mavi akıntı sütunu akış sürerken seni yukarı taşır. Asılı kalmadan, TAM bırakarak tırman; alevi koru.',
       bolmeler: [
-        { tur: 'uygula', n: 14, dy: [185, 220], duzen: 'zikzak', kapi: 2, ff: 1, yazilar: [
-          [0, 'Bu kuyu akış için: asılı kalma, alevi koru.']
+        { tur: 'uygula', n: 14, dy: [185, 220], duzen: 'zikzak', kapi: 2, ff: 1, akinti: 3, yazilar: [
+          [0, 'Bu kuyu akış için: asılı kalma, alevi koru.'],
+          [3, 'Mavi akıntı: akış sürerken içinden geç, süzülürsün.'],
+          [8, 'Akış yokken akıntı söner.'],
+          ['fener', 'Akıntı yolu kestirir: sıradakini atlayabilirsin.']
         ] },
         { tur: 'sina', n: 15, dy: [185, 225], kapi: 2, zincir: 1, ff: 2, kor: 2, yazilar: [] },
-        { tur: 'sina', n: 16, dy: [185, 228], kapi: 3, zincir: 1, ff: 1, yazilar: [] },
-        { tur: 'ustalik', n: 17, dy: [185, 232], kapi: 3, dal: 1, zincir: 1, ff: 1, yazilar: [] }
+        { tur: 'sina', n: 16, dy: [185, 228], kapi: 3, zincir: 1, ff: 1, akinti: 1, yazilar: [] },
+        { tur: 'ustalik', n: 17, dy: [185, 232], kapi: 3, dal: 1, zincir: 1, ff: 1, akinti: 1, yazilar: [] }
       ]
     },
     {
@@ -345,7 +349,7 @@
         ] },
         { tur: 'sina', n: 15, dy: [180, 222], dal: 1, gecit: 1, ff: 1, yazilar: [] },
         { tur: 'sina', n: 16, dy: [180, 226], dal: 1, gecit: 1, ff: 1, cark: 1, yazilar: [] },
-        { tur: 'ustalik', n: 17, dy: [185, 230], dal: 1, gecit: 1, ff: 1, yazilar: [] }
+        { tur: 'ustalik', n: 17, dy: [185, 230], dal: 1, gecit: 1, ff: 1, akinti: 1, yazilar: [] }
       ]
     },
     {
@@ -356,7 +360,7 @@
           [0, 'Fırtına: su çok yakın, fener az. Sakin kal.']
         ] },
         { tur: 'sina', n: 20, dy: [180, 226], kapi: 2, hiz: 1, gecit: 1, sarkac: 1, ff: 2, yazilar: [] },
-        { tur: 'ustalik', n: 21, dy: [185, 230], dal: 1, yay: 1, zincir: 1, ff: 2, yazilar: [] }
+        { tur: 'ustalik', n: 21, dy: [185, 230], dal: 1, yay: 1, zincir: 1, ff: 2, akinti: 1, yazilar: [] }
       ]
     },
     {
@@ -369,7 +373,7 @@
         ] },
         { tur: 'sina', n: 15, dy: [180, 222], gecit: 1, dal: 1, ff: 1, cark: 1, yazilar: [] },
         { tur: 'sina', n: 16, dy: [180, 226], zincir: 1, kapi: 2, guc: ['kalkan'], ff: 2, kor: 1, yazilar: [] },
-        { tur: 'ustalik', n: 17, dy: [185, 232], yay: 1, sarkac: 1, gecit: 1, dal: 1, ff: 1, yazilar: [
+        { tur: 'ustalik', n: 17, dy: [185, 232], yay: 1, sarkac: 1, gecit: 1, dal: 1, ff: 1, akinti: 1, yazilar: [
           ['kova', 'Çıra, fenere hoş geldin.']
         ] }
       ]

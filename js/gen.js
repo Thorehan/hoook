@@ -539,13 +539,15 @@
   // ayar.kor (v0.69): kor halka da çıkar (Günlük 24/11/2026'dan, Haftalık 30/11/2026 haftasından; eski tohumlar aynı kalır).
   // Kor halkalar rastgele sayı çekmez: yol, su ve diğer halkalar aynı kalır, yalnız bazı ana halkalar kor olur.
   // ayar.cark (v0.70): döner çark da çıkar (her 11 ana halkada en çok bir; aynı tarihlerden). Motor çarkı ilk adımda kurar.
-  var KOR_ARA = 7, CARK_ARA = 11, CARK_R = 50;
+  // ayar.akinti (v0.71): akıntı sütunu da çıkar (her 13 düğümde en çok bir; aynı tarihlerden).
+  var KOR_ARA = 7, CARK_ARA = 11, CARK_R = 50, AKINTI_ARA = 13;
+  function akintiUzak(a, x, y) { var dx = Math.max(a.x - x, 0, x - (a.x + a.w)), dy = Math.max(a.y - y, 0, y - (a.y + a.h)); return Math.hypot(dx, dy); }
   function createEndless(seed, kural, ayar) {
-    var r = rng(seed >>> 0), korAcik = !!(ayar && ayar.kor), carkAcik = !!(ayar && ayar.cark);
+    var r = rng(seed >>> 0), korAcik = !!(ayar && ayar.kor), carkAcik = !!(ayar && ayar.cark), akintiAcik = !!(ayar && ayar.akinti);
     var ko = (kural && kural.o) || {};
     var yayGap = ko.yayGap || YAY_GAP, sarkacGap = ko.sarkacGap || SARKAC_GAP, gateGap = ko.gateGap || 2, portalGap = ko.portalGap || 12, ffP = ko.ffP != null ? ko.ffP : 0.4;
     var startY = 0;
-    var st = { hp: { x: 180, y: startY }, prevKind: null, nodes: [], frontier: startY, segs: [], anchors: [], prevHp: null, prevT: null, lastFF: -9, altPrev: true, lastGate: -9, lastYay: -9, prevRing: null, hist: [], lastPortal: -9, portalN: 0, lastSw: -9, lastDal: -99, lastKor: -9, lastCark: -99 };
+    var st = { hp: { x: 180, y: startY }, prevKind: null, nodes: [], frontier: startY, segs: [], anchors: [], prevHp: null, prevT: null, lastFF: -9, altPrev: true, lastGate: -9, lastYay: -9, prevRing: null, hist: [], lastPortal: -9, portalN: 0, lastSw: -9, lastDal: -99, lastKor: -9, lastCark: -99, lastAkinti: -99 };
     var def = {
       id: 'sonsuz', name: 'Sonsuz Kuyu', endless: true, seed: seed, kural: kural ? kural.id : null,
       hint: 'Su altında bekler, yalnız düşersen yakalar. Sağa ya da sola dokunarak tırman; ipi erken bırakıp zincirlersen ekstra puan.',
@@ -707,8 +709,17 @@
           st.prevRing.kor = true; st.lastKor = kPrev; // kor halka: sonraki halka sarkaç olmaz (yukarıdaki koşul)
         } else if (carkAcik && st.prevRing && !altNow && !st.altPrev && !portalHere && kPrev >= 10 && kPrev - st.lastCark >= CARK_ARA && st.lastSw !== kPrev - 1
           && st.prevRing.x >= 70 && st.prevRing.x <= 290 && dist({ x: st.prevRing.x, y: st.prevRing.y - CARK_R + MIN }, t) <= REACH - 10
-          && !s.rings.some(function (rg) { return rg !== st.prevRing && Math.hypot(rg.x - st.prevRing.x, rg.y - st.prevRing.y) < CARK_R + 34; })) {
+          && !s.rings.some(function (rg) { return rg !== st.prevRing && Math.hypot(rg.x - st.prevRing.x, rg.y - st.prevRing.y) < CARK_R + 34; })
+          && !(s.akintilar || []).some(function (a) { return akintiUzak(a, st.prevRing.x, st.prevRing.y) < CARK_R + 24; })) {
           st.prevRing.carkKur = (st.prevRing.x + st.prevRing.y) % 2 ? 1 : -1; st.lastCark = kPrev; // döner çark: motor ilk adımda üç halkayı kurar
+        }
+        // akıntı sütunu (v0.71): bu düğümün (t) 60 birim altından 400 birim üstüne; çarkların çevresinden uzak
+        if (akintiAcik && k >= 12 && k - st.lastAkinti >= AKINTI_ARA && !portalHere) {
+          var akx = clamp(t.x, WL + 60, WR - 60) - 40, aky = t.y - 400;
+          var akA = { x: akx, y: aky, w: 80, h: 460 };
+          if (!s.rings.some(function (rg) { return (rg.cark || rg.carkKur) && akintiUzak(akA, rg.cark ? rg.cark.cx : rg.x, rg.cark ? rg.cark.cy : rg.y) < CARK_R + 24; })) {
+            (s.akintilar || (s.akintilar = [])).push(akA); st.lastAkinti = k;
+          }
         }
         st.altPrev = altNow;
         st.prevHp = st.hp; st.prevT = t; st.prevRing = curRing;
@@ -726,6 +737,7 @@
         s.rings = s.rings.filter(function (o) { return o.y < cut; });
         s.fireflies = s.fireflies.filter(function (o) { return o.y < cut; });
         if (s.panels) s.panels = s.panels.filter(function (o) { return o.y < cut; });
+        if (s.akintilar && s.akintilar.length) s.akintilar = s.akintilar.filter(function (o) { return o.y < cut; });
       }
     };
     return def;
@@ -958,6 +970,25 @@
         o.cark = (o.x + o.y) % 2 ? 1 : -1; carklar.push(j); return true;
       });
     });
+    // akıntı sütunu (v0.71): sıradaki halkanın üstünde uzun, dikey bir hava sütunu (halkanın 60 birim altından iki düğüm
+    // yukarısına); akışla o halkadan bırakan atılmadan süzülür, iki halkayı atlar (kestirme). Çarkların
+    // çevresinden ve başka sütundan uzak. Rastgele sayı çekmez ve en son eklenir: mevcut yerleşim değişmez.
+    var AW = 80, akintilar = [];
+    function rectUzak(rx, ry, rw, rh, px, py) { var dx = Math.max(rx - px, 0, px - (rx + rw)), dy = Math.max(ry - py, 0, py - (ry + rh)); return Math.hypot(dx, dy); }
+    bolmeler.forEach(function (bm) {
+      dagit(bm, bm.B.akinti || 0, 4, function (j) {
+        for (var q = j; q <= j + 3; q++) if (!nodes[q] || nodes[q].fener || nodes[q].kutu || portalAt[q]) return false;
+        return j + 3 <= bm.son + 1;
+      }, function (j) {
+        var a = allPts[j + 1], b = target(nodes[j + 1]);
+        var cx = clamp(b.x, WL + 60, WR - 60), top = target(nodes[j + 3]).y - 40, alt = b.y + 60, h = alt - top;
+        if (h < 380) return false;
+        var x0 = cx - AW / 2;
+        if (carklar.some(function (cj) { return rectUzak(x0, top, AW, h, nodes[cj].x, nodes[cj].y) < CR + 24; })) return false;
+        if (akintilar.some(function (ak) { return ak[1] < alt + 100 && ak[1] + ak[3] > top - 100; })) return false;
+        akintilar.push([Math.round(x0), Math.round(top), AW, Math.round(h)]); return true;
+      });
+    });
     // duvar ipuçları (bekçinin tebeşiri): düğümle sıradaki arasında, hedefin karşı yanında
     var yazilar = [];
     bolmeler.forEach(function (bm) {
@@ -1011,6 +1042,7 @@
       fireflies: zincirler.map(function (z) { return [z[0], Math.round(z[1] + off), z[2], z[3]]; }),
       gucler: gucler.map(function (g) { return [g[0], Math.round(g[1] + off), g[2]]; }),
       dalB2: dallar.length ? [dallar[0].b2.x, Math.round(dallar[0].b2.y + off)] : null, dalSay: dallar.length, zincirSay: zN, carkSay: carklar.length,
+      akintilar: akintilar.map(function (ak) { return [ak[0], Math.round(ak[1] + off), ak[2], ak[3]]; }),
       yazilar: yazilar.map(function (yz) { return { x: yz.x, y: Math.round(yz.y + off), m: yz.m }; }),
       fenerler: bolmeler.filter(function (bm) { return bm.fener >= 0; }).map(function (bm) { return sh(target(nodes[bm.fener])); }),
       route: route, ffRoute: ffRoute, hizRoute: hizRoute, dalRoute: null,

@@ -416,8 +416,8 @@
   // Kor halka (v0.69) yarışma modlarına yeni günden/haftadan itibaren girer: o gün ya da hafta oynanmış kuyular değişmez.
   // Meydan okuma bağlantısı tarih taşımaz: açıldığı gün geçerli kurala göre kurulur.
   var KOR_GUNLUK = '2026-11-24', KOR_HAFTALIK = '2026-11-30';
-  function korAyar(key, bas) { var y = (key || todayKey()) >= bas; return { kor: y, cark: y }; } // kor halka (v0.69) ve döner çark (v0.70) aynı tarihten
-  function newEndlessDef() { return meydan ? (meydan.tur === 'h' ? GEN.createHaftalik(meydan.seed, korAyar(haftaKey(), KOR_HAFTALIK)) : GEN.createEndless(meydan.seed, null, korAyar(todayKey(), KOR_GUNLUK))) : dailyKey ? GEN.createEndless(dailySeed(dailyKey), GEN.gunKurali(dailyKey), korAyar(dailyKey, KOR_GUNLUK)) : weekKey ? GEN.createHaftalik(tohum('kuyu-haftalik-' + weekKey), korAyar(weekKey, KOR_HAFTALIK)) : GEN.createEndless((Date.now() ^ (Math.random() * 1e9)) >>> 0, null, { kor: true, cark: true }); }
+  function korAyar(key, bas) { var y = (key || todayKey()) >= bas; return { kor: y, cark: y, akinti: y }; } // kor halka (v0.69), döner çark (v0.70) ve akıntı sütunu (v0.71) aynı tarihten
+  function newEndlessDef() { return meydan ? (meydan.tur === 'h' ? GEN.createHaftalik(meydan.seed, korAyar(haftaKey(), KOR_HAFTALIK)) : GEN.createEndless(meydan.seed, null, korAyar(todayKey(), KOR_GUNLUK))) : dailyKey ? GEN.createEndless(dailySeed(dailyKey), GEN.gunKurali(dailyKey), korAyar(dailyKey, KOR_GUNLUK)) : weekKey ? GEN.createHaftalik(tohum('kuyu-haftalik-' + weekKey), korAyar(weekKey, KOR_HAFTALIK)) : GEN.createEndless((Date.now() ^ (Math.random() * 1e9)) >>> 0, null, { kor: true, cark: true, akinti: true }); }
   function reset() {
     // Günlük ve Haftalık Kuyu (v0.64): her koşu bir deneme hakkı harcar (Yeniden dene ve Baştan başla dahil). Hak yoksa
     // koşu başlamaz; hak penceresi açılır (video ile yenileme ya da Hikâye'ye devam). Meydan okuma hak harcamaz.
@@ -708,6 +708,12 @@
             window.KuyuScreens.hikaye('Alevlendin!', 'Akış sürerken TAM bırakışlar Çıra\'yı alevlendirir (2, 4 ve 7 TAM). Alevliyken her akış bırakışı seni daha yükseğe fırlatır; akış bitince alev söner.', 6000);
           }
         } else if (e.seviye === 0) tone(330, 0.25, 'sine', 0.04, 165); // alev söndü
+      }
+      else if (e.type === 'akinti') {
+        // akıntıya girdin (akışla): yükselen rüzgâr sesi
+        tone(240, 0.45, 'sine', 0.045, 640); tone(480, 0.3, 'triangle', 0.015, 960); buzz(10);
+        burst(e.x, e.y + 10, 8, 'rgb(' + COL_AKINTI + ')', 120, 0.5, -200);
+        floatText(e.x, e.y - 26, 'AKINTI!', 'rgb(' + COL_AKINTI + ')', 15);
       }
       else if (e.type === 'carkItis') {
         // çark fırlattı: yükselen ıslık, turkuaz kıvılcım
@@ -1177,6 +1183,33 @@
     }
   }
 
+  // Akıntı sütunu (v0.71): yukarı esen hava. Akış sürerken (x2+) parlak ve hızlı akan çizgiler; akış yokken sönük ve yavaş.
+  var COL_AKINTI = '150,210,255';
+  function drawAkintilar(t, vh) {
+    var L = sim.akintilar; if (!L || !L.length) return;
+    var acik = sim.status === 'play' && sim.combo >= 2;
+    for (var i = 0; i < L.length; i++) {
+      var a = L[i]; if (a.y > cam + vh + 20 || a.y + a.h < cam - 20) continue;
+      ctx.save();
+      var g = ctx.createLinearGradient(0, a.y, 0, a.y + a.h), al = acik ? 0.17 : 0.06;
+      g.addColorStop(0, 'rgba(' + COL_AKINTI + ',0)'); g.addColorStop(0.15, 'rgba(' + COL_AKINTI + ',' + al + ')');
+      g.addColorStop(0.85, 'rgba(' + COL_AKINTI + ',' + al + ')'); g.addColorStop(1, 'rgba(' + COL_AKINTI + ',0)');
+      ctx.fillStyle = g; ctx.fillRect(a.x, a.y, a.w, a.h);
+      // yukarı akan çizgiler
+      var hiz = acik ? 0.42 : 0.08, n = 7;
+      ctx.strokeStyle = 'rgba(' + COL_AKINTI + ',' + (acik ? 0.55 : 0.18) + ')'; ctx.lineWidth = 1.6; ctx.lineCap = 'round';
+      for (var k = 0; k < n; k++) {
+        var x = a.x + (k + 0.5) * a.w / n + (reduceMotion ? 0 : Math.sin(t / 500 + k * 1.7) * 3);
+        var y = a.y + a.h - ((t * hiz + k * 97) % a.h), uz = acik ? 22 : 12;
+        if (y - uz < a.y) continue;
+        ctx.beginPath(); ctx.moveTo(x, y); ctx.lineTo(x, y - uz); ctx.stroke();
+      }
+      // kenarlar
+      ctx.strokeStyle = 'rgba(' + COL_AKINTI + ',' + (acik ? 0.3 : 0.1) + ')'; ctx.lineWidth = 1; ctx.setLineDash([6, 8]);
+      ctx.beginPath(); ctx.moveTo(a.x, a.y + 20); ctx.lineTo(a.x, a.y + a.h - 20); ctx.moveTo(a.x + a.w, a.y + 20); ctx.lineTo(a.x + a.w, a.y + a.h - 20); ctx.stroke();
+      ctx.restore();
+    }
+  }
   // Döner çark (v0.70): göbek, demir kollar ve soluk çember; dönüş yönünü gösteren küçük ok. Halka yükselirken parlar
   // (o an bırakırsan çark seni fırlatır): doğru anın ipucu.
   var COL_CARK = '143,211,199';
@@ -1743,6 +1776,7 @@
     var vh = viewH / K;
     for (var i = 0; i < sim.rects.length; i++) drawRect(sim.rects[i]);
     sim.buttons.forEach(drawButton);
+    drawAkintilar(t, vh);
     drawCarklar(t, vh);
     sim.rings.forEach(function (r) { if (r.y > cam - 30 - (r.sw ? CFG.SARKAC_L : 0) && r.y < cam + vh + 30) { if (r.kapi) { drawGate(r, t); return; } if (r.gecit || r.cikis) { drawPortal(r, t); return; } if (r.sw) drawSwingChain(r); drawRing(r.x, r.y); if (r.kor) drawKorHalka(r, t); if (r.cark) drawCarkHalka(r); if (r.yay != null) drawSpringRing(r, t); if (r.ff && !r.got) { drawFireflyRing(r, t); if (r === notHalka && notAktif) drawNot(r, t); } if (r.hiz) drawSpeedRing(r, t); if (r.firlat) drawFirlatRing(r, t); if (r.fener) drawFener(r, t); } });
     sim.fireflies.forEach(function (f) { if (f.y > cam - 20 && f.y < cam + vh + 20) drawFirefly(f, t); });
@@ -2366,6 +2400,8 @@
       i: '<svg viewBox="0 0 64 64"><circle cx="20" cy="40" r="11" fill="none" stroke="#2fb3a6" stroke-width="3.5" stroke-dasharray="5 4"/><path d="M44 30l10 10M54 30L44 40" stroke="#f2b23a" stroke-width="4" stroke-linecap="round" opacity=".7"/></svg>' },
     kurtarma: { t: 'Kurtarma kancası', m: 'Menzilde hiç hedef kalmadı. Ekrana dokun: kanca en yakın yukarı halkaya kadar uzanır.',
       i: '<svg viewBox="0 0 64 64"><circle cx="46" cy="12" r="8" fill="none" stroke="#d08a45" stroke-width="3.5"/><path d="M18 54L44 18" stroke="#bfe6ee" stroke-width="3" stroke-dasharray="4 5" stroke-linecap="round"/><circle cx="16" cy="56" r="6" fill="#f26a3a"/></svg>' },
+    akinti: { t: 'Akıntı sütunu', m: 'Mavi sütunda hava yukarı eser. Akış sürerken (x2 ve üstü) içinden ipsiz geçersen süzülerek yükselirsin: atılmadan birkaç halka geçebilirsin. Akış yokken sütun söner, etkisi olmaz. İstediğin an bir halkaya atılabilirsin.',
+      i: '<svg viewBox="0 0 64 64"><rect x="20" y="6" width="24" height="52" rx="6" fill="#96d2ff" opacity=".18"/><path d="M26 46v-12M32 52v-16M38 44v-12" stroke="#96d2ff" stroke-width="2.5" stroke-linecap="round"/><path d="M24 22l8-8 8 8" fill="none" stroke="#96d2ff" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/><circle cx="32" cy="30" r="6" fill="#f26a3a"/></svg>' },
     cark: { t: 'Döner çark', m: 'Çarkın üç halkası yavaşça döner. Yükselen halkaya tutun: seni yukarı taşır. Halka yükselirken bırakırsan çark seni fırlatır; parlayan halka doğru anı gösterir. Uzaktaysa bir an bekle, çark acele etmez.',
       i: '<svg viewBox="0 0 64 64"><circle cx="32" cy="32" r="20" fill="none" stroke="#8fd3c7" stroke-width="2" stroke-dasharray="4 5" opacity=".6"/><path d="M32 32L32 12M32 32L49 42M32 32L15 42" stroke="#46504e" stroke-width="3"/><circle cx="32" cy="32" r="5" fill="#2a302f" stroke="#8fd3c7" stroke-width="2"/><circle cx="32" cy="12" r="6" fill="none" stroke="#d08a45" stroke-width="3.5"/><circle cx="49" cy="42" r="6" fill="none" stroke="#d08a45" stroke-width="3.5"/><circle cx="15" cy="42" r="6" fill="none" stroke="#d08a45" stroke-width="3.5"/><path d="M52 22a22 22 0 0 0-8-9" fill="none" stroke="#8fd3c7" stroke-width="2.5" stroke-linecap="round"/></svg>' },
     kor: { t: 'Kor halka', m: 'Kızıl halka kordur: tutunabilirsin ama 1,5 saniye sonra söner ve seni bırakır. Çevresindeki yay kalan süreyi gösterir. Asılı bekleme, sıradakine atıl. Sönen kor bir an sonra yeniden kızarır.',
@@ -2379,7 +2415,7 @@
   // Yeni öğe kartları (halka türleri, ahşap, kutu): el yapımı 1–6. bölümler dışında bir koşuda en çok bir tane;
   // kalanı sonraki bölümlerde gelir. 7. bölümde yay, sarkaç ve şerit birlikte ilk kez çıkıyordu (art arda 3 kart).
   // Acil kartlar (boş atış, kurtarma, su, akış, el yorulması) sınırsız.
-  var OGE_KARTLARI = ['ff', 'hiz', 'ahsap', 'kutu', 'kapi', 'yay', 'gecit', 'sarkac', 'firlat', 'zincir', 'kor', 'cark'], introOgeSayisi = 0;
+  var OGE_KARTLARI = ['ff', 'hiz', 'ahsap', 'kutu', 'kapi', 'yay', 'gecit', 'sarkac', 'firlat', 'zincir', 'kor', 'cark', 'akinti'], introOgeSayisi = 0;
   function ogeSiniri() { return mode !== 'level' && introOgeSayisi >= 1; } // Hikâye bölümleri öğreticidir: kart sınırı yok
   function maybeIntro() {
     if (introOpen || pauseOpen || sim.t < 0.6) return;
@@ -2393,6 +2429,7 @@
     if (!save.seen.firlat && sim.rings.some(function (r) { return r.firlat && inView(r.y); })) wantIntro('firlat');
     if (!save.seen.kor && sim.rings.some(function (r) { return r.kor && inView(r.y); })) wantIntro('kor');
     if (!save.seen.cark && sim.rings.some(function (r) { return r.cark && inView(r.y); })) wantIntro('cark');
+    if (!save.seen.akinti && sim.akintilar && sim.akintilar.some(function (a) { return inView(a.y + a.h - 60); })) wantIntro('akinti');
     if (sim.gucler) ['kalkan', 'fener', 'kanat'].forEach(function (tr) { if (!save.seen['guc_' + tr] && sim.gucler.some(function (g) { return g.tur === tr && !g.got && inView(g.y); })) wantIntro('guc_' + tr); });
     if (!save.seen.zincir && sim.fireflies.some(function (f) { return f.zincir != null && !f.got && inView(f.y); })) wantIntro('zincir');
     if (!save.seen.ahsap && sim.rects.some(function (r) { return r.type === 'w' && inView(r.y + r.h / 2); })) wantIntro('ahsap');

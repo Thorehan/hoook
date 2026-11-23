@@ -41,8 +41,10 @@
 Kararlar (23/11): mevcut bölümlere bölme olarak (bölüm sayısı 24 kalır); sıra kor → çark → akıntı; Hikâye'de öğretildikten sonra Günlük ve Haftalık'a da (yeni günden/haftadan itibaren).
 
 - ✅ Kor halka v0.69 (1,5 sn; 7. bölüm öğretir; telefonda denendi)
-- ✅ Döner çark v0.70 (16. bölüm öğretir; telefonda deneme `docs/telefon-testi.md` §16)
-- Akıntı sütunu: sırada
+- ✅ Döner çark v0.70 (16. bölüm öğretir; telefonda denendi)
+- ✅ Akıntı sütunu v0.71 (21. bölüm öğretir; telefonda deneme `docs/telefon-testi.md` §17)
+
+**İstişare 3 tamam** (A, B, C).
 - **Kor halka:** Tutununca kızarır, 1,5 sn sonra söner ve seni bırakır. Asılı kalmadan akışı zorlar; tema ile uyumlu (Çıra bir kor).
 - **Döner çark:** Yavaş dönen bir çarkın üzerindeki halkalar; doğru anda tutunursan seni yukarı taşır. Zamanlama ustalığı.
 - **Akıntı sütunu:** Kuyuda yukarı esen bir hava sütunu; içinden geçerken Çıra hafifçe süzülür, yolu kestirmek için akışla kullanılır.
