@@ -536,12 +536,15 @@
 
   // ---------- sonsuz koşu ----------
   // Zorluk tırmanılan yüksekliğe göre artar; su hızı da. kural: Günlük Kuyu'nun günün kuralı (Sonsuz'da yok).
-  function createEndless(seed, kural) {
-    var r = rng(seed >>> 0);
+  // ayar.kor (v0.69): kor halka da çıkar (Günlük 24/11/2026'dan, Haftalık 30/11/2026 haftasından; eski tohumlar aynı kalır).
+  // Kor halkalar rastgele sayı çekmez: yol, su ve diğer halkalar aynı kalır, yalnız bazı ana halkalar kor olur.
+  var KOR_ARA = 7;
+  function createEndless(seed, kural, ayar) {
+    var r = rng(seed >>> 0), korAcik = !!(ayar && ayar.kor);
     var ko = (kural && kural.o) || {};
     var yayGap = ko.yayGap || YAY_GAP, sarkacGap = ko.sarkacGap || SARKAC_GAP, gateGap = ko.gateGap || 2, portalGap = ko.portalGap || 12, ffP = ko.ffP != null ? ko.ffP : 0.4;
     var startY = 0;
-    var st = { hp: { x: 180, y: startY }, prevKind: null, nodes: [], frontier: startY, segs: [], anchors: [], prevHp: null, prevT: null, lastFF: -9, altPrev: true, lastGate: -9, lastYay: -9, prevRing: null, hist: [], lastPortal: -9, portalN: 0, lastSw: -9, lastDal: -99 };
+    var st = { hp: { x: 180, y: startY }, prevKind: null, nodes: [], frontier: startY, segs: [], anchors: [], prevHp: null, prevT: null, lastFF: -9, altPrev: true, lastGate: -9, lastYay: -9, prevRing: null, hist: [], lastPortal: -9, portalN: 0, lastSw: -9, lastDal: -99, lastKor: -9 };
     var def = {
       id: 'sonsuz', name: 'Sonsuz Kuyu', endless: true, seed: seed, kural: kural ? kural.id : null,
       hint: 'Su altında bekler, yalnız düşersen yakalar. Sağa ya da sola dokunarak tırman; ipi erken bırakıp zincirlersen ekstra puan.',
@@ -695,10 +698,12 @@
         var kPrev = st.nodes.length - 1;
         if (st.prevRing && !altNow && !portalHere && kPrev >= 2 && kPrev - st.lastYay >= yayGap) {
           st.prevRing.yay = yayAngle(st.prevRing, t); st.lastYay = kPrev;
-        } else if (st.prevRing && !altNow && !portalHere && kPrev >= 2 && kPrev - st.lastSw >= sarkacGap && swingOk({ kind: 'ring', x: st.prevRing.x })) {
+        } else if (st.prevRing && !altNow && !portalHere && kPrev >= 2 && kPrev - st.lastSw >= sarkacGap && st.lastKor !== kPrev - 1 && swingOk({ kind: 'ring', x: st.prevRing.x })) {
           // sarkaç halka (yay olmayan ana halka)
           st.prevRing.sarkac = true;   // motor ilk adımda salınımı kurar
           st.lastSw = kPrev;
+        } else if (korAcik && st.prevRing && !altNow && !portalHere && kPrev >= 8 && kPrev - st.lastKor >= KOR_ARA && !st.prevRing.ff && !st.prevRing.hiz) {
+          st.prevRing.kor = true; st.lastKor = kPrev; // kor halka: sonraki halka sarkaç olmaz (yukarıdaki koşul)
         }
         st.altPrev = altNow;
         st.prevHp = st.hp; st.prevT = t; st.prevRing = curRing;
@@ -729,8 +734,8 @@
   // hatasız oynayan bot da yanıyordu (10 tohumda 1–3), yani yanmak karardan değil şanstan gelirdi.
   // Sonsuz Kuyu'nun kendi ayarı (kalıcı karar) değişmez.
   var HAFTALIK_SU = { bas: 26, son: 18, daralma: 800, bekle: 4, bekleSon: 2, surunme: 150, hiz: 220 };
-  function createHaftalik(seed) {
-    var def = createEndless(seed, null);
+  function createHaftalik(seed, ayar) {
+    var def = createEndless(seed, null, ayar);
     def.id = 'haftalik'; def.name = 'Haftalık Kuyu'; def.haftalik = true;
     def.suTakip = { bas: HAFTALIK_SU.bas, son: HAFTALIK_SU.son, daralma: HAFTALIK_SU.daralma, bekle: HAFTALIK_SU.bekle, bekleSon: HAFTALIK_SU.bekleSon, surunme: HAFTALIK_SU.surunme, hiz: HAFTALIK_SU.hiz };
     def.hint = 'Haftalık Kuyu: bu hafta herkes aynı kuyuda. Su Sonsuz Kuyu\'dan erken sıkışır, devam hakkı yok. Haftanın en iyi puanın ligini belirler.';
@@ -873,6 +878,12 @@
       dagit(bm, bm.B.sarkac || 0, 3, function (j) { return serbest(j) && swingOk(nodes[j]); }, function (j) {
         var o = halkaNesne(nodes[j]); if (!o || o.yay != null) return false; o.sarkac = true; return true;
       });
+      // kor halka (v0.69): ana yolda, sonrası sarkaç olmayan (beklemek gerekmeyen) bir halka; art arda değil
+      dagit(bm, bm.B.kor || 0, 2, function (j) { return serbest(j) && nodes[j].kind === 'ring' && nodes[j + 1]; }, function (j) {
+        var o = halkaNesne(nodes[j]); if (!o || o.yay != null || o.sarkac) return false;
+        var sonra = nodes[j + 1].kind === 'ring' ? halkaNesne(nodes[j + 1]) : null; if (sonra && (sonra.sarkac || sonra.yay != null)) return false;
+        o.kor = true; return true;
+      });
     });
     // fırlatma yolu (v0.61): Sonsuz'daki gibi küçük bir motor sahnesinde doğrulanır (dalMini: asılıyken ulaşılmaz, akışla ulaşılır)
     var dallar = [];
@@ -960,7 +971,7 @@
       id: no, name: tarif.ad, hikaye: no, ikinci: !!tarif.ikinci, bolge: tarif.bolge, H: H, generated: true, fenerli: true, dusus: 520,
       hint: tarif.ipucu, start: [180, Math.round(off - 20)], goal: sh(goal), water: tarif.su || 0, suFener: tarif.suFener != null ? tarif.suFener : null, not: tarif.not || 0,
       rects: rects,
-      rings: out.rings.map(function (p) { var a = sh(p); if (fenerHalka[p.x + ',' + p.y]) a.push('fener'); else if (p.yay != null) a.push('yay', p.yay); else if (p.sarkac) a.push('sarkac'); return a; })
+      rings: out.rings.map(function (p) { var a = sh(p); if (fenerHalka[p.x + ',' + p.y]) a.push('fener'); else if (p.yay != null) a.push('yay', p.yay); else if (p.sarkac) a.push('sarkac'); else if (p.kor) a.push('kor'); return a; })
         .concat(ffRings.map(function (a) { return [a.x, Math.round(a.y + off), 'ff']; }))
         .concat(hizRings.map(function (a) { return [a.x, Math.round(a.y + off), 'hiz']; }))
         .concat(gates.map(function (a) { return [a.x, Math.round(a.y + off), 'kapi']; }))

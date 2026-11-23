@@ -1,7 +1,7 @@
 // Hikâye denge tablosu (v0.63, Aşama 5): 48 bölümün her birinde oyuncu modelleri, spam ve tek taraf.
 //   node tools/hikaye-denge.js [deneme sayısı, varsayılan 4] [ilk] [son]
 // Ölünce son yanan fenerden dönülür (yoksa bölüm baştan); en çok 5 dk. Bölüm "geçildi" sayılır, dönüşler ve süre raporlanır.
-// Modeller: temkinli %5 / %20 (tools/hikaye-olcum.js ile aynı), akış %5 (ipi erken bırakır), yavaş %5 (her halkada 1,35 sn bekler),
+// Modeller: temkinli %5 / %20 (tools/hikaye-olcum.js ile aynı), akış %5 (ipi erken bırakır), yavaş %5 (her halkada 1,35 sn bekler; kor halkada sönmeden 0,45 sn önce davranır),
 // spam (sıralı sol-sağ, tools/hata.js gibi), sadeceSag / sadeceSol (hep aynı yana basar; tools/oyuncu.js gibi).
 // Kurallar: hatasız oyuncu her bölümü geçer; tek taraf hiçbir bölümü geçmez; spam düşünen oyuncudan (akış) belirgin yavaş, ortalama (temkinli) düzeyinde ya da kötü.
 //   SADE=1 node tools/hikaye-denge.js 0 7 48   → yalnız temkinli / akış / spam
@@ -54,9 +54,11 @@ function oyna(def, tarz, p, seed) {
     if (!s.rope || a.miss) { step(s, 0.3); continue; }
     if (tarz === 'akis') { step(s, 1.2, () => s.rope && s.rope.len <= 60); E.release(s); step(s, 0.08); continue; } // düşünen ve hızlı: ipi erken bırakır
     // yayla fırlayınca ip yoktur: tepe noktasında (düşmeye başlarken) sıradakine basılır (tools/denge.js gibi)
-    step(s, 1.6, () => (s.rope && s.rope.len <= C.MIN_LEN + 0.01 && Math.hypot(s.p.x - s.p.px, s.p.y - s.p.py) / C.DT < 120) || (!s.rope && !s.hook && s.springs > 0 && s.p.y - s.p.py > -0.4));
+    // kor halka (v0.69): oyuncu azalan yayı görür, sönmeden 0,45 sn önce davranır (tepki payı)
+    const korSinir = () => s.rope && s.rope.korBas != null && s.t >= s.rope.korBas + C.KOR_SN - 0.45;
+    step(s, 1.6, () => korSinir() || (s.rope && s.rope.len <= C.MIN_LEN + 0.01 && Math.hypot(s.p.x - s.p.px, s.p.y - s.p.py) / C.DT < 120) || (!s.rope && !s.hook && s.springs > 0 && s.p.y - s.p.py > -0.4));
     if (!s.rope) continue;
-    step(s, 0.35); if (tarz === 'yavas' && s.rope) step(s, 1.35);
+    step(s, 0.35, korSinir); if (tarz === 'yavas' && s.rope) step(s, 1.35, korSinir);
   }
   return { won: s.status === 'won', t: s.t + ek, donus, bastan, metre: Math.max(0, Math.round((s.startY - s.topY) / 20)), boy: Math.round((s.startY - s.goal.y) / 20) };
 }

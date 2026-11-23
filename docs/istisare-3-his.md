@@ -30,13 +30,19 @@
 - Sıradaki hedefin ötesindeki halka soluk önizlenir.
 - Akış ve alev için ekranda küçük bir gösterge.
 
-## Aşama B · Tatmin anları ✅ v0.68 (23/11; telefonda deneme bekliyor, `docs/telefon-testi.md` §14)
+## Aşama B · Tatmin anları ✅ v0.68 (23/11; telefonda denendi)
 - **Kovaya varış:** gün ışığı patlaması, ateşböcekleri kovaya akar, madalyalar tek tek yanar.
 - **Fener yanması:** ışık dalgası duvar boyunca yayılır, kısa bir tını.
 - **Uzun akış:** x10, x20, x30'da ekran kenarı ısınır, alev büyür, kısa unvan yazısı ("Alevlendin!", "Kor!").
 - **Düşüş ve dönüş:** suya düşünce kor yumuşakça söner; fenerden dönüşte yeniden alevlenir. Hata cezalandırıcı değil, akıcı hissettirir.
 
 ## Aşama C · Yeni mekanikler (her biri ayrı sürüm)
+
+Kararlar (23/11): mevcut bölümlere bölme olarak (bölüm sayısı 24 kalır); sıra kor → çark → akıntı; Hikâye'de öğretildikten sonra Günlük ve Haftalık'a da (yeni günden/haftadan itibaren).
+
+- ✅ Kor halka v0.69 (1,5 sn; 7. bölüm öğretir; telefonda deneme `docs/telefon-testi.md` §15)
+- Döner çark: sırada
+- Akıntı sütunu
 - **Kor halka:** Tutununca kızarır, 1,5 sn sonra söner ve seni bırakır. Asılı kalmadan akışı zorlar; tema ile uyumlu (Çıra bir kor).
 - **Döner çark:** Yavaş dönen bir çarkın üzerindeki halkalar; doğru anda tutunursan seni yukarı taşır. Zamanlama ustalığı.
 - **Akıntı sütunu:** Kuyuda yukarı esen bir hava sütunu; içinden geçerken Çıra hafifçe süzülür, yolu kestirmek için akışla kullanılır.

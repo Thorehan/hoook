@@ -32,6 +32,8 @@
     EARLY: 0.25,        // bu süreden kısa asılıp bırakmak "fırlama" sayılır
     COMBO_HANG: 0.45,   // bundan uzun asılı kalmak akışı bozar
     COMBO_AIR: 1.1,     // havada bundan uzun tutunmadan kalmak akışı bozar
+    KOR_SN: 1.5,        // kor halka (v0.69): tutunduktan bu kadar sonra söner ve seni bırakır (yayı görüp davranan yavaş oyuncu geçer; hiç tepki vermeyen takılır)
+    KOR_SOGUK: 1.0,     // sönen kor halka bu kadar süre tutulamaz (kanca geçer, nişan saymaz), sonra yeniden kızarır
     UP_RISE: 60,        // nişan: bundan az yükselen hedef "yanda" sayılır (3 m)
     UP_ANGLE: 45,       // nişan: bundan düz açıdaki hedef "yanda" sayılır (derece)
     NEAR_V: 40,         // yatayda bu kadar yakın (tam tepedeki) hedef iki taraftan da alınır
@@ -108,6 +110,7 @@
         if (r[2] === 'cikis') o.cikisId = r[3];
         if (r[2] === 'sarkac') { o.sarkac = true; makeSwing(o); }
         if (r[2] === 'fener') o.fener = true; // Hikâye kontrol noktası (v0.57)
+        if (r[2] === 'kor') o.kor = true; // kor halka (v0.69): 1,5 sn sonra söner ve bırakır
         return o;
       }),
       goal: def.goal ? { x: def.goal[0], y: def.goal[1] } : null,
@@ -171,6 +174,8 @@
   // Kanca ucunun bu adımda neye çarptığı. ignore: az önce tutunulan halka ya da ahşap.
   // Atış anında Çıra'nın değdiği (içinden geçtiği) halkalar: kanca onlara takılmaz, nişan da onları engel saymaz.
   // Değdiğin halkaya tutunmanın anlamı yok; aday listesi de 18 birimden yakın hedefleri zaten almaz.
+  // Sönmüş kor halka (v0.69): soğuma süresince yokmuş gibi (kanca içinden geçer, nişan aday saymaz)
+  function soguk(s, rg) { return !!(rg.kor && rg.korSon != null && s.t - rg.korSon < CFG.KOR_SOGUK); }
   function yakinHalkalar(s) {
     var out = [], lim = CFG.R + CFG.RING_R + 5;
     for (var i = 0; i < s.rings.length; i++) { var rg = s.rings[i]; if (!rg.kapi && dist(s.p.x, s.p.y, rg.x, rg.y) < lim) out.push(rg); }
@@ -182,7 +187,7 @@
     function consider(tt, hit) { if (tt != null && (!best || tt < best.t)) { hit.t = tt; best = hit; } }
     for (i = 0; i < s.rings.length; i++) {
       var rg = s.rings[i];
-      if (rg === ignore || rg.kapi || rg.y < minY || rg.y > maxY || (yakin && yakin.indexOf(rg) >= 0)) continue;
+      if (rg === ignore || rg.kapi || soguk(s, rg) || rg.y < minY || rg.y > maxY || (yakin && yakin.indexOf(rg) >= 0)) continue;
       consider(segCircle(x0, y0, x1, y1, rg.x, rg.y, CFG.RING_R + (rg.sw ? 12 : 2)), { kind: 'ring', ring: rg });
     }
     if (s.goal) consider(segCircle(x0, y0, x1, y1, s.goal.x, s.goal.y, 16), { kind: 'goal' });
@@ -325,7 +330,7 @@
   function candidates(s, range) {
     var p = s.p, R = (range || CFG.HOOK_MAX) - 4, out = [], i;
     function add(x, y, kind, ref) { var d = dist(p.x, p.y, x, y); if (d <= R && d > 18) out.push({ x: x, y: y, kind: kind, ref: ref, d: d }); }
-    for (i = 0; i < s.rings.length; i++) { var rg = s.rings[i]; if (!rg.kapi && Math.abs(rg.y - p.y) <= R) add(rg.x, rg.y, 'ring', rg); }
+    for (i = 0; i < s.rings.length; i++) { var rg = s.rings[i]; if (!rg.kapi && !soguk(s, rg) && Math.abs(rg.y - p.y) <= R) add(rg.x, rg.y, 'ring', rg); }
     if (s.goal) add(s.goal.x, s.goal.y, 'goal', 'goal');
     for (i = 0; i < s.boxes.length; i++) add(s.boxes[i].x, s.boxes[i].y, 'box', s.boxes[i]);
     for (i = 0; i < s.rects.length; i++) {
@@ -568,6 +573,7 @@
           var ay = hit.kind === 'ring' ? hit.ring.y : hit.kind === 'goal' ? s.goal.y : hit.y;
           s.rope = { kind: 'anchor', x: ax, y: ay, len: dist(p.x, p.y, ax, ay), target: hit.kind, ref: hit.ring || hit.rect || null };
           s.rope.len0 = s.rope.len;
+          if (hit.ring && hit.ring.kor) { s.rope.korBas = s.t; s.korSay = (s.korSay || 0) + 1; s.events.push({ type: 'kor', x: ax, y: ay }); }
           s.hook = null;
           onAttach(s, ax, ay, hit.kind);
           if (hit.ring && hit.ring.sw) s.swings++;
@@ -622,12 +628,18 @@
           p.px = p.x - vx; p.py = p.y - vy;
         }
       }
+      // Kor halka: tutunduktan KOR_SN sonra söner ve ipi bırakır (asılı beklemek yerine sıradakine atıl)
+      if (rp.korBas != null && s.t - rp.korBas >= CFG.KOR_SN) {
+        rp.ref.korSon = s.t; s.korSondu = (s.korSondu || 0) + 1;
+        s.events.push({ type: 'korSondu', x: rp.x, y: rp.y });
+        detach(s, 'kor'); rp = null;
+      }
       // Geçit girişi: yaklaşınca çıkış halkasına taşınır, orada asılı kalırsın (akış sürer).
-      if (rp.ref && rp.ref.gecit && rp.len <= CFG.GECIT_LEN) { usePortal(s, rp.ref); rp = s.rope; atMin = false; }
+      if (rp && rp.ref && rp.ref.gecit && rp.len <= CFG.GECIT_LEN) { usePortal(s, rp.ref); rp = s.rope; atMin = false; }
       // Yay halkası: ulaştığın an seni okun yönüne fırlatır; ip kendiliğinden bırakılır, akış sürer.
-      if (atMin && rp.ref && rp.ref.yay != null) { launchSpring(s, rp.ref); rp = null; }
+      if (rp && atMin && rp.ref && rp.ref.yay != null) { launchSpring(s, rp.ref); rp = null; }
       // tutunma gücü ve akış
-      else if (atMin) {
+      else if (rp && atMin) {
         s.hang += dt;
         if (s.hang > CFG.COMBO_HANG && s.combo > 0) breakCombo(s, 'asılı');
         if (s.hang > s.grip) { s.slips++; detach(s, 'slip'); }

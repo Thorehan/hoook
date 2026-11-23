@@ -110,6 +110,12 @@ Yayına çıkmadan yerelde denemek için: bilgisayarda `python3 -m http.server 8
 - [ ] x10 / x20 / x30 unvanı (Isındın! / Yanıyorsun! / KOR!) ve ısınan ekran kenarı: hoş mu, dikkat dağıtıyor mu?
 - [ ] Suya düşünce korun sönmesi ve fenerden yeniden alevlenmesi: hata cezalandırıcı değil, akıcı hissettiriyor mu?
 
+## 15. Kor halka (v0.69, 5 dk)
+- [ ] 7. bölüm: tanıtım kartı ve duvar yazıları kor halkayı anlatıyor mu? Kızıl halka diğerlerinden kolay ayırt ediliyor mu?
+- [ ] Tutununca çevredeki süre yayı görünüyor mu, 1,5 sn yetiyor mu (acele ettiriyor ama bunaltmıyor mu)?
+- [ ] Söndüğünde düşmek adil hissettiriyor mu? Kül rengi halkanın tutulmadığı anlaşılıyor mu?
+- [ ] Yarın (24/11) Günlük Kuyu'da kor halkalar çıkıyor mu?
+
 ## 5. Genel izlenim (serbest)
 - En sevdiğim an:
 - En çok zorlandığım yer:

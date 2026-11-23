@@ -413,7 +413,11 @@
     // günün kuralı: koşu başında oyunu durdurmayan kısa kart
     if (kural && window.KuyuScreens && window.KuyuScreens.hikaye) window.KuyuScreens.hikaye('Günün kuralı · ' + kural.ad, kural.metin, 3800);
   }
-  function newEndlessDef() { return meydan ? (meydan.tur === 'h' ? GEN.createHaftalik(meydan.seed) : GEN.createEndless(meydan.seed)) : dailyKey ? GEN.createEndless(dailySeed(dailyKey), GEN.gunKurali(dailyKey)) : weekKey ? GEN.createHaftalik(tohum('kuyu-haftalik-' + weekKey)) : GEN.createEndless((Date.now() ^ (Math.random() * 1e9)) >>> 0); }
+  // Kor halka (v0.69) yarışma modlarına yeni günden/haftadan itibaren girer: o gün ya da hafta oynanmış kuyular değişmez.
+  // Meydan okuma bağlantısı tarih taşımaz: açıldığı gün geçerli kurala göre kurulur.
+  var KOR_GUNLUK = '2026-11-24', KOR_HAFTALIK = '2026-11-30';
+  function korAyar(key, bas) { return { kor: (key || todayKey()) >= bas }; }
+  function newEndlessDef() { return meydan ? (meydan.tur === 'h' ? GEN.createHaftalik(meydan.seed, korAyar(haftaKey(), KOR_HAFTALIK)) : GEN.createEndless(meydan.seed, null, korAyar(todayKey(), KOR_GUNLUK))) : dailyKey ? GEN.createEndless(dailySeed(dailyKey), GEN.gunKurali(dailyKey), korAyar(dailyKey, KOR_GUNLUK)) : weekKey ? GEN.createHaftalik(tohum('kuyu-haftalik-' + weekKey), korAyar(weekKey, KOR_HAFTALIK)) : GEN.createEndless((Date.now() ^ (Math.random() * 1e9)) >>> 0, null, { kor: true }); }
   function reset() {
     // Günlük ve Haftalık Kuyu (v0.64): her koşu bir deneme hakkı harcar (Yeniden dene ve Baştan başla dahil). Hak yoksa
     // koşu başlamaz; hak penceresi açılır (video ile yenileme ya da Hikâye'ye devam). Meydan okuma hak harcamaz.
@@ -704,6 +708,13 @@
             window.KuyuScreens.hikaye('Alevlendin!', 'Akış sürerken TAM bırakışlar Çıra\'yı alevlendirir (2, 4 ve 7 TAM). Alevliyken her akış bırakışı seni daha yükseğe fırlatır; akış bitince alev söner.', 6000);
           }
         } else if (e.seviye === 0) tone(330, 0.25, 'sine', 0.04, 165); // alev söndü
+      }
+      else if (e.type === 'kor') { wantIntro('kor'); tone(240, 0.16, 'sawtooth', 0.025, 360); }
+      else if (e.type === 'korSondu') {
+        // kor söndü: tıslayan ses, duman, kısa titreşim; ip bırakıldı
+        tone(700, 0.35, 'sine', 0.03, 160); buzz(20);
+        burst(e.x, e.y, 8, 'rgba(150,140,130,0.8)', 70, 0.6, -60);
+        floatText(e.x, e.y - 22, 'kor söndü', '#c9a48a', 13);
       }
       else if (e.type === 'clink') { SFX.clink(); burst(e.x, e.y, 7, '#e9f3f0', 220, 0.25, 0); }
       else if (e.type === 'firefly') { SFX.firefly(); buzz([8, 40, 8]); burst(e.x, e.y, 16, COL.atesbocegi, 160, 0.6, -40); if (mode === 'endless') floatText(e.x, e.y - 10, '+25', COL.atesbocegi, 14); notAl(e); }
@@ -1160,6 +1171,31 @@
     }
   }
 
+  // Kor halka (v0.69): kızıl, titreyen ışıkla çizilir; tutununca çevresinde azalan süre yayı (1,5 sn), bitince söner (gri)
+  // ve soğuma süresince kanca tutmaz; sonra yeniden kızarır.
+  function drawKorHalka(r, t) {
+    var x = r.x, y = r.y, soguma = r.korSon != null ? (sim.t - r.korSon) / CFG.KOR_SOGUK : 9;
+    var fl = reduceMotion ? 1 : 0.85 + 0.1 * Math.sin(t / 90 + x) + 0.05 * Math.sin(t / 31 + y);
+    ctx.save();
+    if (soguma < 1) { // sönük: kül rengi, yavaşça yeniden kızarır
+      ctx.lineWidth = 3; ctx.strokeStyle = 'rgba(110,104,98,0.95)';
+      ctx.beginPath(); ctx.arc(x, y, CFG.RING_R - 1, 0, Math.PI * 2); ctx.stroke();
+      if (soguma > 0.6) { ctx.globalAlpha = (soguma - 0.6) / 0.4; ctx.strokeStyle = '#ff6a3a'; ctx.lineWidth = 2; ctx.beginPath(); ctx.arc(x, y, CFG.RING_R - 1, 0, Math.PI * 2); ctx.stroke(); }
+      ctx.restore(); return;
+    }
+    var rp = sim.rope, bende = rp && rp.ref === r && rp.korBas != null, k = bende ? Math.max(0, 1 - (sim.t - rp.korBas) / CFG.KOR_SN) : 1;
+    var sicak = bende ? 1 - k : 0, yan = bende && k < 0.3 && !reduceMotion ? (Math.sin(t / 45) > 0 ? 1 : 0.55) : 1;
+    parilti(x, y, 22 + 10 * sicak, '255,' + Math.round(110 - 40 * sicak) + ',50', (0.32 + 0.3 * sicak) * fl * yan);
+    ctx.lineWidth = 2.6; ctx.strokeStyle = 'rgba(255,' + Math.round(106 - 50 * sicak) + ',58,' + (0.95 * yan).toFixed(3) + ')';
+    ctx.beginPath(); ctx.arc(x, y, CFG.RING_R - 1, 0, Math.PI * 2); ctx.stroke();
+    ctx.strokeStyle = 'rgba(255,214,150,' + (0.7 * fl).toFixed(3) + ')'; ctx.lineWidth = 1;
+    ctx.beginPath(); ctx.arc(x, y, CFG.RING_R - 1, -2.4, -1.2); ctx.stroke();
+    if (bende) { // kalan süre: halkanın çevresinde azalan yay
+      ctx.lineWidth = 2.5; ctx.lineCap = 'round'; ctx.strokeStyle = k < 0.3 ? '#ff4a2a' : '#ffb347';
+      ctx.beginPath(); ctx.arc(x, y, CFG.RING_R + 5, -Math.PI / 2, -Math.PI / 2 + Math.PI * 2 * k); ctx.stroke();
+    }
+    ctx.restore();
+  }
   // Tutunma vurgusu (v0.67): tutunulan halka bir an parlar, hafifçe titrer ve dışa bir ışık halkası yayar.
   function drawVurgu(t) {
     if (!vurgu) return;
@@ -1665,7 +1701,7 @@
     var vh = viewH / K;
     for (var i = 0; i < sim.rects.length; i++) drawRect(sim.rects[i]);
     sim.buttons.forEach(drawButton);
-    sim.rings.forEach(function (r) { if (r.y > cam - 30 - (r.sw ? CFG.SARKAC_L : 0) && r.y < cam + vh + 30) { if (r.kapi) { drawGate(r, t); return; } if (r.gecit || r.cikis) { drawPortal(r, t); return; } if (r.sw) drawSwingChain(r); drawRing(r.x, r.y); if (r.yay != null) drawSpringRing(r, t); if (r.ff && !r.got) { drawFireflyRing(r, t); if (r === notHalka && notAktif) drawNot(r, t); } if (r.hiz) drawSpeedRing(r, t); if (r.firlat) drawFirlatRing(r, t); if (r.fener) drawFener(r, t); } });
+    sim.rings.forEach(function (r) { if (r.y > cam - 30 - (r.sw ? CFG.SARKAC_L : 0) && r.y < cam + vh + 30) { if (r.kapi) { drawGate(r, t); return; } if (r.gecit || r.cikis) { drawPortal(r, t); return; } if (r.sw) drawSwingChain(r); drawRing(r.x, r.y); if (r.kor) drawKorHalka(r, t); if (r.yay != null) drawSpringRing(r, t); if (r.ff && !r.got) { drawFireflyRing(r, t); if (r === notHalka && notAktif) drawNot(r, t); } if (r.hiz) drawSpeedRing(r, t); if (r.firlat) drawFirlatRing(r, t); if (r.fener) drawFener(r, t); } });
     sim.fireflies.forEach(function (f) { if (f.y > cam - 20 && f.y < cam + vh + 20) drawFirefly(f, t); });
     sim.boxes.forEach(drawBox);
     drawVurgu(t);
@@ -2287,6 +2323,8 @@
       i: '<svg viewBox="0 0 64 64"><circle cx="20" cy="40" r="11" fill="none" stroke="#2fb3a6" stroke-width="3.5" stroke-dasharray="5 4"/><path d="M44 30l10 10M54 30L44 40" stroke="#f2b23a" stroke-width="4" stroke-linecap="round" opacity=".7"/></svg>' },
     kurtarma: { t: 'Kurtarma kancası', m: 'Menzilde hiç hedef kalmadı. Ekrana dokun: kanca en yakın yukarı halkaya kadar uzanır.',
       i: '<svg viewBox="0 0 64 64"><circle cx="46" cy="12" r="8" fill="none" stroke="#d08a45" stroke-width="3.5"/><path d="M18 54L44 18" stroke="#bfe6ee" stroke-width="3" stroke-dasharray="4 5" stroke-linecap="round"/><circle cx="16" cy="56" r="6" fill="#f26a3a"/></svg>' },
+    kor: { t: 'Kor halka', m: 'Kızıl halka kordur: tutunabilirsin ama 1,5 saniye sonra söner ve seni bırakır. Çevresindeki yay kalan süreyi gösterir. Asılı bekleme, sıradakine atıl. Sönen kor bir an sonra yeniden kızarır.',
+      i: '<svg viewBox="0 0 64 64"><circle cx="32" cy="34" r="16" fill="#ff6a3a" opacity=".18"/><circle cx="32" cy="34" r="11" fill="none" stroke="#ff6a3a" stroke-width="4"/><path d="M32 15a19 19 0 0 1 18 13" fill="none" stroke="#ffb347" stroke-width="3" stroke-linecap="round"/><path d="M28 56c0-4 4-5 4-9 2 3 4 5 4 9" fill="#ffb347" opacity=".8"/></svg>' },
     kayma: { t: 'El yorulur', m: 'Sonsuz Kuyu\'da asılı kaldıkça çevrendeki yay azalır; bitince elin kayar. Akışta kal, beklemeden tırman.',
       i: '<svg viewBox="0 0 64 64"><circle cx="32" cy="34" r="10" fill="#f26a3a"/><circle cx="32" cy="34" r="18" fill="none" stroke="rgba(255,255,255,.15)" stroke-width="4"/><path d="M32 16a18 18 0 0 1 17 12" fill="none" stroke="#f26a3a" stroke-width="4" stroke-linecap="round"/></svg>' }
   };
@@ -2296,7 +2334,7 @@
   // Yeni öğe kartları (halka türleri, ahşap, kutu): el yapımı 1–6. bölümler dışında bir koşuda en çok bir tane;
   // kalanı sonraki bölümlerde gelir. 7. bölümde yay, sarkaç ve şerit birlikte ilk kez çıkıyordu (art arda 3 kart).
   // Acil kartlar (boş atış, kurtarma, su, akış, el yorulması) sınırsız.
-  var OGE_KARTLARI = ['ff', 'hiz', 'ahsap', 'kutu', 'kapi', 'yay', 'gecit', 'sarkac', 'firlat', 'zincir'], introOgeSayisi = 0;
+  var OGE_KARTLARI = ['ff', 'hiz', 'ahsap', 'kutu', 'kapi', 'yay', 'gecit', 'sarkac', 'firlat', 'zincir', 'kor'], introOgeSayisi = 0;
   function ogeSiniri() { return mode !== 'level' && introOgeSayisi >= 1; } // Hikâye bölümleri öğreticidir: kart sınırı yok
   function maybeIntro() {
     if (introOpen || pauseOpen || sim.t < 0.6) return;
@@ -2308,6 +2346,7 @@
     if (!save.seen.gecit && sim.rings.some(function (r) { return r.gecit && inView(r.y); })) wantIntro('gecit');
     if (!save.seen.sarkac && sim.rings.some(function (r) { return r.sw && inView(r.y); })) wantIntro('sarkac');
     if (!save.seen.firlat && sim.rings.some(function (r) { return r.firlat && inView(r.y); })) wantIntro('firlat');
+    if (!save.seen.kor && sim.rings.some(function (r) { return r.kor && inView(r.y); })) wantIntro('kor');
     if (sim.gucler) ['kalkan', 'fener', 'kanat'].forEach(function (tr) { if (!save.seen['guc_' + tr] && sim.gucler.some(function (g) { return g.tur === tr && !g.got && inView(g.y); })) wantIntro('guc_' + tr); });
     if (!save.seen.zincir && sim.fireflies.some(function (f) { return f.zincir != null && !f.got && inView(f.y); })) wantIntro('zincir');
     if (!save.seen.ahsap && sim.rects.some(function (r) { return r.type === 'w' && inView(r.y + r.h / 2); })) wantIntro('ahsap');
@@ -2466,7 +2505,7 @@
   window.KuyuDebug = { state: function () { return { sim: sim, cam: cam, K: K, mode: mode, level: levelNo }; },
     // test: oyun döngüsü çalışmazken (gizli sekme) sonuç kartını göster
     sonuc: function () { if (sim) { sim.status = mode === 'level' ? 'won' : 'dead'; if (mode === 'level') showLevelResult(); else showEndlessResult(); } },
-    // test: döngü durmuşken (gizli panel) motoru n adım ilerletip bir kare çizer
+    // test: döngü durmuşken (gizli panel) motoru n adım ilerletip bir kare çizer. t gerçek saatle (performance.now() ve sonrası) verilmeli: ileri bir t, gerçek döngüde eksi dt verir ve kamerayı bozar
     kare: function (n, t) { for (var i = 0; i < (n || 0) && sim.status === 'play'; i++) E.step(sim); lastT = t || lastT; handleEvents(); kameraIlerlet(1 / 60); render(t || lastT, 1 / 60); updateHud(); } };
 
   // Ekran yöneticisinin kullandığı arayüz
