@@ -8,9 +8,10 @@
 - Devir noktası: v0.55 (yayında). Bu dönemin başı: v0.51, etiket `geri-donus-v0.51`; v0.52–v0.55'in her biri ayrı commit, `git revert` ile tek tek geri alınabilir.
 - Devir Törehan'dayken Mustafa projede geliştirme yapmaz; devir `docs/DEVIR-MUSTAFA.md` §6'daki adımlarla yapılır.
 
-## Son durum (v0.69)
+## Son durum (v0.70)
 
-- **Yayında v0.69** (23/11/2026, Törehan): kor halka (İstişare 3 Aşama C, 1/3). 1,5 sn sonra söner ve bırakır; 7. bölüm öğretir; Günlük 24/11'den, Haftalık 30/11 haftasından. Telefonda denenecek: `docs/telefon-testi.md` §15.
+- **Yayında v0.70** (23/11/2026, Törehan): döner çark (İstişare 3 Aşama C, 2/3). Yükselen halka taşır, yükselirken bırakınca fırlatır; 16. bölüm öğretir; Günlük/Haftalık kor ile aynı tarihten. Telefonda denenecek: `docs/telefon-testi.md` §16.
+- v0.69 (23/11/2026): kor halka (Aşama C, 1/3). Telefonda denendi.
 - v0.68 (23/11/2026): İstişare 3 Aşama B, tatmin anları. Telefonda denendi.
 - v0.67 (23/11/2026): İstişare 3 Aşama A, his (vuruş hissi, ses ve müzik, titreşim desenleri, görsel ipuçları). Telefonda denendi.
 - v0.66 (23/11/2026): haftanın hedefi (Haftalık Kuyu puan hedefi, 1–3 yıldız).
@@ -40,7 +41,7 @@
 2. **Skor tablosunu açmak:** Supabase seçildi, şimdilik kapalı. Açma kararı ve hesap sonra (`docs/online-kurulum.md`).
 3. İstişare 2'nin kalanı: ✅ görsel akıcılık (v0.56) → **24 uzun bölüm: plan hazır (18/11), `docs/hikaye-bolumleri-plan.md`**. Tarifli üretim, fener kontrol noktası, ikinci yolculuk, bölgeye göre taşıma. Aşama 1 ✅ (v0.59): bölüm 1–3 oynanır (deneme kartları), fener ve fenerden devam, duvar ipuçları. Telefonda onaylandı (19/11). Aşama 2 ✅ (v0.60): bölüm 4–12. Aşama 3 ✅ (v0.61): bölüm 13–24. Aşama 4 ✅ (v0.62): geçiş. Aşama 5 ✅ (v0.63): denge (`tools/hikaye-denge.js`). **Plan tamam.** Sıradaki: telefon geri bildirimiyle ince ayar (süre, su, fener sıklığı, ikinci yolculuğun zorluğu); sonra açık sorular (Supabase, analitik, bekçinin adı, müzik).
 
-- **İstişare 3 (23/11): oynanış hissiyatı.** Plan `docs/istisare-3-his.md`: A his (vuruş, ses, titreşim, görsel ipuçları) → B tatmin anları (kova, fener, uzun akış, düşüş-dönüş) → C yeni mekanikler (kor halka, döner çark, akıntı sütunu). Kontrol değişmiyor. ✅ A (v0.67, telefonda denendi). ✅ B (v0.68, telefonda denendi). C: mevcut bölümlere bölme, sıra kor → çark → akıntı, sonra Günlük/Haftalık. ✅ Kor halka (v0.69). Sıradaki: telefonda kor denemesi, sonra döner çark.
+- **İstişare 3 (23/11): oynanış hissiyatı.** Plan `docs/istisare-3-his.md`: A his (vuruş, ses, titreşim, görsel ipuçları) → B tatmin anları (kova, fener, uzun akış, düşüş-dönüş) → C yeni mekanikler (kor halka, döner çark, akıntı sütunu). Kontrol değişmiyor. ✅ A (v0.67, telefonda denendi). ✅ B (v0.68, telefonda denendi). C: mevcut bölümlere bölme, sıra kor → çark → akıntı, sonra Günlük/Haftalık. ✅ Kor halka (v0.69). ✅ Döner çark (v0.70). Sıradaki: telefonda çark denemesi, sonra akıntı sütunu.
 
 ## Açık sorular (Törehan'a)
 

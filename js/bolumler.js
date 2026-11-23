@@ -15,6 +15,7 @@
      gecit, dal, zincir: geçit çifti, fırlatma yolu ve altın ateşböceği zinciri sayısı (v0.61)
      guc:     yolda bulunan güçlendirmeler, ör. ['kalkan'] (v0.61)
      kor:     kor halka sayısı (v0.69): tutununca 1,5 sn sonra söner ve bırakır
+     cark:    döner çark sayısı (v0.70): ana yoldaki halka üç halkalı dönen çarka döner
      yazilar: duvar ipuçları (bekçinin tebeşiri): [düğüm sırası | 'fener' | 'kova', metin]
    }
    Bölümde ayrıca: su (yükselme hızı, birim/sn), suFener (su kaç fener yanınca başlar; yoksa ilk tutunuşta), not (bekçinin notu, 1–12),
@@ -249,15 +250,19 @@
     },
     {
       no: 16, ad: 'Zincir', bolge: 2, akis: 16, takip: 22, not: 8,
-      ipucu: 'Altın ateşböcekleri sıralıdır: 1, 2, 3. Hepsini akış kopmadan topla; zincir tamamlanınca sayılır.',
+      ipucu: 'Altın ateşböcekleri sıralıdır: 1, 2, 3. Hepsini akış kopmadan topla. Döner çark: halka yükselirken tutun, yükselirken bırak; çark seni fırlatır.',
       bolmeler: [
         { tur: 'ogret', n: 13, dy: [180, 215], duzen: 'zikzak', zincir: 2, ff: 0, yazilar: [
           [0, 'Altın ateşböcekleri sıralı: 1, 2, 3.'],
           [4, 'Hepsini akış kopmadan topla; zincir tamamlanınca sayılır.'],
           ['fener', 'Zincir koptuysa bir sonrakini dene.']
         ] },
-        { tur: 'uygula', n: 14, dy: [180, 220], zincir: 1, ff: 2, yazilar: [] },
-        { tur: 'sina', n: 15, dy: [180, 225], zincir: 1, kapi: 1, ff: 2, yazilar: [] },
+        { tur: 'uygula', n: 14, dy: [175, 205], cark: 3, ff: 1, yazilar: [
+          [0, 'Döner çark: üç halkası döner. Yükselen halkaya tutun.'],
+          [5, 'Halka yükselirken bırak: çark seni fırlatır.'],
+          ['fener', 'Çark acele etmez; doğru anı bekle.']
+        ] },
+        { tur: 'sina', n: 15, dy: [180, 225], zincir: 1, kapi: 1, ff: 2, cark: 1, yazilar: [] },
         { tur: 'ustalik', n: 16, dy: [185, 230], zincir: 1, dal: 1, ff: 1, yazilar: [] }
       ]
     },
@@ -287,7 +292,7 @@
           [0, 'Kristaller ışığını hatırlıyor. Yol yukarıda.'],
           ['fener', 'Mağaranın kalbine yaklaştın.']
         ] },
-        { tur: 'sina', n: 14, dy: [180, 220], dal: 1, yay: 1, kapi: 1, ff: 1, yazilar: [] },
+        { tur: 'sina', n: 14, dy: [180, 220], dal: 1, yay: 1, kapi: 1, ff: 1, cark: 1, yazilar: [] },
         { tur: 'sina', n: 15, dy: [180, 225], zincir: 1, sarkac: 1, ff: 2, kor: 1, yazilar: [] },
         { tur: 'ustalik', n: 16, dy: [185, 232], gecit: 1, dal: 1, kapi: 2, ff: 1, yazilar: [
           ['kova', 'Mağaranın ağzı yukarıda.']
@@ -315,7 +320,7 @@
           [0, 'Yaylar ve geçitler: her fırlayışta sıradakine hazır ol.']
         ] },
         { tur: 'sina', n: 15, dy: [180, 220], yay: 2, gecit: 1, ff: 2, yazilar: [] },
-        { tur: 'sina', n: 16, dy: [180, 225], yay: 2, gecit: 1, ff: 2, yazilar: [] },
+        { tur: 'sina', n: 16, dy: [180, 225], yay: 2, gecit: 1, ff: 2, cark: 1, yazilar: [] },
         { tur: 'ustalik', n: 17, dy: [185, 230], yay: 2, gecit: 1, dal: 1, ff: 1, yazilar: [] }
       ]
     },
@@ -339,7 +344,7 @@
           [0, 'İki yol var: kısa ama zor, uzun ama güvenli.']
         ] },
         { tur: 'sina', n: 15, dy: [180, 222], dal: 1, gecit: 1, ff: 1, yazilar: [] },
-        { tur: 'sina', n: 16, dy: [180, 226], dal: 1, gecit: 1, ff: 1, yazilar: [] },
+        { tur: 'sina', n: 16, dy: [180, 226], dal: 1, gecit: 1, ff: 1, cark: 1, yazilar: [] },
         { tur: 'ustalik', n: 17, dy: [185, 230], dal: 1, gecit: 1, ff: 1, yazilar: [] }
       ]
     },
@@ -362,7 +367,7 @@
           [0, 'Son kuyu. Fener yukarıda.'],
           ['fener', 'Bekçi pencerede bekliyor.']
         ] },
-        { tur: 'sina', n: 15, dy: [180, 222], gecit: 1, dal: 1, ff: 1, yazilar: [] },
+        { tur: 'sina', n: 15, dy: [180, 222], gecit: 1, dal: 1, ff: 1, cark: 1, yazilar: [] },
         { tur: 'sina', n: 16, dy: [180, 226], zincir: 1, kapi: 2, guc: ['kalkan'], ff: 2, kor: 1, yazilar: [] },
         { tur: 'ustalik', n: 17, dy: [185, 232], yay: 1, sarkac: 1, gecit: 1, dal: 1, ff: 1, yazilar: [
           ['kova', 'Çıra, fenere hoş geldin.']

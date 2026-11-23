@@ -116,6 +116,12 @@ Yayına çıkmadan yerelde denemek için: bilgisayarda `python3 -m http.server 8
 - [ ] Söndüğünde düşmek adil hissettiriyor mu? Kül rengi halkanın tutulmadığı anlaşılıyor mu?
 - [ ] Yarın (24/11) Günlük Kuyu'da kor halkalar çıkıyor mu?
 
+## 16. Döner çark (v0.70, 5 dk)
+- [ ] 16. bölüm: tanıtım kartı ve duvar yazıları çarkı anlatıyor mu? Dönüş yönü oku görünüyor mu?
+- [ ] Yükselen halkaya tutunmak ve yukarı taşınmak hoş mu? Çark yavaş mı, hızlı mı?
+- [ ] Halka yükselirken bırakınca "ÇARK!" itişi: doğru anı (turkuaz parlama) yakalayabiliyor musun?
+- [ ] Çarkta asılıyken kanca hiç yanlışlıkla çarkın başka halkasına takılıyor mu?
+
 ## 5. Genel izlenim (serbest)
 - En sevdiğim an:
 - En çok zorlandığım yer:

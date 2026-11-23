@@ -17,14 +17,23 @@ const genMax = args.includes('--gen') ? +args[args.indexOf('--gen') + 1] : 80;
 const springApex = s => !s.rope && !s.hook && s.springs > 0 && s.p.y - s.p.py > -0.4;
 // Rota sabit koordinat tutar; sarkaç halkaysa kanca onun o anki yerine atılır.
 // Sarkaç menzil dışındaysa (uzak uçta) menzile girene kadar beklenir: gerçek oyuncu da bekler.
+// Döner çark (v0.70): rota çarkın merkezini tutar; kanca o an ulaşılan, tercihen yükselen ve yüksekteki halkaya atılır.
+function carkHalkasi(s, x, y) {
+  const hs = s.rings.filter(g => g.cark && g.cark.cx === x && g.cark.cy === y);
+  if (!hs.length) return null;
+  const ok = g => Math.hypot(g.x - s.p.x, g.y - s.p.y) < C.HOOK_MAX - 30 && E.reachable(s, { x: g.x, y: g.y, kind: 'ring', ref: g }, E.currentIgnore(s));
+  const puan = g => g.y + (Math.cos(g.cark.a0 + g.cark.w * s.t) * g.cark.w < 0 ? -40 : 0);
+  const iyi = hs.filter(ok).sort((a, b) => puan(a) - puan(b))[0];
+  return iyi || hs.slice().sort((a, b) => Math.hypot(a.x - s.p.x, a.y - s.p.y) - Math.hypot(b.x - s.p.x, b.y - s.p.y))[0];
+}
 function liveTarget(s, x, y) {
-  const r = s.rings.find(g => g.sw && g.sw.px === x && Math.abs(g.sw.py + C.SARKAC_L - y) < 1);
+  const r = s.rings.find(g => g.sw && g.sw.px === x && Math.abs(g.sw.py + C.SARKAC_L - y) < 1) || carkHalkasi(s, x, y);
   return r ? { x: r.x, y: r.y, ring: r } : { x, y };
 }
 // Hedef (sarkaç ya da sarkaçta sallanırken uzak kalan halka) menzile girene kadar bekle; ip bırakılmaz.
 function waitReach(s, x, y) {
   if (!s.rope || s.rope.kind !== 'anchor') return;
-  if (!(s.rope.ref && s.rope.ref.sw) && !liveTarget(s, x, y).ring) return; // yalnızca sarkaçla ilgili adımlar
+  if (!(s.rope.ref && (s.rope.ref.sw || s.rope.ref.cark)) && !liveTarget(s, x, y).ring) return; // yalnızca sarkaç ve çarkla ilgili adımlar
   for (let k = 0; k < 400 && s.status === 'play'; k++) {
     const t = liveTarget(s, x, y);
     const seen = !t.ring || E.reachable(s, { x: t.x, y: t.y, kind: 'ring', ref: t.ring }, E.currentIgnore(s));
@@ -92,7 +101,7 @@ function play(def, style, route) {
     if (s.status === 'won') { log.push(`${tag} -> KAZANDI t=${s.t.toFixed(2)}s`); break; }
     if (!s.rope && s.guc && s.guc.kanat > 0) continue; // kanat ipi aldı
     if (!s.rope) return { ok: false, s, log, why: `${tag}: tutunamadı (oyuncu ${s.p.x.toFixed(0)},${s.p.y.toFixed(0)}, mesafe ${Math.hypot(x - s.p.x, y - s.p.y).toFixed(0)})` };
-    const okSw = s.rope.ref && s.rope.ref.sw && s.rope.ref.sw.px === x && Math.abs(s.rope.ref.sw.py + C.SARKAC_L - y) < 1;
+    const okSw = s.rope.ref && ((s.rope.ref.sw && s.rope.ref.sw.px === x && Math.abs(s.rope.ref.sw.py + C.SARKAC_L - y) < 1) || (s.rope.ref.cark && s.rope.ref.cark.cx === x && s.rope.ref.cark.cy === y));
     if (s.rope.kind === 'anchor' && !okSw && Math.hypot(s.rope.x - x, s.rope.y - y) > 20) return { ok: false, s, log, why: `${tag}: yanlış yere tutundu (${s.rope.x.toFixed(0)},${s.rope.y.toFixed(0)})` };
     if (asFling) {
       runFor(s, 1.0, () => s.rope.len <= relLen);

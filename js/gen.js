@@ -538,13 +538,14 @@
   // Zorluk tırmanılan yüksekliğe göre artar; su hızı da. kural: Günlük Kuyu'nun günün kuralı (Sonsuz'da yok).
   // ayar.kor (v0.69): kor halka da çıkar (Günlük 24/11/2026'dan, Haftalık 30/11/2026 haftasından; eski tohumlar aynı kalır).
   // Kor halkalar rastgele sayı çekmez: yol, su ve diğer halkalar aynı kalır, yalnız bazı ana halkalar kor olur.
-  var KOR_ARA = 7;
+  // ayar.cark (v0.70): döner çark da çıkar (her 11 ana halkada en çok bir; aynı tarihlerden). Motor çarkı ilk adımda kurar.
+  var KOR_ARA = 7, CARK_ARA = 11, CARK_R = 50;
   function createEndless(seed, kural, ayar) {
-    var r = rng(seed >>> 0), korAcik = !!(ayar && ayar.kor);
+    var r = rng(seed >>> 0), korAcik = !!(ayar && ayar.kor), carkAcik = !!(ayar && ayar.cark);
     var ko = (kural && kural.o) || {};
     var yayGap = ko.yayGap || YAY_GAP, sarkacGap = ko.sarkacGap || SARKAC_GAP, gateGap = ko.gateGap || 2, portalGap = ko.portalGap || 12, ffP = ko.ffP != null ? ko.ffP : 0.4;
     var startY = 0;
-    var st = { hp: { x: 180, y: startY }, prevKind: null, nodes: [], frontier: startY, segs: [], anchors: [], prevHp: null, prevT: null, lastFF: -9, altPrev: true, lastGate: -9, lastYay: -9, prevRing: null, hist: [], lastPortal: -9, portalN: 0, lastSw: -9, lastDal: -99, lastKor: -9 };
+    var st = { hp: { x: 180, y: startY }, prevKind: null, nodes: [], frontier: startY, segs: [], anchors: [], prevHp: null, prevT: null, lastFF: -9, altPrev: true, lastGate: -9, lastYay: -9, prevRing: null, hist: [], lastPortal: -9, portalN: 0, lastSw: -9, lastDal: -99, lastKor: -9, lastCark: -99 };
     var def = {
       id: 'sonsuz', name: 'Sonsuz Kuyu', endless: true, seed: seed, kural: kural ? kural.id : null,
       hint: 'Su altında bekler, yalnız düşersen yakalar. Sağa ya da sola dokunarak tırman; ipi erken bırakıp zincirlersen ekstra puan.',
@@ -698,12 +699,16 @@
         var kPrev = st.nodes.length - 1;
         if (st.prevRing && !altNow && !portalHere && kPrev >= 2 && kPrev - st.lastYay >= yayGap) {
           st.prevRing.yay = yayAngle(st.prevRing, t); st.lastYay = kPrev;
-        } else if (st.prevRing && !altNow && !portalHere && kPrev >= 2 && kPrev - st.lastSw >= sarkacGap && st.lastKor !== kPrev - 1 && swingOk({ kind: 'ring', x: st.prevRing.x })) {
+        } else if (st.prevRing && !altNow && !portalHere && kPrev >= 2 && kPrev - st.lastSw >= sarkacGap && st.lastKor !== kPrev - 1 && st.lastCark !== kPrev - 1 && swingOk({ kind: 'ring', x: st.prevRing.x })) {
           // sarkaç halka (yay olmayan ana halka)
           st.prevRing.sarkac = true;   // motor ilk adımda salınımı kurar
           st.lastSw = kPrev;
         } else if (korAcik && st.prevRing && !altNow && !portalHere && kPrev >= 8 && kPrev - st.lastKor >= KOR_ARA && !st.prevRing.ff && !st.prevRing.hiz) {
           st.prevRing.kor = true; st.lastKor = kPrev; // kor halka: sonraki halka sarkaç olmaz (yukarıdaki koşul)
+        } else if (carkAcik && st.prevRing && !altNow && !st.altPrev && !portalHere && kPrev >= 10 && kPrev - st.lastCark >= CARK_ARA && st.lastSw !== kPrev - 1
+          && st.prevRing.x >= 70 && st.prevRing.x <= 290 && dist({ x: st.prevRing.x, y: st.prevRing.y - CARK_R + MIN }, t) <= REACH - 10
+          && !s.rings.some(function (rg) { return rg !== st.prevRing && Math.hypot(rg.x - st.prevRing.x, rg.y - st.prevRing.y) < CARK_R + 34; })) {
+          st.prevRing.carkKur = (st.prevRing.x + st.prevRing.y) % 2 ? 1 : -1; st.lastCark = kPrev; // döner çark: motor ilk adımda üç halkayı kurar
         }
         st.altPrev = altNow;
         st.prevHp = st.hp; st.prevT = t; st.prevRing = curRing;
@@ -902,7 +907,7 @@
         var halkalar = yakin.map(function (g) { return { x: g.x, y: g.y, sarkac: !!g.sarkac }; });
         var dl = dalBul(allPts, nodes, j, halkalar, hatlar);
         if (!dl || !dalMini(yakin.filter(function (g) { return !g.sarkac && !g.kapi; }), from, dl.b1, dl.b2)) return false;
-        dallar.push({ b1: { x: dl.b1.x, y: dl.b1.y }, b2: { x: dl.b2.x, y: dl.b2.y } }); altAt[j] = dl.b1; return true;
+        dallar.push({ b1: { x: dl.b1.x, y: dl.b1.y }, b2: { x: dl.b2.x, y: dl.b2.y }, j: j }); altAt[j] = dl.b1; return true;
       });
     });
     // ateşböceği zinciri (v0.61): üç ardışık kanca hattının ortasında altın ateşböcekleri; akış kopmadan toplanınca sayılır
@@ -930,6 +935,27 @@
           if (!bos(p, 50)) continue;
           gucler.push([p.x, p.y, tur]); break;
         }
+      });
+    });
+    // döner çark (v0.70): ana yoldaki bir halka, yerinde dönen üç halkalı çarka döner (merkez = düğüm). Halkalardan biri her an
+    // önceki asılma noktasından ulaşılır; sıradaki düğüm çarkın tepesinden menzilde olmalı (halka seni oraya taşır). Çevresi boş olmalı
+    // (çarkın süpürdüğü çember). Rastgele sayı çekmez ve en son eklenir: mevcut yerleşim değişmez.
+    var CR = 50, carklar = [];
+    bolmeler.forEach(function (bm) {
+      dagit(bm, bm.B.cark || 0, 3, function (j) {
+        if (!serbest(j) || nodes[j].kind !== 'ring' || !nodes[j + 1] || !nodes[j - 1] || portalAt[j] || portalAt[j - 1] || portalAt[j + 1]) return false;
+        if (nodes[j].x < 70 || nodes[j].x > 290) return false;
+        if (dist({ x: nodes[j].x, y: nodes[j].y - CR + MIN }, target(nodes[j + 1])) > REACH - 10) return false; // çarkın tepesinden ulaşılır (halka seni oraya taşır)
+        if (dallar.some(function (d) { return j >= d.j - 1 && j <= d.j + 5; })) return false;
+        return true;
+      }, function (j) {
+        var o = halkaNesne(nodes[j]); if (!o || o.yay != null || o.sarkac || o.kor) return false;
+        var once = nodes[j - 1].kind === 'ring' ? halkaNesne(nodes[j - 1]) : null, sonra = nodes[j + 1].kind === 'ring' ? halkaNesne(nodes[j + 1]) : null;
+        if ((once && (once.sarkac || once.cark)) || (sonra && (sonra.sarkac || sonra.yay != null || sonra.kor))) return false;
+        var c = { x: o.x, y: o.y };
+        if (tumHalkalar().some(function (g) { return g !== o && !(g.x === o.x && g.y === o.y) && Math.hypot(g.x - c.x, g.y - c.y) < CR + 34; })) return false;
+        if (zincirler.some(function (z) { return Math.hypot(z[0] - c.x, z[1] - c.y) < CR + 30; }) || gucler.some(function (z) { return Math.hypot(z[0] - c.x, z[1] - c.y) < CR + 30; })) return false;
+        o.cark = (o.x + o.y) % 2 ? 1 : -1; carklar.push(j); return true;
       });
     });
     // duvar ipuçları (bekçinin tebeşiri): düğümle sıradaki arasında, hedefin karşı yanında
@@ -971,7 +997,12 @@
       id: no, name: tarif.ad, hikaye: no, ikinci: !!tarif.ikinci, bolge: tarif.bolge, H: H, generated: true, fenerli: true, dusus: 520,
       hint: tarif.ipucu, start: [180, Math.round(off - 20)], goal: sh(goal), water: tarif.su || 0, suFener: tarif.suFener != null ? tarif.suFener : null, not: tarif.not || 0,
       rects: rects,
-      rings: out.rings.map(function (p) { var a = sh(p); if (fenerHalka[p.x + ',' + p.y]) a.push('fener'); else if (p.yay != null) a.push('yay', p.yay); else if (p.sarkac) a.push('sarkac'); else if (p.kor) a.push('kor'); return a; })
+      rings: out.rings.reduce(function (acc, p) {
+        var a = sh(p);
+        if (p.cark) { for (var ck = 0; ck < 3; ck++) acc.push([a[0], a[1], 'cark', ck, p.cark]); return acc; } // çark: üç halka, merkez düğüm
+        if (fenerHalka[p.x + ',' + p.y]) a.push('fener'); else if (p.yay != null) a.push('yay', p.yay); else if (p.sarkac) a.push('sarkac'); else if (p.kor) a.push('kor');
+        acc.push(a); return acc;
+      }, [])
         .concat(ffRings.map(function (a) { return [a.x, Math.round(a.y + off), 'ff']; }))
         .concat(hizRings.map(function (a) { return [a.x, Math.round(a.y + off), 'hiz']; }))
         .concat(gates.map(function (a) { return [a.x, Math.round(a.y + off), 'kapi']; }))
@@ -979,7 +1010,7 @@
         .concat(dallar.reduce(function (acc, d) { return acc.concat([[d.b1.x, Math.round(d.b1.y + off), 'firlat'], [d.b2.x, Math.round(d.b2.y + off), 'ff', 'dal']]); }, [])),
       fireflies: zincirler.map(function (z) { return [z[0], Math.round(z[1] + off), z[2], z[3]]; }),
       gucler: gucler.map(function (g) { return [g[0], Math.round(g[1] + off), g[2]]; }),
-      dalB2: dallar.length ? [dallar[0].b2.x, Math.round(dallar[0].b2.y + off)] : null, dalSay: dallar.length, zincirSay: zN,
+      dalB2: dallar.length ? [dallar[0].b2.x, Math.round(dallar[0].b2.y + off)] : null, dalSay: dallar.length, zincirSay: zN, carkSay: carklar.length,
       yazilar: yazilar.map(function (yz) { return { x: yz.x, y: Math.round(yz.y + off), m: yz.m }; }),
       fenerler: bolmeler.filter(function (bm) { return bm.fener >= 0; }).map(function (bm) { return sh(target(nodes[bm.fener])); }),
       route: route, ffRoute: ffRoute, hizRoute: hizRoute, dalRoute: null,

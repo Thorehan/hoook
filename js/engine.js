@@ -33,7 +33,11 @@
     COMBO_HANG: 0.45,   // bundan uzun asılı kalmak akışı bozar
     COMBO_AIR: 1.1,     // havada bundan uzun tutunmadan kalmak akışı bozar
     KOR_SN: 1.5,        // kor halka (v0.69): tutunduktan bu kadar sonra söner ve seni bırakır (yayı görüp davranan yavaş oyuncu geçer; hiç tepki vermeyen takılır)
-    KOR_SOGUK: 1.0,     // sönen kor halka bu kadar süre tutulamaz (kanca geçer, nişan saymaz), sonra yeniden kızarır
+    KOR_SOGUK: 1.0,
+    CARK_R: 50,         // döner çark (v0.70): halkaların merkeze uzaklığı (birim)
+    CARK_T: 4.5,        // bir tam tur (sn); yön çarkın yerinden (deterministik)
+    CARK_N: 3,          // çarktaki halka sayısı
+    CARK_ITIS: 300,     // halka yükselirken bırakınca ek yukarı itiş (en çok; halkanın yükselme payıyla orantılı)     // sönen kor halka bu kadar süre tutulamaz (kanca geçer, nişan saymaz), sonra yeniden kızarır
     UP_RISE: 60,        // nişan: bundan az yükselen hedef "yanda" sayılır (3 m)
     UP_ANGLE: 45,       // nişan: bundan düz açıdaki hedef "yanda" sayılır (derece)
     NEAR_V: 40,         // yatayda bu kadar yakın (tam tepedeki) hedef iki taraftan da alınır
@@ -89,6 +93,20 @@
     o.y = o.sw.py + CFG.SARKAC_L * Math.cos(th);
   }
 
+  // Döner çark (v0.70): (cx, cy) merkezli, CARK_R yarıçaplı çemberde dönen halkalar. Açı zamandan (deterministik).
+  function makeCark(o, cx, cy, k, yon) {
+    o.cark = { cx: cx, cy: cy, a0: k * 2 * Math.PI / CFG.CARK_N + ((cx * 3 + cy * 5) % 628) / 100, w: (yon < 0 ? -1 : 1) * 2 * Math.PI / CFG.CARK_T };
+    carkAt(o, 0);
+    return o;
+  }
+  function carkAt(o, t) {
+    var a = o.cark.a0 + o.cark.w * t;
+    o.x = o.cark.cx + CFG.CARK_R * Math.cos(a);
+    o.y = o.cark.cy + CFG.CARK_R * Math.sin(a);
+  }
+  // halkanın o anki dikey hızı (birim/sn; eksi = yükseliyor)
+  function carkVy(o, t) { return CFG.CARK_R * o.cark.w * Math.cos(o.cark.a0 + o.cark.w * t); }
+
   function rect(a) { return { x: a[0], y: a[1], w: a[2], h: a[3], type: a[4], dir: a[5] || 'u' }; }
 
   function createSim(def) {
@@ -111,6 +129,7 @@
         if (r[2] === 'sarkac') { o.sarkac = true; makeSwing(o); }
         if (r[2] === 'fener') o.fener = true; // Hikâye kontrol noktası (v0.57)
         if (r[2] === 'kor') o.kor = true; // kor halka (v0.69): 1,5 sn sonra söner ve bırakır
+        if (r[2] === 'cark') makeCark(o, r[0], r[1], r[3] || 0, r[4] || 1); // döner çark halkası (v0.70): [merkez x, merkez y, 'cark', sıra, yön]
         return o;
       }),
       goal: def.goal ? { x: def.goal[0], y: def.goal[1] } : null,
@@ -175,6 +194,8 @@
   // Atış anında Çıra'nın değdiği (içinden geçtiği) halkalar: kanca onlara takılmaz, nişan da onları engel saymaz.
   // Değdiğin halkaya tutunmanın anlamı yok; aday listesi de 18 birimden yakın hedefleri zaten almaz.
   // Sönmüş kor halka (v0.69): soğuma süresince yokmuş gibi (kanca içinden geçer, nişan aday saymaz)
+  // Aynı çarkın halkaları (v0.70): asılı olduğun ya da az önce bıraktığın çarkın diğer halkaları seninle döner; kanca onlara takılmaz
+  function kardes(a, b) { return !!(a && b && a !== b && a.cark && b.cark && a.cark.cx === b.cark.cx && a.cark.cy === b.cark.cy); }
   function soguk(s, rg) { return !!(rg.kor && rg.korSon != null && s.t - rg.korSon < CFG.KOR_SOGUK); }
   function yakinHalkalar(s) {
     var out = [], lim = CFG.R + CFG.RING_R + 5;
@@ -187,7 +208,7 @@
     function consider(tt, hit) { if (tt != null && (!best || tt < best.t)) { hit.t = tt; best = hit; } }
     for (i = 0; i < s.rings.length; i++) {
       var rg = s.rings[i];
-      if (rg === ignore || rg.kapi || soguk(s, rg) || rg.y < minY || rg.y > maxY || (yakin && yakin.indexOf(rg) >= 0)) continue;
+      if (rg === ignore || kardes(rg, ignore) || rg.kapi || soguk(s, rg) || rg.y < minY || rg.y > maxY || (yakin && yakin.indexOf(rg) >= 0)) continue;
       consider(segCircle(x0, y0, x1, y1, rg.x, rg.y, CFG.RING_R + (rg.sw ? 12 : 2)), { kind: 'ring', ring: rg });
     }
     if (s.goal) consider(segCircle(x0, y0, x1, y1, s.goal.x, s.goal.y, 16), { kind: 'goal' });
@@ -276,6 +297,11 @@
       }
       // Alevliyken erken bırakış (fırlama) ek yukarı itiş verir; asılı kalıp bırakan almaz
       if (s.chain && s.alev > 0) itis += CFG.ALEV_ITIS[s.alev - 1];
+      // Döner çark (v0.70): halka yükselirken bırakırsan çarkın hızı seni fırlatır (doğru an: halka en hızlı yükselirken)
+      if (rp.ref && rp.ref.cark && (why === 'release' || why === 'repress')) {
+        var cpay = -carkVy(rp.ref, s.t) / (CFG.CARK_R * Math.abs(rp.ref.cark.w));
+        if (cpay > 0.15) { var ci = Math.round(CFG.CARK_ITIS * cpay); itis += ci; s.carkItis = (s.carkItis || 0) + 1; s.events.push({ type: 'carkItis', x: s.p.x, y: s.p.y, guc: ci }); }
+      }
       if (itis > 0) {
         s.p.py += itis * CFG.DT; s.itisler++;
         s.events.push({ type: 'itis', x: s.p.x, y: s.p.y, guc: itis, alev: s.alev, tam: tamOldu });
@@ -330,7 +356,8 @@
   function candidates(s, range) {
     var p = s.p, R = (range || CFG.HOOK_MAX) - 4, out = [], i;
     function add(x, y, kind, ref) { var d = dist(p.x, p.y, x, y); if (d <= R && d > 18) out.push({ x: x, y: y, kind: kind, ref: ref, d: d }); }
-    for (i = 0; i < s.rings.length; i++) { var rg = s.rings[i]; if (!rg.kapi && !soguk(s, rg) && Math.abs(rg.y - p.y) <= R) add(rg.x, rg.y, 'ring', rg); }
+    var tutulan = s.rope && s.rope.kind === 'anchor' ? s.rope.ref : null;
+    for (i = 0; i < s.rings.length; i++) { var rg = s.rings[i]; if (!rg.kapi && !soguk(s, rg) && !kardes(rg, tutulan) && Math.abs(rg.y - p.y) <= R) add(rg.x, rg.y, 'ring', rg); }
     if (s.goal) add(s.goal.x, s.goal.y, 'goal', 'goal');
     for (i = 0; i < s.boxes.length; i++) add(s.boxes[i].x, s.boxes[i].y, 'box', s.boxes[i]);
     for (i = 0; i < s.rects.length; i++) {
@@ -548,10 +575,16 @@
     // sarkaç halkalar sallanır; tutunduğun sarkacın ipi de onunla gider
     for (i = 0; i < s.rings.length; i++) {
       var sg = s.rings[i];
+      if (sg.carkKur && !sg.cark) { // Sonsuz/Günlük üreticisi çarkı işaretler (v0.70): halka merkez olur, üç halka kurulur
+        var ccx = sg.x, ccy = sg.y;
+        makeCark(sg, ccx, ccy, 0, sg.carkKur);
+        for (var ck = 1; ck < CFG.CARK_N; ck++) s.rings.push(makeCark({ x: ccx, y: ccy, ff: false, hiz: false, kapi: false, firlat: false }, ccx, ccy, ck, sg.carkKur));
+      }
       if (sg.sarkac && !sg.sw) makeSwing(sg);
       if (sg.sw) swingAt(sg, s.t);
+      else if (sg.cark) carkAt(sg, s.t);
     }
-    if (s.rope && s.rope.kind === 'anchor' && s.rope.ref && s.rope.ref.sw) { s.rope.x = s.rope.ref.x; s.rope.y = s.rope.ref.y; }
+    if (s.rope && s.rope.kind === 'anchor' && s.rope.ref && (s.rope.ref.sw || s.rope.ref.cark)) { s.rope.x = s.rope.ref.x; s.rope.y = s.rope.ref.y; }
 
     if (s.tampon) tamponAt(s);
     // kanca uçuşu
@@ -563,7 +596,7 @@
       var hit = null;
       for (i = 0; i < s.rings.length && !hit; i++) {
         var sgr = s.rings[i];
-        if (sgr.sw && sgr !== hk.ignore && dist(hk.x, hk.y, sgr.x, sgr.y) < CFG.RING_R + 12) hit = { kind: 'ring', ring: sgr, x: hk.x, y: hk.y };
+        if ((sgr.sw || sgr.cark) && sgr !== hk.ignore && !kardes(sgr, hk.ignore) && dist(hk.x, hk.y, sgr.x, sgr.y) < CFG.RING_R + (sgr.sw ? 12 : 8)) hit = { kind: 'ring', ring: sgr, x: hk.x, y: hk.y };
       }
       if (!hit) hit = hookRay(s, hk.x, hk.y, nx, ny, hk.ignore, hk.yakin);
       if (hit) {
@@ -577,6 +610,7 @@
           s.hook = null;
           onAttach(s, ax, ay, hit.kind);
           if (hit.ring && hit.ring.sw) s.swings++;
+          if (hit.ring && hit.ring.cark) s.carkSay = (s.carkSay || 0) + 1;
           if (hit.ring && hit.ring.ff) collectRing(s, hit.ring);
           if (hit.ring && hit.ring.fener) fenerYak(s, hit.ring);
           if (hit.kind === 'goal') { s.status = 'won'; s.events.push({ type: 'won' }); return; }
@@ -766,7 +800,7 @@
       s.tutTop = tutY; s.ilerlemeT = s.t;
       // devam hakkında buradan sürer (yay ve geçit halkası değil: tutununca fırlatır/taşır)
       var gr = s.rope.ref;
-      if (!(gr && (gr.yay != null || gr.gecit || gr.cikis))) s.sonGuvenli = { x: s.rope.x, y: s.rope.y, ref: s.rope.ref, hedef: s.rope.target };
+      if (!(gr && (gr.yay != null || gr.gecit || gr.cikis || gr.cark))) s.sonGuvenli = { x: s.rope.x, y: s.rope.y, ref: s.rope.ref, hedef: s.rope.target };
     }
     if (s.ilerlemeT == null) s.ilerlemeT = s.t;
     var mesafe = (T.bas + (T.son - T.bas) * k) * 20;
