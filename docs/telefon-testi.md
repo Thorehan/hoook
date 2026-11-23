@@ -134,6 +134,13 @@ Yayına çıkmadan yerelde denemek için: bilgisayarda `python3 -m http.server 8
 - [ ] Günlük sekmesi bugünün tablosunu gösteriyor mu? İnternet kapalıyken "ulaşılamadı" yazıyor, Yenile çalışıyor mu?
 - [ ] Liste 375 px'te okunaklı mı, uzun adlar taşıyor mu?
 
+## 19. Yeni arayüz, Aşama 1 (v0.75, 5 dk)
+- [ ] Ana ekran: üst çubuk, yan kartlar, Çıra, bölüm çipi ve OYNA tek bakışta anlaşılıyor mu? Başparmakla OYNA'ya rahat uzanılıyor mu?
+- [ ] Alt sekmeler (Market, Koleksiyon, OYNA, Yarışma, Profil) doğru yeri açıyor mu? Seçili sekme belli mi?
+- [ ] Yan kartlar: Günlük/Haftalık oyunu başlatıyor, Görevler ve Sıralama açılıyor mu? Kırmızı rozetler doğru zamanda mı?
+- [ ] Bölüm çipine dokununca Hikâye haritası, çarka dokununca Ayarlar açılıyor mu?
+- [ ] Yeni düğme stili (bombeli, basınca iniyor) hoş mu? Küçük ekranda (iPhone SE) bir şey sıkışıyor mu?
+
 ## 5. Genel izlenim (serbest)
 - En sevdiğim an:
 - En çok zorlandığım yer:

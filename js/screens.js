@@ -5,7 +5,7 @@
   var G = window.KuyuGame;
   var $ = function (id) { return document.getElementById(id); };
   var reduceMotion = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-  var EKRANLAR = ['ekAcilis', 'ekGiris', 'ekTanitim', 'ekAna', 'ekBolumler', 'ekAyarlar', 'ekProfil', 'ekGorevler', 'ekDolap', 'ekIstat'];
+  var EKRANLAR = ['ekAcilis', 'ekGiris', 'ekTanitim', 'ekAna', 'ekBolumler', 'ekAyarlar', 'ekProfil', 'ekGorevler', 'ekDolap', 'ekIstat', 'ekYarisma'];
   var current = 'ekAcilis';
   var q = new URLSearchParams(location.search);
   var ONL = window.KuyuOnline;
@@ -14,7 +14,7 @@
   var deepLink = meydanLink ? { mode: 'meydan', m: meydanLink } : q.get('mod') === 'gunluk' ? { mode: 'daily' } : q.get('mod') === 'haftalik' ? { mode: 'weekly' } : q.get('mod') === 'sonsuz' ? { mode: 'endless' } : q.get('bolum') ? { mode: 'level', n: parseInt(q.get('bolum'), 10) || 1 } : q.get('hikaye') ? { mode: 'hikaye', n: parseInt(q.get('hikaye'), 10) || 1 } : null;
   var save = function () { return G.save(); };
 
-  var SEKMELER = ['ekAna', 'ekBolumler', 'ekGorevler', 'ekDolap', 'ekProfil', 'ekAyarlar', 'ekIstat'];
+  var SEKMELER = ['ekAna', 'ekBolumler', 'ekGorevler', 'ekDolap', 'ekProfil', 'ekAyarlar', 'ekIstat', 'ekYarisma'];
   function show(id) {
     current = id;
     EKRANLAR.forEach(function (e) { $(e).hidden = e !== id; });
@@ -22,7 +22,7 @@
     // alt gezinme çubuğu yalnızca menü sekmelerinde
     $('altMenu').hidden = SEKMELER.indexOf(id) < 0;
     document.querySelectorAll('#altMenu [data-sekme]').forEach(function (b) {
-      if (b.dataset.sekme === id) b.setAttribute('aria-current', 'page'); else b.removeAttribute('aria-current');
+      if (b.dataset.sekme === id && (!b.dataset.mod || b.dataset.mod === dolapMod)) b.setAttribute('aria-current', 'page'); else b.removeAttribute('aria-current');
     });
     if (id === 'ekAna' || id === 'ekTanitim') startScene(); else stopScene();
     if (id === 'ekDolap') startPreview(); else stopPreview();
@@ -133,7 +133,8 @@
     });
     return { medals: n, done: done };
   }
-  function home() {
+  // yalnizDoldur === true: yalnız kartları ve sayıları tazele, ekran değişmez (Yarışma sekmesi kullanır)
+  function home(yalnizDoldur) {
     var s = save();
     $('tabloAcBtn').hidden = !G.onlineAcik(); // skor tablosu (v0.73): yalnız sunucu açıkken
     $('selamAd').textContent = (s.profile && s.profile.name) || 'Tırmanıcı';
@@ -141,7 +142,7 @@
     var cur = G.siradaki(), bitti = G.hikayeBitti(), curDef = G.levelDef(cur), cb = (s.best || {})[cur] || {};
     var ga = 1 + Math.floor((cur - 1) / 6) * 6, gGec = 0;
     for (var gn = ga; gn < ga + 6; gn++) if (s.best[gn] && s.best[gn].done) gGec++;
-    $('dokunBaslik').textContent = bitti ? 'Hikâye tamam' : 'Başlamak için dokun';
+    $('dokunBaslik').textContent = bitti ? 'BÖLÜMLER' : 'OYNA';
     $('dokunAlt').textContent = bitti ? 'Bir bölümü yeniden oyna, hedefleri tamamla' : cur + '. bölüm · ' + curDef.name;
     $('dokunBolge').textContent = bitti ? '48 bölüm geçildi' : G.bolgeAdi(cur) + ' · ' + gGec + '/6';
     $('dokunBtn').setAttribute('aria-label', bitti ? 'Hikâye tamam: bölümleri aç' : 'Başla: ' + cur + '. bölüm, ' + curDef.name + ', ' + G.bolgeAdi(cur));
@@ -173,11 +174,19 @@
     $('haftalikHak').textContent = hakYazi(hf.hak, 'Pazartesi');
     $('haftalikYildiz').innerHTML = [0, 1, 2].map(function (i) { return '<i class="' + (i < hf.yildiz ? 'var' : '') + '">★</i>'; }).join('');
     $('haftalikBtn').setAttribute('aria-label', 'Haftalık Kuyu: hedef ' + hf.hedef.puan + ' puan, ' + hf.yildiz + ' yıldız, ' + (hf.ligAd ? hf.ligAd + ' ligi' : 'lig yok') + ', ' + hakYazi(hf.hak, 'pazartesi'));
+    // ana ekranın yan kartları (v0.75): kısa durum; ayrıntı Yarışma sekmesinde
+    var yildizKisa = function (n) { return '★★★'.slice(0, n) + '☆☆☆'.slice(0, 3 - n); };
+    $('yanGunlukAlt').textContent = yildizKisa(di.yildiz) + ' · ' + (di.hak.kalan > 0 ? di.hak.kalan + '/' + di.hak.toplam : 'bitti');
+    $('yanGunlukNokta').hidden = !(di.hak.kalan > 0 && !di.playedToday);
+    $('yanGunluk').setAttribute('aria-label', $('gunlukBtn').getAttribute('aria-label'));
+    $('yanHaftalikAlt').textContent = (hf.ligAd ? hf.ligAd + ' · ' : '') + (hf.hak.kalan > 0 ? hf.hak.kalan + '/' + hf.hak.toplam : 'bitti');
+    $('yanHaftalik').setAttribute('aria-label', $('haftalikBtn').getAttribute('aria-label'));
     isikGuncelle();
     var ik = G.isik ? G.isik() : null;
     if (ik && ik.seviye > ik.gorulen) { G.isikGordu(ik.seviye); setTimeout(function () { toast('Kuyu biraz daha aydınlandı · Işık ' + ik.seviye + '/' + ik.en + (ik.odul ? ' · Dolap\'ta yeni: ' + ik.odul.ad + ' ' + window.KuyuEkonomi.TURLER[ik.odul.tur].toLocaleLowerCase('tr-TR') : ''), ik.odul ? 3600 : 2400); }, 700); }
     $('gunlukSeri').hidden = !di.streak;
     $('gunlukSeri').textContent = di.streak + ' gün seri' + (di.playedToday ? '' : di.donmada ? ' · donmada, bugün oyna' : ' · bugün oyna, seri sürsün');
+    if (yalnizDoldur === true) return;
     show('ekAna');
     // günlük giriş: bugün alınmadıysa ana menüye ilk gelişte bir kez göster
     var gd = G.giris();
@@ -202,13 +211,27 @@
       var en = list.filter(function (m) { return !m.done; }).sort(function (a, b) { return b.prog / b.target - a.prog / a.target; })[0];
       alt = window.KuyuGorev.missionText(en) + ' · ' + en.prog + '/' + en.target;
     }
-    $('anaGorevBaslik').textContent = 'Görevler ' + bitti + '/' + list.length;
-    $('anaGorevAlt').textContent = alt;
+    $('anaGorevBaslik').textContent = 'Görevler';
+    $('anaGorevAlt').textContent = bekleyen ? 'Ödül hazır' : bitti + '/' + list.length;
+    $('anaGorevNokta').hidden = !bekleyen;
     $('anaGorevCubuk').innerHTML = cubuk;
     $('anaGorevBtn').classList.toggle('hazir', bekleyen > 0);
     $('anaGorevBtn').setAttribute('aria-label', 'Bugünün görevleri: ' + bitti + ' / ' + list.length + ' tamam. ' + alt);
   }
   $('anaGorevBtn').addEventListener('click', function () { openTasks(); });
+  // v0.75: ana ekranın yan kartları ve üst çubuğu
+  $('yanGunluk').addEventListener('click', function () { G.startDaily(); });
+  $('yanHaftalik').addEventListener('click', function () { G.startWeekly(); });
+  $('paraBtn').addEventListener('click', function () { openDolap('market'); });
+  $('ayarBtn').addEventListener('click', function () { openSettings(); });
+  $('bolumHap').addEventListener('click', function () { openLevels(); });
+  // Yarışma sekmesi: Günlük ve Haftalık kartları home() ile doldurulur (aynı veriler), sonra sekme açılır
+  function openYarisma() {
+    home(true); // kartları tazele
+    $('yarTabloBtn').hidden = !G.onlineAcik();
+    show('ekYarisma'); $('ekYarisma').scrollTop = 0;
+  }
+  $('yarTabloBtn').addEventListener('click', function () { openTablo('haftalik'); });
   // dokun ve başla: ilk bölüm geçilene dek öğretici (İlk Halka), sonra Sonsuz Kuyu
   function hakYazi(h, zaman) { return h.kalan > 0 ? h.kalan + '/' + h.toplam + ' deneme' : h.son ? zaman + ' yeni denemeler' : 'Deneme bitti · ▶ +1'; }
   $('dokunBtn').addEventListener('click', function () { if (G.hikayeBitti()) openLevels(); else G.startLevel(G.siradaki()); });
@@ -356,8 +379,8 @@
   document.querySelectorAll('#altMenu [data-sekme]').forEach(function (b) {
     b.addEventListener('click', function () {
       var t = b.dataset.sekme;
-      if (t === current) return;
-      if (t === 'ekAna') home(); else if (t === 'ekBolumler') openLevels(); else if (t === 'ekGorevler') openTasks(); else if (t === 'ekDolap') openDolap(); else if (t === 'ekProfil') openProfile(); else openSettings();
+      if (t === current && (t !== 'ekDolap' || b.dataset.mod === dolapMod)) return;
+      if (t === 'ekAna') home(); else if (t === 'ekBolumler') openLevels(); else if (t === 'ekGorevler') openTasks(); else if (t === 'ekDolap') openDolap(b.dataset.mod); else if (t === 'ekProfil') openProfile(); else if (t === 'ekYarisma') openYarisma(); else openSettings();
     });
   });
 
@@ -453,7 +476,9 @@
   // Sahip olunmayan ürüne ilk dokunuş ÖNİZLEMEdir: kahraman o renge bürünür, altta "Al · fiyat" çubuğu açılır.
   // Satın alma yalnızca o çubuktaki "Al" ile olur. Sahip olunan ürüne dokunmak doğrudan kuşanır.
   var dolapTur = 'govde', previewRaf = 0, onizleme = null, onizlemeGorunum = null;
-  function openDolap() { onizleme = null; renderDolap(); show('ekDolap'); $('ekDolap').scrollTop = 0; }
+  // v0.75: Dolap iki kipte açılır: Market (sende olmayanlar, fiyat ve kilit) · Koleksiyon (sende olanlar, kuşan). Aşama 2–3'te ayrı ekranlar olur.
+  var dolapMod = 'market';
+  function openDolap(mod) { dolapMod = mod === 'koleksiyon' ? 'koleksiyon' : 'market'; onizleme = null; renderDolap(); show('ekDolap'); $('ekDolap').scrollTop = 0; }
   function swatch(it) {
     if (it.tur === 'kanca') {
       var cv = document.createElement('canvas'), d = 2; cv.width = cv.height = 34 * d;
@@ -473,7 +498,10 @@
     var KAT = window.KuyuEkonomi.KATALOG, ozel = KAT.filter(function (it) { return it.fiyat !== 0; });
     $('dolapKoleksiyon').textContent = 'Koleksiyon ' + ozel.filter(function (it) { return sahip.indexOf(it.id) >= 0; }).length + '/' + ozel.length;
     document.querySelectorAll('[data-dolap]').forEach(function (b) { b.setAttribute('aria-selected', b.dataset.dolap === dolapTur ? 'true' : 'false'); });
-    $('dolapListe').innerHTML = window.KuyuEkonomi.KATALOG.filter(function (it) { return it.tur === dolapTur; }).map(function (it) {
+    $('dolapBaslik').textContent = dolapMod === 'koleksiyon' ? 'Koleksiyon' : 'Market';
+    var liste = window.KuyuEkonomi.KATALOG.filter(function (it) { var has = sahip.indexOf(it.id) >= 0 || it.fiyat === 0; return it.tur === dolapTur && (dolapMod === 'koleksiyon' ? has : !has); });
+    if (!liste.length) { $('dolapListe').innerHTML = '<p class="not bos-not">' + (dolapMod === 'koleksiyon' ? 'Bu bölümde henüz bir şeyin yok. Market\'e göz at.' : 'Bu bölümdeki her şey sende. Koleksiyon\'dan kuşanabilirsin.') + '</p>'; renderSatinCubuk(bak); return; }
+    $('dolapListe').innerHTML = liste.map(function (it) {
       var has = sahip.indexOf(it.id) >= 0, on = kus[it.tur] === it.id, bak2 = onizleme === it.id, durum;
       if (bak2) durum = '<span class="d-durum onizleme">Önizleme</span>';
       else if (on) durum = '<span class="d-durum kusanili">Kuşanıldı</span>';
@@ -737,7 +765,7 @@
   $('ipucuSifirBtn').addEventListener('click', function () { G.resetIntros(); toast('Tanıtım kartları yeni şeyleri ilk gördüğünde yeniden çıkacak.'); });
 
   document.addEventListener('keydown', function (e) {
-    if (e.key === 'Escape' && (current === 'ekBolumler' || current === 'ekAyarlar' || current === 'ekProfil')) home();
+    if (e.key === 'Escape' && (current === 'ekBolumler' || current === 'ekAyarlar' || current === 'ekProfil' || current === 'ekYarisma')) home();
     if ((e.key === 'Enter' || e.key === ' ') && current === 'ekTanitim') $('ekTanitim').click();
   });
 
@@ -842,15 +870,15 @@
     if (current === 'ekAna') {
       // kahraman logo ile "Başlamak için dokun" yazısı arasındaki boşlukta sallansın, üstlerine binmesin
       var cvTop = sceneCanvas.getBoundingClientRect().top;
-      var lb = document.querySelector('#ekAna .ana-logo').getBoundingClientRect().bottom - cvTop;
-      var at = document.querySelector('#ekAna .dokun-yazi').getBoundingClientRect().top - cvTop; // "dokun" yazısının üstünde kalsın
+      var lb = document.querySelector('#ekAna .ana-ust').getBoundingClientRect().bottom - cvTop + 40 * u;
+      var at = document.querySelector('#ekAna .oyna-alan').getBoundingClientRect().top - cvTop; // bölüm ve OYNA'nın üstünde kalsın
       ringY = Math.max(lb + 16 * u, Math.min(ringY, at - 46 * u - 13 * u - 12));
     }
     ring(ctx, cx, ringY, 11 * u);
     ring(ctx, cx - 110 * u, ringY + 150 * u, 9 * u);
     ring(ctx, cx + 105 * u, ringY - 140 * u, 9 * u);
 
-    var r = 13 * u, rope = 46 * u;
+    var r = (current === 'ekAna' ? 19 : 13) * u, rope = (current === 'ekAna' ? 60 : 46) * u; // ana ekranda Çıra büyük (v0.75)
     if (current === 'ekTanitim') {
       // Önsöz (docs/hikaye.md): kuyunun ağzında fener → bir kıvılcım kopup düşer → dipte Çıra gözünü açar.
       var k0 = reduceMotion ? 99 : (now - sceneT0) / 1000, k = k0 - ONSOZ;
