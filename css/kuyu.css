@@ -215,3 +215,8 @@ button.anahtar-dugme[aria-checked="false"] { color: var(--soluk); }
 /* v0.67: alev göstergesi (akış çipinde, bir sonraki alev basamağına kalan TAM) */
 .cip .alev-pip { display: inline-flex; gap: 2px; margin-left: 2px; }
 .cip .alev-pip i { width: 5px; height: 5px; border-radius: 50%; background: #3a3f2a; display: block; }
+/* v0.68: bölüm sonunda kazanılan madalyalar tek tek yanar */
+.kart.sonuc .madalya.var { animation: madalyaYan .5s ease-out both; animation-delay: calc(.35s + var(--i) * .28s); }
+.kart.sonuc .madalya.var.yeni { animation: madalyaYan .5s ease-out both, madalyaZipla .5s cubic-bezier(.3, 1.6, .5, 1) both; animation-delay: calc(.35s + var(--i) * .28s), calc(.35s + var(--i) * .28s); }
+@keyframes madalyaYan { 0% { filter: brightness(.45) saturate(0); } 55% { filter: brightness(1.7) saturate(1.2); box-shadow: 0 0 18px rgba(255,211,106,.55); } 100% { filter: none; } }
+@media (prefers-reduced-motion: reduce) { .kart.sonuc .madalya.var, .kart.sonuc .madalya.var.yeni { animation: none; } }

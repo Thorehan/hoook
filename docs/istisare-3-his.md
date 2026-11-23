@@ -11,7 +11,7 @@
 | Yeni mekanik | Üçü de: kor halka, döner çark, akıntı sütunu (Hikâye'de kendi öğretici bölmesiyle) |
 | Tatmin anları | Dördü de: kovaya varış, fener yanması, uzun akış, düşüş ve dönüş |
 
-## Aşama A · His (fiziğe dokunmaz) ✅ v0.67 (23/11; telefonda deneme bekliyor, `docs/telefon-testi.md` §13)
+## Aşama A · His (fiziğe dokunmaz) ✅ v0.67 (23/11; telefonda denendi)
 
 **Vuruş hissi**
 - Tutunma anında halka parlar ve hafifçe titrer; Çıra ezilip esner (squash & stretch).
@@ -30,7 +30,7 @@
 - Sıradaki hedefin ötesindeki halka soluk önizlenir.
 - Akış ve alev için ekranda küçük bir gösterge.
 
-## Aşama B · Tatmin anları
+## Aşama B · Tatmin anları ✅ v0.68 (23/11; telefonda deneme bekliyor, `docs/telefon-testi.md` §14)
 - **Kovaya varış:** gün ışığı patlaması, ateşböcekleri kovaya akar, madalyalar tek tek yanar.
 - **Fener yanması:** ışık dalgası duvar boyunca yayılır, kısa bir tını.
 - **Uzun akış:** x10, x20, x30'da ekran kenarı ısınır, alev büyür, kısa unvan yazısı ("Alevlendin!", "Kor!").

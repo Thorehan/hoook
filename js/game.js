@@ -144,6 +144,10 @@
     return 1;
   }
   function hisSifirla() { durak = 0; yavas = 0; nefes = 0; vurgu = null; ezil = null; }
+  // Tatmin anları (v0.68, İstişare 3 Aşama B): kovaya varış, fener yanması, uzun akış, düşüş ve dönüş. Yalnız görüntü ve ses.
+  var anlar = null, kenarIsi = 0, UNVAN = ['Isındın!', 'Yanıyorsun!', 'KOR!'];
+  function anlarSifirla() { anlar = { kova: null, akanlar: [], dalga: [], unvan: null, sonme: null, yanma: null }; kenarIsi = 0; }
+  anlarSifirla();
   function setMuteIcon() {
     if (!$('sesBtn')) return; // ses düğmesi artık duraklatma panelinde
     $('sesBtn').innerHTML = save.mute
@@ -420,7 +424,7 @@
     }
     istatBitir('terk'); // Baştan başla / Yeni koşu
     if (mode === 'endless') def = newEndlessDef();
-    sim = E.createSim(def); hisSifirla();
+    sim = E.createSim(def); hisSifirla(); anlarSifirla();
     notKur();
     hayaletKur();
     sonsuzBolge = 0;
@@ -623,8 +627,18 @@
         floatText(e.x, e.y - 28, GG.ad.toUpperCase() + '!', 'rgb(' + GG.renk + ')', 17);
       }
       else if (e.type === 'gucBitti') tone(440, 0.15, 'sine', 0.04, 330);
-      else if (e.type === 'fener') { tone(659, 0.18, 'triangle', 0.06, 988); tone(988, 0.32, 'sine', 0.04); burst(e.x, e.y - 26, 20, '#ffd36a', 160, 0.7, -50); floatText(e.x, e.y - 46, 'fener yandı', '#ffd36a', 15); buzz([15, 30, 15]); }
-      else if (e.type === 'fenerDon') { floatText(e.x, e.y - 40, 'fenerden devam', '#ffd36a', 14); }
+      else if (e.type === 'fener') {
+        // fener yanması: duvar boyunca yayılan ışık dalgası ve üç notalı kısa tını
+        [659, 988, 1319].forEach(function (f, i) { setTimeout(function () { tone(f, 0.4 - i * 0.06, 'sine', 0.05); }, i * 70); });
+        anlar.dalga.push({ x: e.x, y: e.y - 32, t0: lastT });
+        burst(e.x, e.y - 26, 20, '#ffd36a', 160, 0.7, -50); floatText(e.x, e.y - 46, 'fener yandı', '#ffd36a', 15); buzz([15, 30, 15]);
+      }
+      else if (e.type === 'fenerDon') {
+        // fenerden dönüş: kor küçük bir kıvılcımdan yeniden alevlenir
+        anlar.sonme = null; anlar.yanma = { t0: lastT };
+        setTimeout(function () { tone(330, 0.4, 'triangle', 0.05, 660); }, 120);
+        floatText(e.x, e.y - 40, 'fenerden devam', '#ffd36a', 14);
+      }
       else if (e.type === 'kalkan') { perde = Math.max(perde, 0.55); tone(523, 0.15, 'triangle', 0.06, 1047); burst(e.x, e.y, 22, 'rgb(127,214,255)', 220, 0.6, -40); floatText(e.x, e.y - 34, 'kalkan kurtardı!', 'rgb(127,214,255)', 15); buzz([20, 40, 20]); }
       else if (e.type === 'cekildi') burst(e.x, e.y, 4, COL.atesbocegi, 80, 0.25, 0);
       else if (e.type === 'zincirAdim') { tone(e.bozuk ? 440 : 523 + e.n * 110, 0.09, 'sine', 0.05); burst(e.x, e.y, 6, e.bozuk ? '#8fa09c' : '#ffd36a', 120, 0.35, -20); floatText(e.x + 14, e.y - 16, e.n + '/' + CFG.ZINCIR_N, e.bozuk ? '#8fa09c' : '#ffd36a', 12); }
@@ -653,7 +667,12 @@
       } else if (e.type === 'combo') {
         wantIntro('akis');
         SFX.combo(e.combo);
-        if (e.combo % 10 === 0 && e.combo <= 30 && !reduceMotion) { yavas = YAVAS_SURE; nefes = NEFES_SURE; } // uzun akış: kısa ağır çekim
+        if (e.combo % 10 === 0 && e.combo <= 30) {
+          if (!reduceMotion) { yavas = YAVAS_SURE; nefes = NEFES_SURE; } // uzun akış: kısa ağır çekim
+          anlar.unvan = { t0: lastT, m: UNVAN[e.combo / 10 - 1] }; // kısa unvan yazısı
+          [0, 1, 2].forEach(function (i) { setTimeout(function () { tone(akisNota(e.combo + i * 2) * 2, 0.16, 'triangle', 0.045); }, 90 + i * 75); });
+          buzz([10, 30, 10, 30, 25]);
+        }
         var pts = Math.min(e.combo, CFG.COMBO_CAP) * CFG.COMBO_PTS;
         floatText(e.x, e.y - 16, 'AKIŞ x' + e.combo + (mode === 'endless' ? '  +' + pts : ''), e.combo >= 8 ? COL.atesbocegi : COL.gok, 13 + Math.min(e.combo, 10));
       } else if (e.type === 'comboBreak') { if (e.combo >= 3) SFX.kopus(e.combo); floatText(sim.p.x, sim.p.y - 26, 'akış bitti (' + e.why + ')', '#8fa09c', 12); }
@@ -707,10 +726,14 @@
       else if (e.type === 'waterStart') { wantIntro('su'); if (!sim.def.suTakip) floatText(sim.p.x, sim.p.y + 40, 'su yükseliyor', COL.suAcik, 14); }
       else if (e.type === 'devam') { perde = Math.max(perde, 0.7); tone(523, 0.12, 'triangle', 0.06, 784); burst(e.x, e.y, 18, '#ffd36a', 180, 0.5, -40); floatText(e.x, e.y - 34, 'devam!', '#ffd36a', 16); }
       else if (e.type === 'dead') {
-        SFX.dead(); shake = 8; buzz(e.why === 'su' ? TIT.su : TIT.dusus); hisSifirla();
-        burst(sim.p.x, sim.p.y, 22, e.why === 'su' ? COL.suAcik : (look().govde || COL.kahraman), 260, 0.7);
+        var suya = e.why === 'su';
+        // düşüş: kor yumuşakça söner (suda buhar), ceza gibi değil
+        if (suya) { tone(420, 0.5, 'triangle', 0.045, 110); tone(1800, 0.35, 'sine', 0.012, 600); } else SFX.dead();
+        shake = suya ? 4 : 6; buzz(suya ? TIT.su : TIT.dusus); hisSifirla();
+        anlar.sonme = { x: sim.p.x, y: sim.p.y, t0: lastT, su: suya, buhar: 0 };
+        burst(sim.p.x, sim.p.y, suya ? 10 : 16, suya ? COL.suAcik : (look().govde || COL.kahraman), suya ? 150 : 220, 0.6);
         deadT = 0;
-      } else if (e.type === 'won') { SFX.won(); buzz([20, 60, 30]); winT = 0; burst(sim.p.x, sim.p.y, 20, COL.gok, 200, 0.8, -60); }
+      } else if (e.type === 'won') { SFX.won(); buzz([20, 60, 30]); winT = 0; burst(sim.p.x, sim.p.y, 20, COL.gok, 200, 0.8, -60); kovaBasla(); }
     }
   }
 
@@ -1191,6 +1214,102 @@
     ctx.restore();
   }
 
+  // ---------- tatmin anları (v0.68) ----------
+  // Kovaya varış: toplanan ateşböcekleri (en az 3 ışık) Çıra'dan kovaya akar; her biri varınca yükselen bir nota
+  function kovaBasla() {
+    var n = Math.min(12, 3 + E.fireflyCount(sim));
+    anlar.kova = { t0: lastT };
+    for (var i = 0; i < n; i++) anlar.akanlar.push({ x0: sim.p.x + (Math.random() - 0.5) * 36, y0: sim.p.y + (Math.random() - 0.5) * 30, yan: Math.random() < 0.5 ? -1 : 1, gec: 0.1 + i * 0.07, sure: 0.5 + Math.random() * 0.15, i: i, t0: lastT });
+  }
+  function drawAkanlar(t) {
+    var L = anlar.akanlar, g = sim.goal; if (!L.length || !g) return;
+    var gx = g.x, gy = g.y + 14;
+    for (var i = L.length - 1; i >= 0; i--) {
+      var a = L[i], e = (t - a.t0) / 1000 - a.gec, x, y;
+      if (e < 0) { x = a.x0 + Math.sin(t / 120 + a.i) * 3; y = a.y0 + Math.cos(t / 140 + a.i) * 3; }
+      else {
+        var k = Math.min(1, e / a.sure), q = k * k * (3 - 2 * k), cx = (a.x0 + gx) / 2 + a.yan * 50, cy = Math.min(a.y0, gy) - 40;
+        x = (1 - q) * (1 - q) * a.x0 + 2 * (1 - q) * q * cx + q * q * gx; y = (1 - q) * (1 - q) * a.y0 + 2 * (1 - q) * q * cy + q * q * gy;
+        if (k >= 1) { L.splice(i, 1); tone(akisNota(2 + a.i) * 2, 0.14, 'sine', 0.04); burst(gx, gy, 3, COL.atesbocegi, 90, 0.3, -20); continue; }
+      }
+      parilti(x, y, 11, '232,242,124', 0.55);
+      ctx.fillStyle = COL.atesbocegi; ctx.beginPath(); ctx.arc(x, y, 2.4, 0, Math.PI * 2); ctx.fill();
+    }
+  }
+  // Gün ışığı patlaması: kovadan ekrana yayılan sıcak ışık (ekran katmanı)
+  function drawKovaIsigi(t) {
+    if (!anlar.kova || !sim.goal) return;
+    var e = (t - anlar.kova.t0) / 1000; if (e > 1.4) { anlar.kova = null; return; }
+    var a = e < 0.18 ? e / 0.18 : Math.max(0, 1 - (e - 0.18) / 1.2);
+    var S = K * DPR, gx = sim.goal.x * S, gy = (sim.goal.y - cam) * S, r = Math.max(40, canvas.height * (0.3 + 0.9 * Math.min(1, e / 0.6)));
+    ctx.save(); ctx.setTransform(1, 0, 0, 1, 0, 0);
+    var g = ctx.createRadialGradient(gx, gy, 0, gx, gy, r);
+    g.addColorStop(0, 'rgba(255,246,214,' + (0.6 * a).toFixed(3) + ')'); g.addColorStop(0.4, 'rgba(255,226,160,' + (0.25 * a).toFixed(3) + ')'); g.addColorStop(1, 'rgba(255,226,160,0)');
+    ctx.fillStyle = g; ctx.fillRect(0, 0, canvas.width, canvas.height);
+    ctx.restore();
+  }
+  // Fener yanması: fenerden dışa genişleyen sıcak halka; iki duvar boyunca yukarı ve aşağı akan ışık
+  function drawDalga(t) {
+    var L = anlar.dalga;
+    for (var i = L.length - 1; i >= 0; i--) {
+      var d = L[i], k = (t - d.t0) / 1000 / 1.1;
+      if (k >= 1) { L.splice(i, 1); continue; }
+      if (k < 0) continue;
+      var a = (1 - k) * (1 - k), r = 30 + k * 520;
+      ctx.save();
+      ctx.strokeStyle = 'rgba(255,200,120,' + (0.35 * a).toFixed(3) + ')'; ctx.lineWidth = 3 + 12 * (1 - k);
+      ctx.beginPath(); ctx.arc(d.x, d.y, r, 0, Math.PI * 2); ctx.stroke();
+      [10, CFG.W - 10].forEach(function (wx) { parilti(wx, d.y - r, 46, '255,200,120', 0.5 * a); parilti(wx, d.y + r, 46, '255,200,120', 0.35 * a); });
+      ctx.restore();
+    }
+  }
+  // Uzun akış: x10, x20, x30'da ekran kenarı ısınır (akış sürdükçe kalır, kopunca söner)
+  function drawKenarIsi(t, dt) {
+    var c = sim.status === 'play' ? sim.combo : 0, hedef = c >= 30 ? 3 : c >= 20 ? 2 : c >= 10 ? 1 : 0;
+    kenarIsi += (hedef - kenarIsi) * Math.min(1, dt * 3);
+    if (kenarIsi < 0.03) return;
+    var W = canvas.width, H = canvas.height, w = W * 0.16, pu = reduceMotion ? 1 : 0.85 + 0.15 * Math.sin(t / 180), a = Math.min(0.42, 0.13 * kenarIsi) * pu;
+    ctx.save(); ctx.setTransform(1, 0, 0, 1, 0, 0);
+    var lg = ctx.createLinearGradient(0, 0, w, 0); lg.addColorStop(0, 'rgba(255,120,40,' + a.toFixed(3) + ')'); lg.addColorStop(1, 'rgba(255,120,40,0)');
+    ctx.fillStyle = lg; ctx.fillRect(0, 0, w, H);
+    var rg = ctx.createLinearGradient(W, 0, W - w, 0); rg.addColorStop(0, 'rgba(255,120,40,' + a.toFixed(3) + ')'); rg.addColorStop(1, 'rgba(255,120,40,0)');
+    ctx.fillStyle = rg; ctx.fillRect(W - w, 0, w, H);
+    var bg = ctx.createLinearGradient(0, H, 0, H - w); bg.addColorStop(0, 'rgba(255,150,60,' + (a * 0.8).toFixed(3) + ')'); bg.addColorStop(1, 'rgba(255,150,60,0)');
+    ctx.fillStyle = bg; ctx.fillRect(0, H - w, W, w);
+    ctx.restore();
+  }
+  // Kısa unvan yazısı (Isındın! / Yanıyorsun! / KOR!): ekranın üst üçte birinde büyüyüp söner
+  function drawUnvan(t) {
+    var u = anlar.unvan; if (!u) return;
+    var e = (t - u.t0) / 1000, D = 1.3;
+    if (e > D) { anlar.unvan = null; return; }
+    if (e < 0) return;
+    var s = reduceMotion ? 1 : e < 0.18 ? 0.6 + 0.5 * (e / 0.18) : e < 0.3 ? 1.1 - 0.1 * ((e - 0.18) / 0.12) : 1, a = e > D - 0.4 ? (D - e) / 0.4 : Math.min(1, e / 0.08);
+    var S = K * DPR;
+    ctx.save(); ctx.setTransform(1, 0, 0, 1, 0, 0);
+    ctx.translate(canvas.width / 2, canvas.height * 0.3); ctx.scale(s * S, s * S);
+    ctx.globalAlpha = Math.max(0, a); ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+    ctx.font = '800 34px "Baloo 2", system-ui, sans-serif';
+    ctx.lineWidth = 6; ctx.lineJoin = 'round'; ctx.strokeStyle = 'rgba(40,16,6,0.8)'; ctx.strokeText(u.m, 0, 0);
+    ctx.fillStyle = u.m === 'KOR!' ? '#ffe08a' : '#ffb347'; ctx.fillText(u.m, 0, 0);
+    ctx.restore();
+  }
+  // Düşüş: kor yumuşakça söner; suya düştüyse buhar yükselir
+  function drawSonme(t) {
+    var d = anlar.sonme; if (!d) return;
+    var e = (t - d.t0) / 1000, k = Math.min(1, e / 0.7);
+    if (d.su && !reduceMotion && e < 0.9 && t - d.buhar > 70) {
+      d.buhar = t;
+      parts.push({ x: d.x + (Math.random() - 0.5) * 14, y: d.y - 4, vx: (Math.random() - 0.5) * 20, vy: -40 - Math.random() * 30, g: -10, r: 2.2 + Math.random() * 2, life: 0.7, max: 0.7, color: 'rgba(214,226,224,0.55)' });
+    }
+    if (k >= 1) return;
+    ctx.save(); ctx.globalAlpha = 1 - k * 0.9;
+    ctx.translate(d.x, d.y + (d.su ? k * 6 : 0)); ctx.scale(1 - 0.5 * k, 1 - 0.5 * k);
+    korCiz(ctx, 0, 0, CFG.R, t / 1000, look().govde || COL.kahraman, look().govde2 || COL.kahramanKoyu);
+    ctx.globalAlpha = k * 0.7; ctx.fillStyle = '#3a3a36'; ctx.beginPath(); ctx.arc(0, 0, CFG.R, 0, Math.PI * 2); ctx.fill();
+    ctx.restore();
+  }
+
   // Asılıyken elin ne kadar dayanacağı: oyuncunun çevresinde azalan yay.
   function drawGrip() {
     if (!isFinite(sim.grip)) return; // bölümlerde el kaymaz
@@ -1373,7 +1492,15 @@
     trail.unshift({ x: p.x, y: p.y }); if (trail.length > (sim.alev ? 10 : 7)) trail.pop();
     var hot = sim.combo >= 2, alev = sim.alev || 0;
     drawGucEtki(p, t);
+    if (kenarIsi > 0.05) parilti(p.x, p.y, CFG.R * (2.6 + kenarIsi), alev ? '255,170,80' : '255,211,106', 0.16 * kenarIsi); // uzun akışta alev büyür
     if (alev) drawAlev(p, t, alev);
+    var yS = 1;
+    if (anlar.yanma) { // fenerden dönüş: kor kıvılcımdan büyür
+      var ye = (t - anlar.yanma.t0) / 1000 - 0.12;
+      if (ye > 0.6) anlar.yanma = null;
+      else if (ye < 0) yS = 0.2;
+      else { var yk = Math.min(1, ye / 0.4), c1 = 1.70158; yS = Math.max(0.2, 1 + (c1 + 1) * Math.pow(yk - 1, 3) + c1 * Math.pow(yk - 1, 2)); parilti(p.x, p.y, CFG.R * (2 + 4 * yk), '255,200,120', 0.5 * (1 - yk)); }
+    }
     if (trail.length > 2) {
       ctx.strokeStyle = alev ? alevRenk(alev) : hot ? COL.atesbocegi : trailCol(t); ctx.lineCap = 'round'; ctx.lineJoin = 'round';
       for (var i = 1; i < trail.length; i++) {
@@ -1390,6 +1517,7 @@
       if (ee > 0.4 || ee < 0) ezil = null;
       else { var kz = Math.exp(-ee * 9) * Math.cos(ee * 26) * 0.26; ctx.rotate(ezil.ang); ctx.scale(1 + kz, 1 - kz * 0.75); ctx.rotate(-ezil.ang); }
     }
+    if (yS !== 1) ctx.scale(yS, yS);
     korCiz(ctx, 0, 0, CFG.R, t / 1000, look().govde || COL.kahraman, look().govde2 || COL.kahramanKoyu);
     ctx.restore();
     // ara ara yükselen kıvılcım (hareket azaltma açıksa yok)
@@ -1530,6 +1658,7 @@
       nefes = Math.max(0, nefes - dt);
     }
     drawBackground(t);
+    drawDalga(t);
     drawToz(t, 0.55, 12, 0.9, 0.10);
     drawKorIsigi(t);
     drawGoal(t);
@@ -1545,11 +1674,15 @@
     drawAimMarkers(t);
     drawRope();
     drawTamBolge(t);
-    if (sim.status !== 'dead') { drawHero(t); drawGrip(); }
+    if (sim.status !== 'dead') { drawHero(t); drawGrip(); } else drawSonme(t);
+    drawAkanlar(t);
     drawParticles(dt);
     drawWater(t);
     drawToz(t, 1.25, 6, 1.5, 0.13);
     drawFloaters(dt);
+    drawKenarIsi(t, dt);
+    drawKovaIsigi(t);
+    drawUnvan(t);
     drawTouchHint(dt);
     drawGucHud();
     if (finalT !== null) drawFinal();
@@ -1921,6 +2054,8 @@
       '<div class="dur-iki"><button type="button" id="tekrarBtn">Tekrar</button><button type="button" id="bolumlerDonBtn">Bölümler</button></div>';
     showSheet();
     countUp($('odulSayi'), reward);
+    // madalyalar tek tek yanar (CSS) ve her biri bir nota çalar
+    [ffT > 0 && ff >= ffT, perfect, flow].forEach(function (ok, i) { if (ok) setTimeout(function () { tone([784, 988, 1175][i], 0.22, 'triangle', 0.05); tone([1568, 1976, 2349][i], 0.12, 'sine', 0.015); }, 380 + i * 280); });
     $('tekrarBtn').onclick = function () { reset(); };
     $('sonrakiBtn').onclick = function () { sonrakiBolum(); };
     dolapKisaBagla();

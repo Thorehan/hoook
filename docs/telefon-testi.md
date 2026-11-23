@@ -104,6 +104,12 @@ Yayına çıkmadan yerelde denemek için: bilgisayarda `python3 -m http.server 8
 - [ ] Asılıyken sonraki halkanın soluk önizlemesi işe yarıyor mu, kalabalık mı?
 - [ ] Akış çipindeki alev noktaları anlaşılıyor mu?
 
+## 14. Tatmin anları (v0.68, 10 dk)
+- [ ] Kovaya varış: gün ışığı, kovaya akan ateşböcekleri ve tek tek yanan madalyalar tatmin edici mi, uzun mu?
+- [ ] Fener yanınca duvar boyunca yayılan ışık ve tını: fark ediliyor mu?
+- [ ] x10 / x20 / x30 unvanı (Isındın! / Yanıyorsun! / KOR!) ve ısınan ekran kenarı: hoş mu, dikkat dağıtıyor mu?
+- [ ] Suya düşünce korun sönmesi ve fenerden yeniden alevlenmesi: hata cezalandırıcı değil, akıcı hissettiriyor mu?
+
 ## 5. Genel izlenim (serbest)
 - En sevdiğim an:
 - En çok zorlandığım yer:

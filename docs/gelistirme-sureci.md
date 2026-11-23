@@ -133,6 +133,7 @@ Kullanıcı hikâyeye online'dan önce geçti; online (5) sonra.
 - [?] Bekçinin adı.
 
 ## Yapılanlar
+- 2026-11-23 · v0.68 · İstişare 3 Aşama B (tatmin anları): kovaya varışta gün ışığı ve kovaya akan ateşböcekleri, madalyalar tek tek yanar; fener ışık dalgası; x10/x20/x30 unvanı ve ısınan kenarlar; kor söner (suda buhar), fenerden dönüşte yeniden alevlenir. Fizik ve botlar aynı.
 - 2026-11-23 · v0.67 · İstişare 3 Aşama A (his): tutunma parlaması ve esneme, TAM'da kısa donma ve kamera nefesi, uzun akışta ağır çekim, akış melodisi, TAM akoru, kopuş sesi, müzik katmanları, titreşim desenleri, TAM bölgesi çemberi, sonraki halka önizlemesi, alev göstergesi. Fizik ve botlar aynı.
 - 2026-11-23 · v0.66 · Haftanın hedefi: Haftalık Kuyu'da haftalık puan hedefi, 1–3 yıldız (+10/+10/+20), kartta, sonuç kartında ve rekor duvarında. Ortalama gün ~157 ateşböceği.
 - 2026-11-22 · v0.65 · Denge: ikinci yolculuk ilk yolculuk kadar uzun (öğret bölmesi sına olur), su daha yakın (22/18/16/15 m). Spam için daha sert kilit ve aynı yan denendi, düşünen oyuncuyu bozduğu için geri alındı.
