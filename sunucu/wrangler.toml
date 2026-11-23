@@ -1,16 +1,16 @@
-# Kuyu · skor sunucusu (Cloudflare Worker). Kurulum: docs/online-kurulum.md
-name = "kuyu-skor"
+# Hoook (Kuyu) · skor sunucusu (Cloudflare Worker). Kurulum: docs/online-kurulum.md
+name = "hoook-skor"
 main = "src/index.js"
 compatibility_date = "2026-11-01"
 
 [vars]
 # Firebase proje kimliği (Project settings → General → Project ID). Herkese açık bir değerdir.
-FIREBASE_PROJE = ""
+FIREBASE_PROJE = "hoook-6fed5"
 # İstek kabul edilen sayfalar (virgülle)
 KOKENLER = "https://thorehan.github.io,http://localhost:8766"
 
 [[d1_databases]]
 binding = "DB"
-database_name = "kuyu-skor"
-# "npx wrangler@4 d1 create kuyu-skor" komutunun verdiği kimlik buraya yazılır
+database_name = "hoook-skor"
+# "npx wrangler@4 d1 create hoook-skor" komutunun verdiği kimlik buraya yazılır
 database_id = ""

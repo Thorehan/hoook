@@ -35,15 +35,15 @@ Hesaplar stüdyonun Google hesabıyla açılır (hesap sahibi açar; e-posta ve 
 1. Hesap aç. Terminalde: `npx wrangler@4 login`
 2. `sunucu/` klasöründe:
    ```bash
-   npx wrangler@4 d1 create kuyu-skor
+   npx wrangler@4 d1 create hoook-skor
    ```
    Çıkan `database_id`'yi `sunucu/wrangler.toml`'a yaz; `FIREBASE_PROJE`'ye Firebase `projectId`'yi yaz.
 3. Tabloları kur ve yayınla:
    ```bash
-   npx wrangler@4 d1 execute kuyu-skor --remote --file=schema.sql
+   npx wrangler@4 d1 execute hoook-skor --remote --file=schema.sql
    npx wrangler@4 deploy
    ```
-   Çıkan adres `https://kuyu-skor.<hesap>.workers.dev` olur.
+   Çıkan adres `https://hoook-skor.<hesap>.workers.dev` olur.
 4. `js/online.js` → `AYAR = { url: '<Worker adresi>', firebase: '<apiKey>' }`. Sürümü artır, commit ve push. Canlıda Haftalık Kuyu'yu oyna; sonuç kartında tablo görünmeli.
 
 Ücretsiz sınırlar: Workers günde 100 bin istek, istek başına 10 ms işlemci; D1 günde 5 milyon satır okuma, 100 bin yazma; Firebase anonim giriş ücretsiz. Bir tablo açılışı (100 satır) ~100 satır okuma sayılır.

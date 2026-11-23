@@ -1,5 +1,5 @@
 -- Kuyu · skor tablosu (Cloudflare D1 / SQLite). Kurulum: docs/online-kurulum.md
---   npx wrangler@4 d1 execute kuyu-skor --remote --file=schema.sql
+--   npx wrangler@4 d1 execute hoook-skor --remote --file=schema.sql
 -- Oyuncu başına tahtada tek satır; uid Firebase kimliğidir (listede dönmez).
 CREATE TABLE IF NOT EXISTS skorlar (
   tahta TEXT    NOT NULL,                -- h-2026-11-23 haftalık (pazartesi), g-2026-11-23 günlük

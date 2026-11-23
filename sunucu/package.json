@@ -1,8 +1,8 @@
 {
-  "name": "kuyu-skor",
+  "name": "hoook-skor",
   "private": true,
   "type": "module",
-  "description": "Kuyu skor sunucusu (Cloudflare Worker + D1)",
+  "description": "Hoook skor sunucusu (Cloudflare Worker + D1)",
   "scripts": {
     "yerel": "npx wrangler@4 dev",
     "yayinla": "npx wrangler@4 deploy"
