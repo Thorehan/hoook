@@ -1,6 +1,6 @@
-# Kuyu · Claude için çalışma kuralları
+# Hoook (eski adı Kuyu) · Claude için çalışma kuralları
 
-Funday Morning Games'in 2D mobil oyunu. Düz HTML + JS (derleme yok), GitHub Pages'te yayında: https://thorehan.github.io/kuyu/ (`main`'e push edilince ~1 dk'da güncellenir). İki ortak **sırayla** çalışır: **Törehan** (Windows) ve **Mustafa** (Mac). Yanıtlar Türkçe.
+Funday Morning Games'in 2D mobil oyunu **Hoook** (23/11/2026'ya kadar adı Kuyu'ydu; depo `Thorehan/hoook`, eski `/kuyu/` adresi `Thorehan/kuyu` yönlendirme deposuyla yeni adrese gider). İç adlar (`window.Kuyu*`, `kuyu.*` kayıt anahtarları, `KUYU1.` yedek kodu, `css/kuyu.css`) uyumluluk için değişmez. Düz HTML + JS (derleme yok), GitHub Pages'te yayında: https://thorehan.github.io/hoook/ (`main`'e push edilince ~1 dk'da güncellenir). İki ortak **sırayla** çalışır: **Törehan** (Windows) ve **Mustafa** (Mac). Yanıtlar Türkçe.
 
 ## 1 · Devir kuralı (en önemli kural)
 
@@ -59,10 +59,10 @@ Kod: `js/engine.js` (deterministik fizik ve kurallar, DT 1/120), `js/gen.js` (b�
   - zorluk eğrisi: `node tools/denge.js` (bölümlerde geçme oranı bölgeyle düşmeli, hatasız oyuncu geçmeli)
   - birim testleri: `node tools/ekonomi-test.js`, `node tools/gorev-test.js`, `node tools/hayalet-test.js`, `node tools/istatistik-test.js`, `node tools/online-test.js`
 - **Yerelde deneme:** Proje klasöründe `python3 -m http.server 8766` (Windows'ta `python`), sonra http://localhost:8766. Tarayıcıda servis çalışanı önbellekler; değişiklik görünmüyorsa kayıtlı servis çalışanını sil ve sayfayı yenile.
-- **Sürüm:** Her yayında `index.html` içindeki `?v=0.xx` ve "Kuyu v0.xx" etiketleri birlikte artırılır (`kontrol.js` denetler). README'nin başındaki sürüm ve `docs/gelistirme-sureci.md` "Yapılanlar" bölümü güncellenir.
+- **Sürüm:** Her yayında `index.html` içindeki `?v=0.xx` ve "Hoook v0.xx" etiketleri birlikte artırılır (`kontrol.js` denetler). README'nin başındaki sürüm ve `docs/gelistirme-sureci.md` "Yapılanlar" bölümü güncellenir.
 - **Git:**
-  - Commit mesajı "Kuyu v0.xx: kısa başlık" ve madde madde açıklama.
-  - Yalnız `main` var. Push edilince Pages yayınlar; `curl https://thorehan.github.io/kuyu/index.html` ile yeni sürüm etiketi doğrulanır.
+  - Commit mesajı "Hoook v0.xx: kısa başlık" ve madde madde açıklama.
+  - Yalnız `main` var. Push edilince Pages yayınlar; `curl https://thorehan.github.io/hoook/index.html` ile yeni sürüm etiketi doğrulanır.
   - **`main`'e zorla push (force push) yok.** Geri dönüş gerekirse `git revert` ya da etiketten yeni dal açılır.
   - Geri dönüş etiketleri (`geri-donus-v0.17`, `v0.45`, `v0.47`, `v0.51`) silinmez.
 - **Gizlilik:** E-posta, anahtar ya da parola dosyalara ve commit'lere yazılmaz.

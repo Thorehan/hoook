@@ -1,4 +1,4 @@
-// Servis çalışanı: Kuyu'yu telefona kurulabilir ve internetsiz açılabilir yapar (Pofi'deki yapının sade hâli).
+// Servis çalışanı: Hoook'u (eski adı Kuyu) telefona kurulabilir ve internetsiz açılabilir yapar (Pofi'deki yapının sade hâli).
 // Kod (html, js, css, manifest) her zaman önce ağdan, tarayıcı önbelleğini atlayarak alınır; böylece güncellemeden
 // sonra eski ve yeni dosyalar karışmaz. Ağ yoksa son kaydedilen sürüm açılır.
 // Görseller önbellekten gelir (değişmezler; değişirse adları değişir).
@@ -6,8 +6,10 @@
 // Her kod dosyası önbellekte TEK kayıt tutar (?v= etiketi atılır, hep en son alınan sürüm). Sayfa açılışları
 // index.html kaydına yazılır. Böylece internetsiz açılış en son sürümü açar ve önbellek her sürümde şişmez.
 // v1'de her ?v= ayrı kaydediliyordu ve internetsizken en ESKİ kayıt açılıyordu; v2 eskisini silerek başlar.
-const CODE = 'kuyu-code-v2';
-const MEDIA = 'kuyu-media-v1';
+// v0.73: ad Hoook oldu, adres /hoook/. Önbellek adları değişti; eski kuyu-* önbellekleri silinir.
+// Aynı sitedeki (thorehan.github.io) başka oyunların önbelleklerine dokunulmaz (önceden hepsi siliniyordu).
+const CODE = 'hoook-code-v1';
+const MEDIA = 'hoook-media-v1';
 
 const CORE = [
   './', 'index.html', 'manifest.webmanifest',
@@ -38,7 +40,7 @@ async function precache() {
 self.addEventListener('install', e => { self.skipWaiting(); e.waitUntil(precache()); });
 self.addEventListener('activate', e => {
   e.waitUntil((async () => {
-    for (const k of await caches.keys()) if (![CODE, MEDIA].includes(k)) await caches.delete(k);
+    for (const k of await caches.keys()) if (/^(kuyu|hoook)-/.test(k) && ![CODE, MEDIA].includes(k)) await caches.delete(k);
     await self.clients.claim();
   })());
 });

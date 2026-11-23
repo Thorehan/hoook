@@ -4,25 +4,25 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="theme-color" content="#0d1416">
-<meta name="description" content="Kuyu: kancayla halkadan halkaya atılarak derin bir kuyudan gün ışığına tırmandığın mobil oyun. Funday Morning Games.">
-<title>Kuyu</title>
+<meta name="description" content="Hoook: kancayla halkadan halkaya atılarak derin bir kuyudan gün ışığına tırmandığın mobil oyun. Funday Morning Games.">
+<title>Hoook</title>
 <link rel="icon" type="image/png" href="assets/icons/icon-192.png">
 <link rel="manifest" href="manifest.webmanifest">
 <link rel="apple-touch-icon" href="assets/icons/apple-180.png">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-title" content="Kuyu">
+<meta name="apple-mobile-web-app-title" content="Hoook">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@600;800&family=Figtree:wght@400;600&display=swap">
-<link rel="stylesheet" href="css/kuyu.css?v=0.72">
-<link rel="stylesheet" href="css/ekranlar.css?v=0.72">
+<link rel="stylesheet" href="css/kuyu.css?v=0.73">
+<link rel="stylesheet" href="css/ekranlar.css?v=0.73">
 </head>
 <body>
 <div class="app" id="oyunEkrani" hidden>
   <div class="serit">
-    <div class="bilgi"><b id="baslik">Kuyu</b><div class="cipler" id="cipler" aria-live="off"></div></div>
+    <div class="bilgi"><b id="baslik">Hoook</b><div class="cipler" id="cipler" aria-live="off"></div></div>
     <div class="puan" id="puan" hidden>0<small>puan</small></div>
     <button type="button" id="menuBtn" aria-label="Duraklat" title="Duraklat">
       <svg viewBox="0 0 20 20" aria-hidden="true"><rect x="5" y="4" width="3.4" height="12" rx="1.2" fill="currentColor"/><rect x="11.6" y="4" width="3.4" height="12" rx="1.2" fill="currentColor"/></svg>
@@ -30,7 +30,7 @@
   </div>
 
   <div class="sahne" id="sahne">
-    <canvas id="oyun" aria-label="Kuyu. Bir noktaya bas ve basılı tut: kanca oraya fırlar, ipe sarılırsın. Bırakınca düşersin."></canvas>
+    <canvas id="oyun" aria-label="Hoook. Bir noktaya bas ve basılı tut: kanca oraya fırlar, ipe sarılırsın. Bırakınca düşersin."></canvas>
     <div class="katman" id="katman" hidden><div class="kart" id="kart"></div></div>
     <!-- Tanıtım kartı: yeni bir şey ilk kez görülünce oyun kısa süre durur -->
     <div class="katman alt tanitim-katman" id="yeniKatman" hidden role="dialog" aria-modal="true" aria-labelledby="yeniBaslik">
@@ -72,7 +72,7 @@
   <img id="acilisLogo" class="marka-logo" src="assets/funday-morning-logo.webp" alt="Funday Morning Games">
   <div class="yukleme" aria-hidden="true"><div id="yuklemeDolgu"></div></div>
   <div class="yukleme-not" id="yuklemeNot">Yükleniyor…</div>
-  <div class="ek-surum">Kuyu v0.72</div>
+  <div class="ek-surum">Hoook v0.73</div>
 </section>
 
 <!-- Giriş: yalnızca ilk açılışta -->
@@ -94,7 +94,7 @@
   <canvas id="tanitimSahne" aria-hidden="true"></canvas>
   <div class="sunar" id="sunar"><img src="assets/funday-morning-logo.webp" alt="Funday Morning Games"><span>sunar</span></div>
   <div class="tanitim-baslik">
-    <h1>Kuyu</h1>
+    <h1>Hoook</h1>
     <span class="alt-hap">ÇIRA'YI IŞIĞA ÇIKAR</span>
     <div class="dokun">Başlamak için dokun</div>
   </div>
@@ -277,7 +277,7 @@
     <button type="button" id="istatBtn">Oyun istatistikleri</button>
     <button type="button" id="tanitimBtn">Tanıtımı yeniden izle</button>
     <button type="button" id="ipucuSifirBtn">Tanıtım kartlarını yeniden göster</button>
-    <p class="surum">Kuyu v0.72 · prototip · Funday Morning Games</p>
+    <p class="surum">Hoook v0.73 · prototip · Funday Morning Games</p>
   </div>
 </section>
 
@@ -325,18 +325,18 @@
 <div class="hikaye-kart" id="hikayeKart" role="status" hidden><b id="hkBaslik"></b><span id="hkMetin"></span></div>
 <div class="bildirim" id="bildirim" role="status" hidden></div>
 
-<script src="js/engine.js?v=0.72"></script>
-<script src="js/levels.js?v=0.72"></script>
-<script src="js/bolumler.js?v=0.72"></script>
-<script src="js/gen.js?v=0.72"></script>
-<script src="js/gorevler.js?v=0.72"></script>
-<script src="js/ekonomi.js?v=0.72"></script>
-<script src="js/istatistik.js?v=0.72"></script>
-<script src="js/muzik.js?v=0.72"></script>
-<script src="js/notlar.js?v=0.72"></script>
-<script src="js/hayalet.js?v=0.72"></script>
-<script src="js/online.js?v=0.72"></script>
-<script src="js/game.js?v=0.72"></script>
-<script src="js/screens.js?v=0.72"></script>
+<script src="js/engine.js?v=0.73"></script>
+<script src="js/levels.js?v=0.73"></script>
+<script src="js/bolumler.js?v=0.73"></script>
+<script src="js/gen.js?v=0.73"></script>
+<script src="js/gorevler.js?v=0.73"></script>
+<script src="js/ekonomi.js?v=0.73"></script>
+<script src="js/istatistik.js?v=0.73"></script>
+<script src="js/muzik.js?v=0.73"></script>
+<script src="js/notlar.js?v=0.73"></script>
+<script src="js/hayalet.js?v=0.73"></script>
+<script src="js/online.js?v=0.73"></script>
+<script src="js/game.js?v=0.73"></script>
+<script src="js/screens.js?v=0.73"></script>
 </body>
 </html>

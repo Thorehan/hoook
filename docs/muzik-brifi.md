@@ -7,7 +7,7 @@ Paylaşılan sayfa: Artifact "Kuyu Müzik Brifi" (aynı içerik).
 ## Oyun
 Kuyu, tek elle oynanan dikey bir tırmanma oyunu. Kahraman bir kuyunun dibinden kancayla halkadan halkaya savrularak gün ışığına çıkar; alttan su yükselir. Oyuncu ipi erken bırakıp havadayken sıradakine tutunursa **akış** zinciri kurar; oyunun ritmi budur. Oturumlar kısa (bölüm 10–60 sn, Sonsuz Kuyu 1–3 dk), çoğunlukla telefon hoparlöründen ya da kulaklıkla dinlenir.
 
-Şu an oyunda kod içinde üretilen geçici bir ortam müziği çalıyor (Ayarlar → Müzik). Tempo ve tonlar aşağıdaki tabloyla aynı; dinleyip referans alabilirsin: https://thorehan.github.io/kuyu/
+Şu an oyunda kod içinde üretilen geçici bir ortam müziği çalıyor (Ayarlar → Müzik). Tempo ve tonlar aşağıdaki tabloyla aynı; dinleyip referans alabilirsin: https://thorehan.github.io/hoook/
 
 ## İstenen parçalar (döngü)
 

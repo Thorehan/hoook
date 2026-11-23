@@ -19,14 +19,14 @@ Ayrıntılar `README.md`'de, hikâye `docs/hikaye.md`'de.
 
 ## 2 · Depoya erişim
 
-Depo: https://github.com/Thorehan/kuyu (herkese açık; okumak ve klonlamak için erişim gerekmez, **push için gerekir**).
+Depo: https://github.com/Thorehan/hoook (herkese açık; okumak ve klonlamak için erişim gerekmez, **push için gerekir**).
 
 **Törehan yapar (bir kez):**
-1. github.com/Thorehan/kuyu → **Settings** → **Collaborators** → **Add people**.
+1. github.com/Thorehan/hoook → **Settings** → **Collaborators** → **Add people**.
 2. Mustafa'nın GitHub kullanıcı adını yaz → **Add to repository**. GitHub parola ya da iki adımlı doğrulama isteyebilir.
 
 **Mustafa yapar (bir kez):**
-1. Gelen davet e-postasından ya da https://github.com/Thorehan/kuyu/invitations adresinden daveti **kabul et**. Davet 7 gün geçerlidir.
+1. Gelen davet e-postasından ya da https://github.com/Thorehan/hoook/invitations adresinden daveti **kabul et**. Davet 7 gün geçerlidir.
 2. Kurulum (Mac):
    - `git --version` çalışmıyorsa `xcode-select --install`
    - **Node.js** 18 ya da üstü (testler için; nodejs.org ya da `brew install node`)
@@ -34,8 +34,12 @@ Depo: https://github.com/Thorehan/kuyu (herkese açık; okumak ve klonlamak içi
    - Claude Code
 3. Depoyu klonla:
    ```bash
-   git clone https://github.com/Thorehan/kuyu.git
-   cd kuyu
+   git clone https://github.com/Thorehan/hoook.git
+   cd hoook
+   ```
+   Eski `kuyu` klonun varsa yeni klon gerekmez; o klasörde bağlantıyı değiştir (23/11/2026, ad Hoook oldu):
+   ```bash
+   git remote set-url origin https://github.com/Thorehan/hoook.git
    ```
 4. Git'e kim olduğunu söyle (bu klasör için yeterli):
    ```bash
@@ -44,7 +48,7 @@ Depo: https://github.com/Thorehan/kuyu (herkese açık; okumak ve klonlamak içi
    ```
 5. İlk push'ta GitHub girişi istenir. Tarayıcıyla giriş yap, ya da parola yerine GitHub'da açtığın bir "Personal access token" kullan. Mac anahtar zinciri bunu hatırlar.
 
-Push edilen her şey 1 dakika içinde https://thorehan.github.io/kuyu/ adresinde yayına girer. Telefonda deneme aynı adresten yapılır.
+Push edilen her şey 1 dakika içinde https://thorehan.github.io/hoook/ adresinde yayına girer. Telefonda deneme aynı adresten yapılır.
 
 ## 3 · İlk oturum
 

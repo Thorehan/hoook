@@ -2328,8 +2328,8 @@
   function bildir(msg, ms) { if (window.KuyuScreens && window.KuyuScreens.toast) window.KuyuScreens.toast(msg, ms); }
   function meydanPaylas(m) {
     var url = ONLINE.meydanBaglanti(location.origin + location.pathname, m);
-    var metin = 'Kuyu\'da ' + m.puan + ' puan yaptım. Aynı kuyuda beni geçebilir misin?';
-    if (navigator.share) { navigator.share({ title: 'Kuyu', text: metin, url: url }).catch(function () {}); return; }
+    var metin = 'Hoook\'ta ' + m.puan + ' puan yaptım. Aynı kuyuda beni geçebilir misin?';
+    if (navigator.share) { navigator.share({ title: 'Hoook', text: metin, url: url }).catch(function () {}); return; }
     if (navigator.clipboard && navigator.clipboard.writeText) navigator.clipboard.writeText(metin + ' ' + url).then(function () { bildir('Bağlantı kopyalandı. Arkadaşına gönder.', 2800); }, function () { bildir(url, 6000); });
     else bildir(url, 6000);
   }

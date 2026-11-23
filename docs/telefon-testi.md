@@ -1,6 +1,6 @@
 # Kuyu · Telefon deneme listesi (yaklaşık 10 dakika)
 
-Adres: https://thorehan.github.io/kuyu/
+Adres: https://thorehan.github.io/hoook/
 
 Her maddenin yanına ✓ (sorun yok), ✗ (sorun var) ya da kısa bir not yazın. Bir sorunu anlatırken telefon modelini ve hangi bölümde olduğunu ekleyin; mümkünse ekran görüntüsü alın.
 

@@ -1,4 +1,4 @@
-# Kuyu · Durum (kalınan nokta)
+# Hoook (Kuyu) · Durum (kalınan nokta)
 
 > Her oturumun başında okunur, iş bitince güncellenir. Kısa tutulur (~40 satır).
 
@@ -8,8 +8,9 @@
 - Devir noktası: v0.55 (yayında). Bu dönemin başı: v0.51, etiket `geri-donus-v0.51`; v0.52–v0.55'in her biri ayrı commit, `git revert` ile tek tek geri alınabilir.
 - Devir Törehan'dayken Mustafa projede geliştirme yapmaz; devir `docs/DEVIR-MUSTAFA.md` §6'daki adımlarla yapılır.
 
-## Son durum (v0.72)
+## Son durum (v0.73)
 
+- **v0.73** (23/11/2026, Törehan): oyunun adı **Hoook**. Depo `Thorehan/hoook`, adres https://thorehan.github.io/hoook/. Eski adres yönlendiriyor. Mustafa'nın klonunda: `git remote set-url origin https://github.com/Thorehan/hoook.git`.
 - **v0.72** (23/11/2026, Törehan): gerçek skor tablosu açık (Firebase + Cloudflare). Günlük ve Haftalık sonuç kartında gerçek sıra. Canlıda denendi.
 - v0.71 (23/11/2026, Törehan): akıntı sütunu (İstişare 3 Aşama C, 3/3). Akış sürerken yukarı süzdürür, kestirme; 21. bölüm öğretir; Günlük/Haftalık kor ve çark ile aynı tarihten (24/11, 30/11 haftası). Telefonda denendi (23/11): yeni mekanikler, bölümler, his ve kontrol iyi; ince ayar gerekmedi.
 - v0.70 (23/11/2026): döner çark (Aşama C, 2/3). Telefonda denendi.
@@ -40,7 +41,7 @@
 
 - ✅ 18/11: Törehan v0.52–v0.55 kararlarını gözden geçirdi, hepsi kalıyor (bölge suyu, ekonomi, Haftalık + lig, Supabase istemcisi kapalı).
 1. **Telefonda deneme**, özellikle bölge suyu mesafeleri ve Haftalık Kuyu.
-2. **Skor tablosu açık (v0.72, 23/11):** Firebase (proje `hoook-6fed5`, stüdyo Google hesabı) + Cloudflare Worker `hoook-skor.torehan-anbarli.workers.dev` ve D1 `hoook-skor` (Cloudflare hesabı Törehan'ın). Sıradaki: Haftalık menüsünde tam tablo ekranı; Aşama 2 puan doğrulama (Workers Paid 5 $/ay); Aşama 3 Google/Apple bağlama. Oyunun adı **Hoook** olacak (repo ve oyun içi ad değişikliği bekliyor).
+2. **Skor tablosu açık (v0.72, 23/11):** Firebase (proje `hoook-6fed5`, stüdyo Google hesabı) + Cloudflare Worker `hoook-skor.torehan-anbarli.workers.dev` ve D1 `hoook-skor` (Cloudflare hesabı Törehan'ın). Sıradaki: Haftalık menüsünde tam tablo ekranı; Aşama 2 puan doğrulama (Workers Paid 5 $/ay); Aşama 3 Google/Apple bağlama.
 3. İstişare 2'nin kalanı: ✅ görsel akıcılık (v0.56) → **24 uzun bölüm: plan hazır (18/11), `docs/hikaye-bolumleri-plan.md`**. Tarifli üretim, fener kontrol noktası, ikinci yolculuk, bölgeye göre taşıma. Aşama 1 ✅ (v0.59): bölüm 1–3 oynanır (deneme kartları), fener ve fenerden devam, duvar ipuçları. Telefonda onaylandı (19/11). Aşama 2 ✅ (v0.60): bölüm 4–12. Aşama 3 ✅ (v0.61): bölüm 13–24. Aşama 4 ✅ (v0.62): geçiş. Aşama 5 ✅ (v0.63): denge (`tools/hikaye-denge.js`). **Plan tamam.** Sıradaki: telefon geri bildirimiyle ince ayar (süre, su, fener sıklığı, ikinci yolculuğun zorluğu); sonra açık sorular (Supabase, analitik, bekçinin adı, müzik).
 
 - **İstişare 3 (23/11): oynanış hissiyatı.** Plan `docs/istisare-3-his.md`: A his (vuruş, ses, titreşim, görsel ipuçları) → B tatmin anları (kova, fener, uzun akış, düşüş-dönüş) → C yeni mekanikler (kor halka, döner çark, akıntı sütunu). Kontrol değişmiyor. ✅ A (v0.67, telefonda denendi). ✅ B (v0.68, telefonda denendi). C: mevcut bölümlere bölme, sıra kor → çark → akıntı, sonra Günlük/Haftalık. ✅ Kor halka (v0.69). ✅ Döner çark (v0.70). ✅ Akıntı sütunu (v0.71). **İstişare 3 tamam** ve telefonda onaylandı (23/11: kor, çark, akıntı, bölüm süreleri, su, fener, his efektleri ve kontrol iyi; ince ayar gerekmedi). Sıradaki: açık sorular.

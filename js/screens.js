@@ -659,7 +659,7 @@
   var sifirSor = false;
   $('istatBtn').addEventListener('click', openIstat);
   $('istatKopyala').addEventListener('click', function () {
-    var metin = JSON.stringify({ oyun: 'Kuyu', surum: (document.querySelector('.surum') || {}).textContent, istatistik: G.istatOzet() }, null, 1);
+    var metin = JSON.stringify({ oyun: 'Hoook', surum: (document.querySelector('.surum') || {}).textContent, istatistik: G.istatOzet() }, null, 1);
     function yedek() { // pano izni yoksa metni seçili bir kutuda göster
       var eski = document.querySelector('.istat-metin'); if (eski) eski.remove();
       var ta = document.createElement('textarea'); ta.value = metin; ta.className = 'istat-metin'; ta.readOnly = true;

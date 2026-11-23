@@ -1,10 +1,12 @@
-# Kuyu
+# Hoook
 
-**Funday Morning Games** · 2D mobil oyun · prototip v0.72
+> Eski adı Kuyu (v0.72'ye kadar). Oyunun dünyası hâlâ bir kuyu; mod adları (Günlük Kuyu, Haftalık Kuyu) ve koddaki iç adlar (`window.Kuyu*`, `kuyu.*` kayıt anahtarları, `KUYU1.` yedek kodu) uyumluluk için aynı kaldı.
+
+**Funday Morning Games** · 2D mobil oyun · prototip v0.73
 
 Derin bir kuyunun dibindesin. Telefonu tek elle tut: ekranın soluna ya da sağına dokun, kanca o taraftaki hedefe fırlasın; basılı tut, ipe sarıl; bırak, savrul. Halkadan halkaya, ahşaptan ahşaba tırmanıp kuyudan çık.
 
-**Canlı sürüm:** https://thorehan.github.io/kuyu/
+**Canlı sürüm:** https://thorehan.github.io/hoook/
 
 **Geliştirme sırası ve kararlar:** [docs/gelistirme-sureci.md](docs/gelistirme-sureci.md) (oynanış sorunları → geliştirmeler → online → hikâye)
 
