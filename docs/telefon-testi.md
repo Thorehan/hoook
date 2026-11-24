@@ -159,7 +159,7 @@ Yayına çıkmadan yerelde denemek için: bilgisayarda `python3 -m http.server 8
 - [ ] Menülerde metin seçilemiyor, uzun basınca menü çıkmıyor, iki parmakla ve çift dokunuşla yakınlaşmıyor mu? (Ad yazma alanı hâlâ çalışıyor mu?)
 - [ ] Market, Koleksiyon gibi sayfalarda başlık üstte sabit kalıyor mu?
 - [ ] Her düğmede kısa ses ve titreşim: hoş mu, fazla mı? Ayarlardan kapatınca susuyor mu?
-- [ ] Sekmeler arası kayma ve diğer ekranların büyüyerek gelişi akıcı mı?
+- [ ] Sekmeler arası kayma ve diğer ekranların (v0.79: büyümeden, solarak) gelişi akıcı mı? Hiçbir pencere büyüyerek açılmıyor mu?
 
 ## 5. Genel izlenim (serbest)
 - En sevdiğim an:

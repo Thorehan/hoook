@@ -70,7 +70,7 @@ button.ana:disabled { filter: grayscale(.7) brightness(.8); }
 .nokta-say { position: absolute; top: -8px; right: -8px; min-width: 20px; height: 20px; padding: 0 5px; border-radius: 10px; background: #ff3b4e; border: 2px solid var(--a-kontur);
   font: 800 11px/16px var(--font-metin); font-style: normal; color: #fff; text-align: center; animation: noktaAtim 1.6s ease-in-out infinite; }
 .nokta-say:empty { width: 20px; min-width: 20px; padding: 0; }
-@keyframes noktaAtim { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.15); } }
+@keyframes noktaAtim { 0%, 100% { opacity: 1; } 50% { opacity: .55; } } /* v0.79: büyüme yok, yanıp söner */
 .yan-kart .ag-cubuk { display: flex; gap: 2px; width: 62px; margin-top: 3px; }
 .yan-kart .ag-cubuk > i { flex: 1; height: 5px; border-radius: 3px; background: rgba(0,0,0,.35); overflow: hidden; display: block; }
 .yan-kart .ag-cubuk > i > i { display: block; height: 100%; background: #fff07a; }
@@ -89,7 +89,7 @@ button.ana:disabled { filter: grayscale(.7) brightness(.8); }
   box-shadow: 0 6px 0 var(--a-kontur), inset 0 -7px 0 rgba(0,0,0,.18), inset 0 5px 0 rgba(255,255,255,.35); animation: oynaNefes 2.4s ease-in-out infinite; }
 .oyna-dugme:hover { background: linear-gradient(180deg, #ffb46a, #ff8a45 55%, var(--a-ates2)); }
 .oyna-dugme:active { box-shadow: 0 2px 0 var(--a-kontur), inset 0 -7px 0 rgba(0,0,0,.18), inset 0 5px 0 rgba(255,255,255,.35); transform: translateY(4px); animation: none; }
-@keyframes oynaNefes { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.035); } }
+@keyframes oynaNefes { 0%, 100% { filter: brightness(1); } 50% { filter: brightness(1.12) saturate(1.08); } } /* v0.79: büyüme yok, ışır */
 
 /* ---------- alt gezinme: 5 sekme, OYNA ortada yükseltilmiş ---------- */
 .alt-menu { display: grid; grid-template-columns: 1fr 1fr 1.2fr 1fr 1fr; align-items: end; gap: 2px;
@@ -213,12 +213,22 @@ button, [role="tab"] { -webkit-tap-highlight-color: transparent; touch-action: m
 /* oyun tarzı ekran geçişleri: sekmeler yöne göre kayar, diğerleri büyüyerek gelir */
 .ekran.gec-sag { animation: gecSag .28s cubic-bezier(.2, .9, .3, 1) both; }
 .ekran.gec-sol { animation: gecSol .28s cubic-bezier(.2, .9, .3, 1) both; }
-.ekran.gec-pop { animation: gecPop .26s cubic-bezier(.2, 1.25, .4, 1) both; }
+.ekran.gec-pop { animation: gecPop .22s ease-out both; }
 @keyframes gecSag { from { transform: translateX(22%); opacity: 0; } }
 @keyframes gecSol { from { transform: translateX(-22%); opacity: 0; } }
-@keyframes gecPop { from { transform: scale(.94); opacity: 0; } }
+@keyframes gecPop { from { transform: translateY(10px); opacity: 0; } } /* v0.79: büyüme yok, hafif yukarı kayarak belirir */
 /* basınca hafif büzülme (bombeli düğmeler zaten iner); kartlar ve sekmeler de tepki verir */
 .kol-kart, .m-urun, .kol-sekmeler button, .alt-menu button { transition: transform .08s ease; }
-.kol-kart:active, .m-urun:active, .kol-sekmeler button:active { transform: scale(.95); }
-.alt-menu button:active .am-ik { transform: scale(.9); }
+.kol-kart:active, .m-urun:active, .kol-sekmeler button:active { transform: translateY(2px); }
+.alt-menu button:active .am-ik { transform: translateY(2px); }
 @media (prefers-reduced-motion: reduce) { .ekran.gec-sag, .ekran.gec-sol, .ekran.gec-pop { animation: none; } }
+
+/* ---------- v0.79: yakınlaşma (büyüme) hissi kaldırıldı ----------
+   Törehan 24/11: pencerelerin büyüyerek açılması iyi hissettirmiyor. Eski giriş animasyonları boyut değiştirmeden
+   solma ve hafif kaymaya döner (aynı adla yeniden tanımlanır; sonra tanımlanan geçerli olur). */
+@keyframes kartGir { from { transform: translateY(16px); opacity: 0; } }
+@keyframes panelGir { from { transform: translateY(14px); opacity: 0; } }
+@keyframes belir { from { transform: translateY(10px); opacity: 0; } to { transform: none; opacity: 1; } }
+@keyframes logoGir { from { opacity: 0; } }
+@keyframes madalyaZipla { 0% { transform: translateY(0); } 40% { transform: translateY(-8px); } 70% { transform: translateY(1px); } 100% { transform: none; } }
+@keyframes dokunNabiz { 0%, 100% { opacity: .62; } 50% { opacity: 1; } }

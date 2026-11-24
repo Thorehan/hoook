@@ -8,8 +8,9 @@
 - Devir noktası: v0.55 (yayında). Bu dönemin başı: v0.51, etiket `geri-donus-v0.51`; v0.52–v0.55'in her biri ayrı commit, `git revert` ile tek tek geri alınabilir.
 - Devir Törehan'dayken Mustafa projede geliştirme yapmaz; devir `docs/DEVIR-MUSTAFA.md` §6'daki adımlarla yapılır.
 
-## Son durum (v0.78)
+## Son durum (v0.79)
 
+- **v0.79** (24/11/2026, Törehan): menülerde yakınlaşma (büyüme) hissi kaldırıldı; pencere ve ekranlar solarak ve hafif kayarak gelir. Oyun içindeki kamera nefesi (TAM ve uzun akış, %3) duruyor.
 - **v0.78** (24/11/2026, Törehan): yerel uygulama hissi (tarayıcı izleri kapalı, sabit başlıklar, dokunuş sesi ve titreşimi, ekran geçişleri). Arayüzün görsel yönü değişiyor: Törehan "web uygulaması ve yapay zekâ yapımı gibi" dedi; ekip bir UI görseli hazırlayacak, arayüz ondan ilerleyecek (Figma eklentisi önerildi). İstişare 4 Aşama 4–6 görsel gelince. Telefonda denenecek: `docs/telefon-testi.md` §22.
 - **v0.77** (24/11/2026, Törehan): İstişare 4 Aşama 3, Market (haftanın ürünü, günlük vitrin ve video ile %50, kategoriler, ürün kartı), fiyat dengesi (~12 hafta, Törehan onayı). Telefonda denenecek: `docs/telefon-testi.md` §21.
 - **v0.76** (23/11/2026, Törehan): İstişare 4 Aşama 2, karakterler ve takılar (9 karakter, Baş/Yüz/Sırt, nadirlik), Koleksiyon ekranı, oyunda seçili karakter. Telefonda denenecek: `docs/telefon-testi.md` §20. Not: katalog büyüdü, ortalama oyuncu için Dolap 83 günde biter (hedef ~8 hafta); fiyat dengesi Aşama 3'te.
