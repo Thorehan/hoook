@@ -155,6 +155,12 @@ Yayına çıkmadan yerelde denemek için: bilgisayarda `python3 -m http.server 8
 - [ ] Vitrindeki ▶ %50: video izleyince o ürün yarı fiyata iniyor mu? Ertesi gün indirim kalkıyor mu?
 - [ ] Fiyatlar (Nadir karakter 240–280, Destansı 520–600, Efsane 1200) ulaşılabilir ama değerli hissettiriyor mu?
 
+## 22. Yerel uygulama hissi (v0.78, 3 dk)
+- [ ] Menülerde metin seçilemiyor, uzun basınca menü çıkmıyor, iki parmakla ve çift dokunuşla yakınlaşmıyor mu? (Ad yazma alanı hâlâ çalışıyor mu?)
+- [ ] Market, Koleksiyon gibi sayfalarda başlık üstte sabit kalıyor mu?
+- [ ] Her düğmede kısa ses ve titreşim: hoş mu, fazla mı? Ayarlardan kapatınca susuyor mu?
+- [ ] Sekmeler arası kayma ve diğer ekranların büyüyerek gelişi akıcı mı?
+
 ## 5. Genel izlenim (serbest)
 - En sevdiğim an:
 - En çok zorlandığım yer:

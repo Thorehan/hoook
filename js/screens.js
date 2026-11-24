@@ -15,8 +15,17 @@
   var save = function () { return G.save(); };
 
   var SEKMELER = ['ekAna', 'ekBolumler', 'ekGorevler', 'ekDolap', 'ekProfil', 'ekAyarlar', 'ekIstat', 'ekYarisma', 'ekKoleksiyon'];
+  // Ekran geçişi (v0.78): alt sekmeler arasında yöne göre kayma, diğer ekranlarda hafif büyüyerek gelme
+  var SEKME_SIRA = { ekDolap: 0, ekKoleksiyon: 1, ekAna: 2, ekYarisma: 3, ekProfil: 4 };
+  function gecis(onceki, id) {
+    var el = $(id); if (!el || reduceMotion || onceki === id || id === 'oyun' || id === 'ekAcilis') return;
+    var a = SEKME_SIRA[onceki], b = SEKME_SIRA[id], sinif = a != null && b != null ? (b > a ? 'gec-sag' : 'gec-sol') : 'gec-pop';
+    el.classList.remove('gec-sag', 'gec-sol', 'gec-pop'); void el.offsetWidth; el.classList.add(sinif);
+  }
   function show(id) {
+    var onceki = current;
     current = id;
+    gecis(onceki, id);
     EKRANLAR.forEach(function (e) { $(e).hidden = e !== id; });
     $('oyunEkrani').hidden = id !== 'oyun';
     // alt gezinme çubuğu yalnızca menü sekmelerinde
@@ -1097,6 +1106,19 @@
     hikaye: hikaye,
     video: video
   };
+
+  // ---------- yerel uygulama hissi (v0.78) ----------
+  // Tarayıcı izleri: iki parmakla yakınlaştırma ve uzun basma menüsü kapalı (yazı alanları hariç); çift dokunuş yakınlaştırmasını CSS touch-action kapatır
+  ['gesturestart', 'gesturechange'].forEach(function (t) { document.addEventListener(t, function (e) { e.preventDefault(); }, { passive: false }); });
+  document.addEventListener('touchmove', function (e) { if (e.touches && e.touches.length > 1) e.preventDefault(); }, { passive: false });
+  document.addEventListener('contextmenu', function (e) { if (!e.target.closest('input, textarea')) e.preventDefault(); });
+  document.addEventListener('dragstart', function (e) { if (e.target.tagName === 'IMG') e.preventDefault(); });
+  // Her düğmeye basınca kısa ses ve hafif titreşim; ana düğmelerde (OYNA, Al, GİY, sekmeler) daha dolgun
+  document.addEventListener('pointerdown', function (e) {
+    var b = e.target.closest('button, [role="tab"]');
+    if (!b || b.disabled || b.getAttribute('aria-disabled') === 'true') return;
+    if (G.dokunus) G.dokunus(b.matches('.ana, .oyna-dugme, .oyna-sekme, .yan-kart, .m-haftalik'));
+  }, { passive: true });
 
   boot();
 })();

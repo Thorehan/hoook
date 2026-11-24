@@ -194,3 +194,31 @@ button.ana:disabled { filter: grayscale(.7) brightness(.8); }
 .alt-menu button > .nokta { top: 0; left: calc(50% + 10px); width: 12px; height: 12px; }
 .alt-menu button.oyna-sekme > .nokta { top: -26px; left: calc(50% + 18px); }
 .katman-ust > .kart.urun-kart, .katman-ust > .kart.tablo-kart, .katman-ust > .kart.hak-kart { background: linear-gradient(180deg, #3a2d86, #241a5c); border: 3px solid var(--a-kontur); box-shadow: 0 6px 0 var(--a-kontur); }
+
+/* ---------- yerel uygulama hissi (v0.78) ---------- */
+/* metin seçme, uzun basma menüsü, resim sürükleme ve çift dokunuş yakınlaştırması kapalı (yazı alanları hariç) */
+html { touch-action: manipulation; }
+body { -webkit-user-select: none; user-select: none; -webkit-touch-callout: none; }
+input, textarea { -webkit-user-select: text; user-select: text; -webkit-touch-callout: default; }
+img { -webkit-user-drag: none; user-drag: none; }
+button, [role="tab"] { -webkit-tap-highlight-color: transparent; touch-action: manipulation; }
+/* sabit ekranlar: başlık üstte kalır, içerik altında kayar; kaydırma çubuğu görünmez, uçta sekme yok */
+.ekran.sayfa-ekran { overscroll-behavior: contain; scrollbar-width: none; -webkit-overflow-scrolling: touch; }
+.ekran.sayfa-ekran::-webkit-scrollbar { display: none; }
+.ekran.sayfa-ekran .sayfa-ust { position: sticky; z-index: 6; top: calc(-16px - env(safe-area-inset-top, 0px));
+  margin-top: calc(-16px - env(safe-area-inset-top, 0px)); padding: calc(16px + env(safe-area-inset-top, 0px)) 0 10px;
+  background: linear-gradient(180deg, #33267a 0%, #33267a 82%, rgba(51,38,122,0) 100%); max-width: none; }
+.ekran.sayfa-ekran .sayfa-ust > * { flex: none; }
+.ekran.sayfa-ekran .sayfa-ust h2 { flex: 1; }
+/* oyun tarzı ekran geçişleri: sekmeler yöne göre kayar, diğerleri büyüyerek gelir */
+.ekran.gec-sag { animation: gecSag .28s cubic-bezier(.2, .9, .3, 1) both; }
+.ekran.gec-sol { animation: gecSol .28s cubic-bezier(.2, .9, .3, 1) both; }
+.ekran.gec-pop { animation: gecPop .26s cubic-bezier(.2, 1.25, .4, 1) both; }
+@keyframes gecSag { from { transform: translateX(22%); opacity: 0; } }
+@keyframes gecSol { from { transform: translateX(-22%); opacity: 0; } }
+@keyframes gecPop { from { transform: scale(.94); opacity: 0; } }
+/* basınca hafif büzülme (bombeli düğmeler zaten iner); kartlar ve sekmeler de tepki verir */
+.kol-kart, .m-urun, .kol-sekmeler button, .alt-menu button { transition: transform .08s ease; }
+.kol-kart:active, .m-urun:active, .kol-sekmeler button:active { transform: scale(.95); }
+.alt-menu button:active .am-ik { transform: scale(.9); }
+@media (prefers-reduced-motion: reduce) { .ekran.gec-sag, .ekran.gec-sol, .ekran.gec-pop { animation: none; } }

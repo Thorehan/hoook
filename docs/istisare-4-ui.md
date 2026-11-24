@@ -71,7 +71,9 @@ Kaynaklar: [Pixune: hypercasual UI/UX](https://pixune.com/blog/hypercasual-games
 
 1. ✅ (v0.75, telefonda denendi) **Tasarım dili + ana ekran + alt gezinme:** yeni düğme, kart ve çubuk bileşenleri; OYNA ekranı; 5 sekme (eski ekranlar geçici olarak sekmelerin altında).
 2. ✅ (v0.76, telefonda denendi) **Eşya modeli + Koleksiyon:** (kadro: karakterlerde 3 nadirlik Nadir · Destansı · Efsane + Etkinlik özel; Renk yuvası; seçilen karakter oyunda da görünür) karakter ve aksesuar veri yapısı, nadirlik, eski görünümlerin taşınması, önizleme sahnesi.
-3. ✅ (v0.77, telefonda deneme bekliyor) **Market:** (haftanın ürünü yalnız Efsane ve Destansı karakter/takılardan; Efsane yalnız haftanın ürünüyken satılır; ~12 hafta, Törehan 24/11) günlük vitrin, haftalık sınırlı, kategoriler, fiyatlar ve ekonomi ölçümü.
+**Yön değişikliği (24/11):** Aşama 1–3'ün CSS ile çizilmiş görünüşü "web uygulaması / yapay zekâ yapımı gibi" bulundu. Ekip bir UI görseli hazırlayacak; bundan sonra arayüz o görselin yapısından ilerler (yapı ve akış korunur, görünüş değişir). v0.78'de görselden bağımsız yerel uygulama hissi düzeltmeleri yapıldı.
+
+3. ✅ (v0.77) **Market:** (haftanın ürünü yalnız Efsane ve Destansı karakter/takılardan; Efsane yalnız haftanın ürünüyken satılır; ~12 hafta, Törehan 24/11) günlük vitrin, haftalık sınırlı, kategoriler, fiyatlar ve ekonomi ölçümü.
 4. **Sezon şeridi + görevler:** sezon puanı, 30 kademe, görevlerin sezona bağlanması.
 5. **Yarışma ve Profil sekmeleri:** Günlük, Haftalık, lig, skor tablosu ve rekor duvarı tek yerde.
 6. **Oyun içi çizim:** karakterlerin oyunda çizimi ve animasyonu; halka, duvar ve su yeni stilde. Görsel olarak en büyük iş; botlar ve nişan etkilenmez (yalnız çizim).

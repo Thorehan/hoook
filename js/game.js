@@ -115,6 +115,9 @@
     o.connect(g); g.connect(a.destination); o.start(t); o.stop(t + dur + 0.02);
   }
   var SFX = {
+    // menü dokunuşu (v0.78): kısa tık; ana düğmelerde (OYNA, Al, GİY) biraz daha dolgun ve yükselen
+    dokun: function () { tone(1180, 0.045, 'triangle', 0.035, 1500); },
+    dokunAna: function () { tone(520, 0.07, 'triangle', 0.05, 880); setTimeout(function () { tone(1040, 0.06, 'sine', 0.03); }, 35); },
     fire: function () { tone(520, 0.08, 'triangle', 0.05, 900); },
     attach: function () { tone(180, 0.12, 'square', 0.06, 90); },
     // akış bir melodiye döner (v0.67): her tutunma pentatonik dizide bir nota yükselir, üstte hafif bir oktav
@@ -2693,6 +2696,8 @@
     isikGordu: function (sv) { save.isikGorulen = sv; persist(); },
     toggleHayalet: function () { save.hayalet = !hayaletAcik(); persist(); return hayaletAcik(); },
     hayaletAcik: function () { return hayaletAcik(); },
+    // v0.78: menü düğmesine basınca ses ve hafif titreşim (efekt sesi ve titreşim ayarlarına uyar)
+    dokunus: function (ana) { ac(); if (ana) SFX.dokunAna(); else SFX.dokun(); buzz(ana ? 12 : 6); },
     toggleHaptics: function () { save.haptics = save.haptics === false; persist(); if (save.haptics) buzz(20); return save.haptics; },
     unlockAudio: function () { ac(); },
     pause: function () { pauseGame(); },
