@@ -8,8 +8,9 @@
 - Devir noktası: v0.55 (yayında). Bu dönemin başı: v0.51, etiket `geri-donus-v0.51`; v0.52–v0.55'in her biri ayrı commit, `git revert` ile tek tek geri alınabilir.
 - Devir Törehan'dayken Mustafa projede geliştirme yapmaz; devir `docs/DEVIR-MUSTAFA.md` §6'daki adımlarla yapılır.
 
-## Son durum (v0.80)
+## Son durum (v0.81)
 
+- **v0.81** (24/11/2026, Törehan): kamera nefesi yenilendi: arka plan ve duvarlar artık büyümüyor; yalnız oyun katmanı mini yaklaş-uzaklaş yapıyor (%1,8, 0,34 sn). Sırada arayüzün özgün hyper-casual yeniden tasarımı (önce yön taslakları). Telefonda denenecek: `docs/telefon-testi.md` §24.
 - **v0.80** (24/11/2026, Törehan): platform standartları: dokunma alanları ≥44 px, Android geri tuşu, dört ekran boyutunda tarama. Telefonda denenecek: `docs/telefon-testi.md` §23. Arayüz çalışma ilkeleri (Senior Mobile UI/UX): her arayüz işinde önce yaklaşım, sonra uygulama; çalışan özellik izinsiz değişmez.
 - **v0.79** (24/11/2026, Törehan): menülerde yakınlaşma (büyüme) hissi kaldırıldı; pencere ve ekranlar solarak ve hafif kayarak gelir. Oyun içindeki kamera nefesi (TAM ve uzun akış, %3) duruyor.
 - **v0.78** (24/11/2026, Törehan): yerel uygulama hissi (tarayıcı izleri kapalı, sabit başlıklar, dokunuş sesi ve titreşimi, ekran geçişleri). Arayüzün görsel yönü değişiyor: Törehan "web uygulaması ve yapay zekâ yapımı gibi" dedi; ekip bir UI görseli hazırlayacak, arayüz ondan ilerleyecek (Figma eklentisi önerildi). İstişare 4 Aşama 4–6 görsel gelince. Telefonda denenecek: `docs/telefon-testi.md` §22.

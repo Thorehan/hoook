@@ -167,6 +167,10 @@ Yayına çıkmadan yerelde denemek için: bilgisayarda `python3 -m http.server 8
 - [ ] Küçük düğmeler (profil, ateşböceği, çark, kategori sekmeleri, ayar anahtarları) ilk dokunuşta tutuyor mu?
 - [ ] Küçük ekranlı telefonda Çıra, bölüm çipi ve OYNA birbirine değmeden görünüyor mu?
 
+## 24. Kamera nefesi (v0.81, 2 dk)
+- [ ] TAM yapınca ve akış x10'da: arka plan ve duvarlar yerinde kalıp yalnız Çıra, halkalar ve ip minik yaklaşıp uzaklaşıyor mu?
+- [ ] Nefes hissi duruyor mu, yoksa artık fark edilmiyor mu? (Az geliyorsa %1,8 → %2,5 yapılabilir.)
+
 ## 5. Genel izlenim (serbest)
 - En sevdiğim an:
 - En çok zorlandığım yer:

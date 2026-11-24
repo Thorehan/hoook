@@ -143,7 +143,7 @@
   var TIT = { tutun: 8, kutu: 14, tam: [10, 35, 14], alev: function (s) { return 40 + 15 * s; }, su: [25, 45, 25, 45, 70], dusus: [90] };
   // Zaman: TAM'da kısa donma (hit-stop), uzun akışta (x10, x20, x30) kısa ağır çekim. Yalnız gerçek zaman bekletilir;
   // motor aynı sabit adımlarla ilerler, uçuş hızı aynı kalır. Hareket azaltma açıksa ağır çekim yok.
-  var durak = 0, yavas = 0, YAVAS_SURE = 0.6, nefes = 0, NEFES_SURE = 0.28, vurgu = null, ezil = null;
+  var durak = 0, yavas = 0, YAVAS_SURE = 0.6, nefes = 0, NEFES_SURE = 0.34, vurgu = null, ezil = null;
   function zamanOlcek(dt) {
     if (durak > 0) { durak -= dt; return 0; }
     if (yavas > 0) { yavas = Math.max(0, yavas - dt); return 1 - 0.4 * Math.sin(Math.PI * (1 - yavas / YAVAS_SURE)); }
@@ -1773,14 +1773,16 @@
     if (shake > 0 && !reduceMotion) { sx = (Math.random() - 0.5) * shake; sy = (Math.random() - 0.5) * shake; }
     shake = Math.max(0, shake - dt * 30);
     ctx.setTransform(K * DPR, 0, 0, K * DPR, sx * DPR, (-cam * K + sy) * DPR);
-    if (nefes > 0) { // kameranın kısa nefesi: Çıra'nın çevresinde hafif yaklaşıp geri çekilme
-      var nz = 1 + 0.03 * Math.sin(Math.PI * (1 - nefes / NEFES_SURE)), np = sim.p;
-      ctx.translate(np.x, np.y); ctx.scale(nz, nz); ctx.translate(-np.x, -np.y);
-      nefes = Math.max(0, nefes - dt);
-    }
     drawBackground(t);
     drawDalga(t);
     drawToz(t, 0.55, 12, 0.9, 0.10);
+    // Kameranın kısa nefesi (v0.81): duvar ve arka plan sabit kalır; yalnız oyun katmanı (Çıra, halkalar, ip, su) Çıra'nın
+    // çevresinde minik yaklaşıp uzaklaşır: önce %1,8 yakın, sonra hafif açılıp yerine oturur
+    if (nefes > 0) {
+      var nk = 1 - nefes / NEFES_SURE, nz = 1 + 0.018 * Math.sin(2 * Math.PI * nk) * (1 - 0.4 * nk), np = sim.p;
+      ctx.translate(np.x, np.y); ctx.scale(nz, nz); ctx.translate(-np.x, -np.y);
+      nefes = Math.max(0, nefes - dt);
+    }
     drawKorIsigi(t);
     drawGoal(t);
     var vh = viewH / K;
