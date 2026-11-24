@@ -133,6 +133,7 @@ Kullanıcı hikâyeye online'dan önce geçti; online (5) sonra.
 - [?] Bekçinin adı.
 
 ## Yapılanlar
+- 2026-11-24 · v0.84 · İstişare 5 Aşama 2 (Muhammed): Market, Koleksiyon ve ürün sayfası Askıda Menü dilinde (kuyu duvarı, kirişe asılı tabela, çiviye asılı eğik çıkartma kartlar, alttan açılan ürün sayfası, aşağı çekerek kapatma, satın alma kutlaması); 360×640 / 375×667 / 390×844 / 430×932 tarandı.
 - 2026-11-24 · v0.83 · Hikâye bölümlerinde asılı başlangıç (geçici çengel), sonsuz modlar dipten; ana ekranda OYNA duvar halkasından sarkar, Çıra yukarıda, "Başlamak için dokun" geri geldi.
 - 2026-11-24 · v0.82 · İstişare 5 Aşama 1 (Askıda Menü): tasarım dili (düz renk, kalın çizgi, sert gölge, Lilita One), kirişe asılı sallanan etiketlerle ana ekran, yeni alt sekme çubuğu.
 - 2026-11-24 · v0.81 · Kamera nefesi: arka plan sabit, yalnız oyun katmanı mini yaklaş-uzaklaş (%1,8, 0,34 sn).

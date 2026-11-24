@@ -184,6 +184,13 @@ Yayına çıkmadan yerelde denemek için: bilgisayarda `python3 -m http.server 8
 - [ ] Ana ekranda OYNA'nın yeri (ortadaki halkadan sarkan) başparmağa rahat mı?
 - [ ] Boş yere dokununca oyun başlıyor mu? Yanlışlıkla başlatma oluyor mu (üst şerit ve kiriş başlatmaz)?
 
+## 27. Askıda Menü: Market ve Koleksiyon (v0.84, 4 dk)
+- [ ] Market ve Koleksiyon ana ekranla aynı oyunun parçası gibi mi? Kuyu duvarı, kiriş ve asılı tabela hoş mu?
+- [ ] Eğik, çiviye asılı kartlar okunaklı mı? Fiyatlar ve nadirlik bir bakışta anlaşılıyor mu?
+- [ ] Ürüne dokununca sayfa alttan geliyor mu? Aşağı çekince, boşluğa dokununca ve Android geri ile kapanıyor mu? Az çekince yerine dönüyor mu?
+- [ ] Bir şey alınca ya da giyilince kartın savrulması ve ateşböceği parçacıkları hoş mu, fazla mı?
+- [ ] Koleksiyon'da ad ve GİY alttaki şeritte rahat mı? 3 sütunlu ızgara yeterince büyük mü?
+
 ## 5. Genel izlenim (serbest)
 - En sevdiğim an:
 - En çok zorlandığım yer:

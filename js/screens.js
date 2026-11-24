@@ -34,7 +34,7 @@
       if (b.dataset.sekme === id && (!b.dataset.mod || b.dataset.mod === dolapMod)) b.setAttribute('aria-current', 'page'); else b.removeAttribute('aria-current');
     });
     if (id === 'ekAna' || id === 'ekTanitim') startScene(); else stopScene();
-    if (id !== 'ekDolap' && !$('urunKatman').hidden) urunKapat();
+    if (id !== 'ekDolap' && !$('urunKatman').hidden) urunKapat(true);
     if (id === 'ekKoleksiyon') kolBaslat(); else kolDur();
     if (id !== 'oyun' && id !== 'ekAcilis') G.muzikSahne('menu'); // menülerde sakin müzik
     if (SEKMELER.indexOf(id) >= 0) { $('gorevNokta').hidden = !G.gorevBekleyen(); $('marketNokta').hidden = !G.vitrinYeni() || id === 'ekDolap'; } // Market: bugünün vitrini görülmedi
@@ -554,13 +554,65 @@
     else if (d.sinif === 'yetmez') { al.innerHTML = (d.fiyat - G.cuzdan().ates) + ' eksik'; al.disabled = true; }
     else al.innerHTML = 'AL · <i class="ikon-ates" aria-hidden="true"></i>' + d.fiyat;
     $('urunVideo').hidden = !(id === v.indirimli && !has && !G.vitrinIndirimde(id));
+    clearTimeout(urunKapTimer); $('urunKatman').classList.remove('kapaniyor');
+    $('urunSayfa').style.transition = ''; $('urunSayfa').style.transform = '';
     $('urunKatman').hidden = false;
     urunOnizle();
     (al.disabled ? $('urunKapat') : al).focus({ preventScroll: true });
   }
-  function urunKapat() { $('urunKatman').hidden = true; cancelAnimationFrame(urunRaf); urunId = null; }
+  // v0.84: alttan açılan sayfa aşağı kayarak kapanır (hemen = true: animasyonsuz, ör. sekme değişince)
+  var urunKapTimer = 0;
+  function urunKapat(hemen) {
+    var k = $('urunKatman');
+    cancelAnimationFrame(urunRaf); urunId = null; clearTimeout(urunKapTimer);
+    if (k.hidden) return;
+    if (hemen === true || reduceMotion) { k.hidden = true; k.classList.remove('kapaniyor'); return; }
+    k.classList.add('kapaniyor');
+    urunKapTimer = setTimeout(function () { k.hidden = true; k.classList.remove('kapaniyor'); $('urunSayfa').style.transform = ''; }, 220);
+  }
+  // aşağı çekerek kapatma: düğmeler dışında bir yerden tutulur; 90 px'ten fazla çekilirse kapanır, azsa geri yerine oturur
+  var surukle = null;
+  $('urunSayfa').addEventListener('pointerdown', function (e) {
+    if (e.target.closest('button')) return;
+    surukle = { y: e.clientY, dy: 0 }; this.setPointerCapture(e.pointerId); this.style.transition = 'none';
+  });
+  $('urunSayfa').addEventListener('pointermove', function (e) {
+    if (!surukle) return;
+    surukle.dy = Math.max(0, e.clientY - surukle.y);
+    this.style.transform = surukle.dy ? 'translateY(' + surukle.dy + 'px)' : '';
+  });
+  function surukBitti() {
+    if (!surukle) return;
+    var dy = surukle.dy, s = $('urunSayfa'); surukle = null;
+    if (dy > 90) { urunKapat(); return; }
+    s.style.transition = 'transform .2s cubic-bezier(.3, 1.3, .5, 1)'; s.style.transform = '';
+  }
+  $('urunSayfa').addEventListener('pointerup', surukBitti);
+  $('urunSayfa').addEventListener('pointercancel', surukBitti);
+  // çıkartma kartı savrulur; kutla: üstüne ateşböceği parçacıkları da yükselir (satın alma ve giyme başarısı)
+  function salla(el) {
+    if (!el) return;
+    var h = el.id === 'mHaftalik' ? el.parentNode : el; // haftanın ürünü askısıyla birlikte savrulur
+    h.classList.remove('savrul'); void h.offsetWidth; h.classList.add('savrul');
+    setTimeout(function () { h.classList.remove('savrul'); }, 650);
+  }
+  function kutla(el) {
+    if (!el) return;
+    salla(el);
+    if (reduceMotion) return;
+    for (var i = 0; i < 8; i++) {
+      var p = document.createElement('i'), a = -Math.PI / 2 + (i - 3.5) * 0.34, d = 38 + (i % 3) * 14;
+      p.className = 'bocek-parca'; p.setAttribute('aria-hidden', 'true');
+      p.style.setProperty('--dx', (Math.cos(a) * d).toFixed(1) + 'px'); p.style.setProperty('--dy', (Math.sin(a) * d - 12).toFixed(1) + 'px');
+      el.appendChild(p);
+      setTimeout(function (n) { n.remove(); }, 950, p);
+    }
+  }
+  function marketKutla(id) {
+    setTimeout(function () { document.querySelectorAll('#ekDolap [data-urun="' + id + '"]').forEach(kutla); }, 180);
+  }
   function urunOnizle() {
-    var cv = $('urunOnizleme'), dpr = Math.min(2, window.devicePixelRatio || 1), w = cv.clientWidth || 300, h = 190;
+    var cv = $('urunOnizleme'), dpr = Math.min(2, window.devicePixelRatio || 1), w = cv.clientWidth || 300, h = window.innerHeight <= 700 ? 150 : 180; // v0.84: sayfa küçük ekrana sığsın
     cv.width = w * dpr; cv.height = h * dpr; cv.style.height = h + 'px';
     var c = cv.getContext('2d');
     cancelAnimationFrame(urunRaf);
@@ -568,15 +620,15 @@
       var it = urunId && window.KuyuEkonomi.item(urunId); if (!it) return;
       var ek = {}; ek[it.tur] = it.id;
       c.setTransform(dpr, 0, 0, dpr, 0, 0);
-      onizlemeCiz(c, w, h, now, G.gorunumIle(ek), it.tur === 'alev', '#2a1f5c', 1.3);
+      onizlemeCiz(c, w, h, now, G.gorunumIle(ek), it.tur === 'alev', '#1c1838', 1.3);
       urunRaf = requestAnimationFrame(tick);
     })(performance.now());
   }
   $('urunAl').addEventListener('click', function () {
     var it = window.KuyuEkonomi.item(urunId); if (!it) return;
-    if (sahipMi(it.id)) { G.kusan(it.id); resimBellek = {}; toast(it.ad + ' kuşanıldı', 1600); urunKapat(); renderMarket(); return; }
+    if (sahipMi(it.id)) { G.kusan(it.id); resimBellek = {}; toast(it.ad + ' kuşanıldı', 1600); urunKapat(); renderMarket(); marketKutla(it.id); return; }
     var r = G.satinAl(it.id);
-    if (r.ok) { resimBellek = {}; if (G.sfx) G.sfx.won(); toast(it.ad + ' alındı ve kuşanıldı'); urunKapat(); renderMarket(); return; }
+    if (r.ok) { resimBellek = {}; if (G.sfx) G.sfx.won(); toast(it.ad + ' alındı ve kuşanıldı'); urunKapat(); renderMarket(); marketKutla(it.id); return; }
     if (r.neden === 'yetersiz') toast(r.eksik + ' ateşböceği eksik. Bölüm, Günlük ve Haftalık Kuyu, görev ve günlük girişten toplanır.');
     urunAc(it.id);
   });
@@ -588,8 +640,8 @@
   $('urunKatman').addEventListener('click', function (e) { if (e.target === $('urunKatman')) urunKapat(); });
   $('urunKatman').addEventListener('keydown', function (e) { if (e.key === 'Escape') { e.stopPropagation(); urunKapat(); } });
   $('mSekmeler').addEventListener('click', function (e) { var b = e.target.closest('[data-mtur]'); if (!b) return; dolapTur = b.dataset.mtur; renderMarket(); });
-  ['mVitrin', 'mIzgara'].forEach(function (k) { $(k).addEventListener('click', function (e) { var b = e.target.closest('[data-urun]'); if (b) urunAc(b.dataset.urun); }); });
-  $('mHaftalik').addEventListener('click', function () { if ($('mHaftalik').dataset.urun) urunAc($('mHaftalik').dataset.urun); });
+  ['mVitrin', 'mIzgara'].forEach(function (k) { $(k).addEventListener('click', function (e) { var b = e.target.closest('[data-urun]'); if (b) { salla(b); urunAc(b.dataset.urun); } }); });
+  $('mHaftalik').addEventListener('click', function () { if ($('mHaftalik').dataset.urun) { salla($('mHaftalik')); urunAc($('mHaftalik').dataset.urun); } });
   // Önizleme (Market ve Koleksiyon, v0.76): halkada sallanan kahraman; L görünüm, alevGoster alev basamaklarını döndürür
   function onizlemeCiz(c, w, h, now, L, alevGoster, zemin, olcek) {
       var t = now / 1000;
@@ -664,14 +716,14 @@
     $('kolAcilis').textContent = ac;
   }
   $('kolSekmeler').addEventListener('click', function (e) { var b = e.target.closest('[data-kol]'); if (!b) return; kolTur = b.dataset.kol; kolSecili = null; renderKol(); });
-  $('kolIzgara').addEventListener('click', function (e) { var b = e.target.closest('[data-kol-id]'); if (!b) return; kolSecili = b.dataset.kolId; renderKol(); });
+  $('kolIzgara').addEventListener('click', function (e) { var b = e.target.closest('[data-kol-id]'); if (!b) return; kolSecili = b.dataset.kolId; renderKol(); salla($('kolIzgara').querySelector('.secili')); });
   $('kolGiy').addEventListener('click', function () {
     var EK = window.KuyuEkonomi, it = EK.item(kolSecili); if (!it) return;
-    if (sahipMi(it.id)) { G.kusan(it.id); resimBellek = {}; if (G.sfx) G.sfx.won(); toast(it.ad + ' kuşanıldı', 1600); renderKol(); return; }
+    if (sahipMi(it.id)) { G.kusan(it.id); resimBellek = {}; if (G.sfx) G.sfx.won(); toast(it.ad + ' kuşanıldı', 1600); renderKol(); kutla($('kolIzgara').querySelector('.secili')); return; }
     if (!it.etkinlik && !it.isik && it.lig == null) { dolapTur = it.tur; openDolap(); urunAc(it.id); } // Market'te ürün kartıyla açılır
   });
   function kolBaslat() {
-    var cv = $('kolOnizleme'), dpr = Math.min(2, window.devicePixelRatio || 1), w = cv.clientWidth || 320, h = 200;
+    var cv = $('kolOnizleme'), dpr = Math.min(2, window.devicePixelRatio || 1), w = cv.clientWidth || 320, h = window.innerHeight <= 700 ? 150 : 170; // v0.84: ad şeridi altta, pano biraz kısaldı
     cv.width = w * dpr; cv.height = h * dpr; cv.style.height = h + 'px';
     var c = cv.getContext('2d');
     cancelAnimationFrame(kolRaf);
@@ -679,7 +731,7 @@
       var it = window.KuyuEkonomi.item(kolSecili), ek = {};
       if (it) ek[it.tur] = it.id;
       c.setTransform(dpr, 0, 0, dpr, 0, 0);
-      onizlemeCiz(c, w, h, now, G.gorunumIle(ek), kolTur === 'alev', '#2a1f5c', 1.35);
+      onizlemeCiz(c, w, h, now, G.gorunumIle(ek), kolTur === 'alev', '#1c1838', 1.35);
       kolRaf = requestAnimationFrame(tick);
     })(performance.now());
   }
