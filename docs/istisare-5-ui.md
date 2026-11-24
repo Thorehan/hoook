@@ -33,7 +33,7 @@ Bütün özellikler ve akışlar aynı kalır: Hikâye, Günlük, Haftalık, Gö
 
 ## Aşamalar
 
-1. **Tasarım dili + ana ekran + alt sekme çubuğu** (asılı etiketler, salınım, yeni yazı tipi).
+1. ✅ (v0.82, telefonda deneme bekliyor) **Tasarım dili + ana ekran + alt sekme çubuğu** (asılı etiketler, salınım, yeni yazı tipi). OYNA uzun ipte ekranın ortasına iner (başparmağa yakın); bölüm adı OYNA etiketinde, bölüm çipi altına zincirli.
 2. **Market ve Koleksiyon** (çıkartma kartlar, ürün sayfası).
 3. **Yarışma, Profil, pencereler ve durumlar.**
 4. Açılış, tanıtım ve sonuç kartları; dört ekran boyutunda tarama.

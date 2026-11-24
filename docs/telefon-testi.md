@@ -171,6 +171,13 @@ Yayına çıkmadan yerelde denemek için: bilgisayarda `python3 -m http.server 8
 - [ ] TAM yapınca ve akış x10'da: arka plan ve duvarlar yerinde kalıp yalnız Çıra, halkalar ve ip minik yaklaşıp uzaklaşıyor mu?
 - [ ] Nefes hissi duruyor mu, yoksa artık fark edilmiyor mu? (Az geliyorsa %1,8 → %2,5 yapılabilir.)
 
+## 25. Askıda Menü: ana ekran (v0.82, 4 dk)
+- [ ] Ana ekran ilk bakışta "özgün oyun" gibi mi, yoksa hâlâ web sayfası gibi mi?
+- [ ] Etiketlerin sallanması hoş mu, baş döndürüyor mu? Basınca savrulma hissi iyi mi?
+- [ ] OYNA başparmakla rahat erişiliyor mu? Daha aşağıda mı olmalı?
+- [ ] Yazılar (Lilita One) okunaklı mı? Görevler, Günlük, Haftalık, Sıralama, bölüm çipi doğru yere gidiyor mu?
+- [ ] Alt çubukta seçili sekmenin kalkıp renklenmesi anlaşılır mı?
+
 ## 5. Genel izlenim (serbest)
 - En sevdiğim an:
 - En çok zorlandığım yer:

@@ -133,6 +133,7 @@ Kullanıcı hikâyeye online'dan önce geçti; online (5) sonra.
 - [?] Bekçinin adı.
 
 ## Yapılanlar
+- 2026-11-24 · v0.82 · İstişare 5 Aşama 1 (Askıda Menü): tasarım dili (düz renk, kalın çizgi, sert gölge, Lilita One), kirişe asılı sallanan etiketlerle ana ekran, yeni alt sekme çubuğu.
 - 2026-11-24 · v0.81 · Kamera nefesi: arka plan sabit, yalnız oyun katmanı mini yaklaş-uzaklaş (%1,8, 0,34 sn).
 - 2026-11-24 · v0.80 · Platform standartları: dokunma alanları ≥44 px, Android geri tuşu (pencere → oyun duraklat → OYNA → çıkış uyarısı), 360×640 / 375×667 / 390×844 / 430×932 taraması; küçük ekranda Çıra bölüm çipine değmiyor.
 - 2026-11-24 · v0.79 · Menülerde yakınlaşma hissi kaldırıldı (büyüyen pencere, kart, başlık, OYNA nabzı, rozet, madalya, basış): solma ve kaymaya döndü.

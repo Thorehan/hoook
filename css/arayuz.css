@@ -243,3 +243,116 @@ button, [role="tab"] { -webkit-tap-highlight-color: transparent; touch-action: m
 /* anahtar: görünüş aynı (54×32), görünmez dokunma payı 44 px'e genişler */
 .anahtar { position: relative; overflow: visible; }
 .anahtar::after { content: ''; position: absolute; inset: -7px -4px; }
+
+/* =====================================================================
+   İstişare 5 · "Askıda Menü" (v0.82, Aşama 1: tasarım dili, ana ekran, alt çubuk)
+   Düz renk, 3 px koyu çizgi, bulanık değil kaymış sert gölge; büyüme yok, salınım var.
+   ===================================================================== */
+:root {
+  --s-cizgi: #15112a; --s-gece: #1c1838; --s-gece2: #2a2350; --s-krem: #fff4dc; --s-ip: #efe2c4;
+  --s-kor: #ff7a2f; --s-kor2: #e0521b; --s-bocek: #ffe066; --s-mavi: #5ec8ff; --s-mor: #9b6bff; --s-yesil: #5fd38d; --s-pembe: #ff6fa8;
+  --s-soluk: #b9b2dc;
+  --font-afis: "Lilita One", "Baloo 2", system-ui, sans-serif;
+}
+
+/* ---------- kiriş: ana ekranın tepesinde tahta; üst şerit onun üstünde durur ---------- */
+#ekAna .kiris { position: absolute; z-index: 1; left: 0; right: 0; top: 0; height: calc(env(safe-area-inset-top, 0px) + 70px); pointer-events: none;
+  background:
+    radial-gradient(circle at 14px 50%, #3a2615 0 3px, transparent 3.5px) 0 calc(100% - 9px) / 64px 12px repeat-x,
+    repeating-linear-gradient(180deg, transparent 0 11px, rgba(0,0,0,.09) 11px 13px),
+    linear-gradient(180deg, #94653a, #74492a);
+  border-bottom: 4px solid var(--s-cizgi); box-shadow: 0 5px 0 rgba(21,17,42,.35); }
+#ekAna .ana-ust { z-index: 2; }
+#ekAna button.selam, #ekAna .para-hap, #ekAna .cark-btn { border-width: 3px !important; box-shadow: 0 3px 0 var(--s-cizgi); }
+#ekAna button.selam:active, #ekAna .para-hap:active, #ekAna .cark-btn:active { transform: translateY(3px); box-shadow: 0 0 0 var(--s-cizgi); }
+#ekAna button.selam { background: var(--s-gece2); }
+#ekAna .selam b, #ekAna .para-hap b { font-family: var(--font-afis); font-weight: 400; letter-spacing: .3px; }
+#ekAna .para-hap { background: var(--s-cizgi); }
+#ekAna .para-hap .arti { background: var(--s-yesil); }
+#ekAna .cark-btn { background: var(--s-gece2); }
+
+/* ---------- askılar: üç sütun, her biri kirişten iple sarkar ---------- */
+#ekAna .askilar { display: grid; grid-template-columns: 82px minmax(0, 1fr) 82px; gap: 10px; width: 100%; max-width: 448px; margin: 12px auto 0; align-items: start; pointer-events: none; }
+.aski-sutun { display: flex; justify-content: center; animation: askiIn .55s cubic-bezier(.3, 1.35, .5, 1) both; }
+.aski-sutun.orta { animation-delay: .05s; } .aski-sutun.sag { animation-delay: .1s; }
+@keyframes askiIn { from { transform: translateY(-140px); } }
+.aski { --ip: 10px; --sal: 2.2deg; display: flex; flex-direction: column; align-items: center; width: 100%; transform-origin: 50% 0; pointer-events: none;
+  animation: askiSal 3.4s ease-in-out infinite alternate; }
+.aski > button { pointer-events: auto; }
+.aski.a-oyna { --ip: clamp(22px, 20vh, 190px); --sal: 1.3deg; animation-duration: 4.2s; animation-delay: -1.3s; }
+.aski.a-haftalik { animation-delay: -2.1s; }
+.aski.kisa { --ip: 7px; animation-duration: 2.7s; animation-delay: -.8s; }
+.aski.a-bolum { width: auto; max-width: 100%; animation-duration: 3s; }
+.aski:has(> button[hidden]) { display: none; } /* Sıralama kapalıyken ipi ve çengeli de görünmez */
+@keyframes askiSal { from { transform: rotate(calc(var(--sal) * -1)); } to { transform: rotate(var(--sal)); } }
+.aski.savrul { animation: askiSavrul .6s cubic-bezier(.3, .6, .4, 1); }
+@keyframes askiSavrul { 0% { transform: rotate(0); } 25% { transform: rotate(-7deg); } 55% { transform: rotate(4deg); } 80% { transform: rotate(-1.5deg); } 100% { transform: rotate(0); } }
+.aski-ip { display: block; width: 3px; height: var(--ip); background: var(--s-ip); box-shadow: 1px 0 0 rgba(21,17,42,.45); border-radius: 0 0 2px 2px; flex: none; }
+.cengel { display: block; position: relative; z-index: 2; width: 16px; height: 12px; margin: -1px 0 -9px; flex: none;
+  border: 3.5px solid #d9dde0; border-top: 0; border-radius: 0 0 10px 10px; box-shadow: 0 2px 0 rgba(21,17,42,.6); }
+
+/* ---------- çıkartma etiket (yan etiketler) ---------- */
+#ekAna .askilar .yan-kart { width: 100%; padding: 15px 4px 8px; border-radius: 15px; gap: 2px; background: var(--etiket, var(--s-mavi));
+  box-shadow: 0 4px 0 var(--s-cizgi); filter: none; }
+#ekAna .askilar .yan-kart::before, #ekAna .oyna-dugme::before, #ekAna .bolum-hap::before { content: ''; position: absolute; left: 50%; top: 4px; width: 10px; height: 10px; margin-left: -5px;
+  border-radius: 50%; background: var(--s-cizgi); box-shadow: inset 0 2px 0 rgba(0,0,0,.4); }
+#ekAna .askilar .yan-kart:active, #ekAna .oyna-dugme:active, #ekAna .bolum-hap:active { transform: translateY(4px); box-shadow: 0 0 0 var(--s-cizgi); }
+#ekAna .askilar .yan-kart:hover { filter: brightness(1.05); }
+#ekAna .askilar .yan-kart > svg { width: 30px; height: 30px; }
+#ekAna .askilar .yan-kart b { font-family: var(--font-afis); font-weight: 400; font-size: 16px; letter-spacing: .3px; -webkit-text-stroke: 0; text-shadow: 0 2px 0 rgba(21,17,42,.55); }
+#ekAna .askilar .yan-kart small { font-family: var(--font-metin); font-weight: 800; font-size: 11px; color: #fff; text-shadow: 0 1px 0 rgba(21,17,42,.45); }
+#ekAna .k-cam { --etiket: var(--s-mavi); } #ekAna .k-mor { --etiket: var(--s-mor); } #ekAna .k-yesil { --etiket: var(--s-yesil); } #ekAna .k-ates { --etiket: var(--s-kor); }
+#ekAna .askilar .kisa .yan-kart { padding-top: 14px; }
+#ekAna .askilar .kisa .yan-kart > svg { width: 24px; height: 24px; }
+#ekAna .askilar .kisa .yan-kart b { font-size: 14px; }
+#ekAna .yan-kart .ag-cubuk { width: 58px; }
+#ekAna .yan-kart .ag-cubuk > i { background: rgba(21,17,42,.35); }
+#ekAna .nokta-say { top: -7px; right: -7px; background: var(--s-pembe); border-width: 3px; }
+
+/* ---------- OYNA: büyük, alt kenarı bombeli etiket ---------- */
+#ekAna .oyna-dugme { position: relative; width: 100%; max-width: 196px; min-height: 0; flex-direction: column; gap: 0; padding: 20px 8px 12px;
+  border-radius: 24px 24px 50px 50px / 24px 24px 34px 34px; background: var(--s-kor); box-shadow: 0 5px 0 var(--s-cizgi); border-width: 3px !important;
+  font-family: var(--font-afis); font-weight: 400; font-size: 46px; line-height: 1; letter-spacing: 1px; -webkit-text-stroke: 0; text-shadow: 0 3px 0 rgba(21,17,42,.6); }
+#ekAna .oyna-dugme:hover { background: #ff8a45; }
+#ekAna .oyna-dugme .oyna-alt { display: block; margin-top: 5px; font-family: var(--font-metin); font-weight: 800; font-size: 12.5px; letter-spacing: 0; line-height: 1.2; color: #fff; text-shadow: 0 1px 0 rgba(21,17,42,.5);
+  white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 100%; }
+
+/* ---------- bölüm çipi: OYNA'nın altına zincirli krem etiket ---------- */
+#ekAna .bolum-hap { position: relative; padding: 15px 12px 7px; border-radius: 12px; background: var(--s-krem); border: 3px solid var(--s-cizgi); box-shadow: 0 3px 0 var(--s-cizgi); color: var(--s-cizgi); }
+#ekAna .bolum-hap:hover { background: #fff; }
+#ekAna .bolum-hap::before { width: 8px; height: 8px; margin-left: -4px; }
+#ekAna .bh-alt { flex-wrap: wrap; justify-content: center; row-gap: 5px; column-gap: 7px; max-width: 140px; color: var(--s-cizgi); font-family: var(--font-metin); font-weight: 800; font-size: 12px; white-space: nowrap; }
+#ekAna .bh-alt::after { content: 'harita ›'; color: var(--s-kor2); order: 1; }
+#ekAna .bolum-hap .hedefler { order: 2; flex-basis: 100%; justify-content: center; }
+#ekAna .bolum-hap .hedefler i { background: rgba(21,17,42,.18); }
+#ekAna .bolum-hap .hedefler i.var { background: var(--s-kor); box-shadow: 0 0 0 1.5px var(--s-cizgi); }
+
+/* ---------- alt sekme çubuğu: koyu tahta, her sekme bir çıkartma; seçili olan kalkar ve renklenir ---------- */
+.alt-menu { background: var(--s-gece); border-top: 4px solid var(--s-cizgi); box-shadow: inset 0 3px 0 var(--s-gece2); padding-top: 10px; }
+.alt-menu button { color: var(--s-soluk); font-family: var(--font-afis); font-weight: 400; font-size: 12px; letter-spacing: .3px; gap: 4px; }
+.alt-menu .am-ik { width: 48px; height: 42px; border-radius: 14px; background: var(--s-gece2); border: 3px solid var(--s-cizgi); box-shadow: 0 3px 0 var(--s-cizgi);
+  transition: transform .18s cubic-bezier(.3, 1.4, .5, 1), background-color .15s; }
+.alt-menu .am-ik svg { width: 26px; height: 26px; }
+.alt-menu button:active .am-ik { transform: translateY(3px); box-shadow: 0 0 0 var(--s-cizgi); }
+.alt-menu button[aria-current="page"] { color: #fff; }
+.alt-menu button[aria-current="page"] .am-ik { background: var(--sekme, var(--s-mavi)); border-color: var(--s-cizgi); box-shadow: 0 4px 0 var(--s-cizgi); transform: translateY(-5px) rotate(-4deg); }
+.alt-menu button[data-sekme="ekDolap"] { --sekme: var(--s-pembe); }
+.alt-menu button[data-sekme="ekKoleksiyon"] { --sekme: var(--s-mavi); }
+.alt-menu button[data-sekme="ekYarisma"] { --sekme: var(--s-bocek); }
+.alt-menu button[data-sekme="ekProfil"] { --sekme: var(--s-yesil); }
+.alt-menu button.oyna-sekme .am-ik { width: 62px; height: 62px; margin-top: -30px; border-radius: 20px; background: var(--s-kor); box-shadow: 0 4px 0 var(--s-cizgi); transform: rotate(-3deg); }
+.alt-menu button.oyna-sekme[aria-current="page"] .am-ik { background: var(--s-kor); transform: translateY(-4px) rotate(3deg); }
+.alt-menu button.oyna-sekme:active .am-ik { transform: translateY(3px) rotate(-3deg); }
+.alt-menu .nokta { background: var(--s-pembe); box-shadow: 0 0 0 3px var(--s-cizgi); }
+
+/* küçük ekran: etiketler ve OYNA biraz küçülür, ipler kısalır */
+@media (max-height: 700px) {
+  #ekAna .kiris { height: calc(env(safe-area-inset-top, 0px) + 66px); }
+  #ekAna .askilar { margin-top: 8px; }
+  .aski.a-oyna { --ip: clamp(14px, 6vh, 40px); }
+  #ekAna .oyna-dugme { font-size: 38px; padding: 17px 8px 10px; }
+  #ekAna .askilar .yan-kart > svg { width: 24px; height: 24px; }
+  #ekAna .askilar .yan-kart { padding: 14px 4px 6px; }
+}
+@media (max-width: 359px) { #ekAna .askilar { grid-template-columns: 76px minmax(0, 1fr) 76px; gap: 4px; } }
+@media (prefers-reduced-motion: reduce) { .aski, .aski.savrul, .aski-sutun { animation: none; } .alt-menu .am-ik { transition: none; } }

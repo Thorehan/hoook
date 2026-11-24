@@ -962,11 +962,11 @@
     // halkalar
     var ringY = current === 'ekAna' ? h * 0.47 : h * 0.52;
     if (current === 'ekAna') {
-      // kahraman logo ile "Başlamak için dokun" yazısı arasındaki boşlukta sallansın, üstlerine binmesin
-      var cvTop = sceneCanvas.getBoundingClientRect().top;
-      var lb = document.querySelector('#ekAna .ana-ust').getBoundingClientRect().bottom - cvTop + 40 * u;
-      var at = document.querySelector('#ekAna .oyna-alan').getBoundingClientRect().top - cvTop; // bölüm ve OYNA'nın üstünde kalsın
-      ringY = Math.max(lb + 16 * u, Math.min(ringY, at - 60 * u - 19 * u - 20)); // v0.80: büyük Çıra'nın ip boyu (60u) ve yarıçapı (19u); bölüm çipine değmez
+      // v0.82 (Askıda Menü): Çıra asılı etiketlerin altıyla alt sekme çubuğu arasındaki boşlukta sallanır, ikisine de binmez
+      var cvTop = sceneCanvas.getBoundingClientRect().top, mn = $('altMenu');
+      var lb = document.querySelector('#ekAna .askilar').getBoundingClientRect().bottom - cvTop + 6 * u;
+      var at = (mn && !mn.hidden ? mn.getBoundingClientRect().top : sceneCanvas.getBoundingClientRect().bottom) - cvTop - 40 * u; // OYNA sekmesi çubuktan taşar
+      ringY = lb + Math.max(16 * u, (at - lb - 60 * u - 19 * u) * 0.42); // ip boyu 60u, yarıçap 19u; boşluğun biraz üst yarısında
     }
     ring(ctx, cx, ringY, 11 * u);
     ring(ctx, cx - 110 * u, ringY + 150 * u, 9 * u);
@@ -1141,8 +1141,14 @@
   document.addEventListener('pointerdown', function (e) {
     var b = e.target.closest('button, [role="tab"]');
     if (!b || b.disabled || b.getAttribute('aria-disabled') === 'true') return;
+    // v0.82: asılı etikete basınca ipinde savrulur (hareket azaltma açıksa yok)
+    var as = !reduceMotion && b.parentNode && b.parentNode.classList && b.parentNode.classList.contains('aski') ? b.parentNode : null;
+    if (as) { as.classList.remove('savrul'); void as.offsetWidth; as.classList.add('savrul'); }
     if (G.dokunus) G.dokunus(b.matches('.ana, .oyna-dugme, .oyna-sekme, .yan-kart, .m-haftalik'));
   }, { passive: true });
+
+  // savrulma bitince etiket olağan salınımına döner (iç içe etiketlerde yalnız kendi animasyonu)
+  document.addEventListener('animationend', function (e) { if (e.animationName === 'askiSavrul') e.target.classList.remove('savrul'); });
 
   boot();
 })();
