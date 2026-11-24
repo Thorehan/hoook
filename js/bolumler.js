@@ -379,8 +379,101 @@
       ]
     }
   ];
+  // Kısa bölümler (v0.85, deneme; İstişare 6, docs/kisa-bolumler-plan.md): her biri bugünkü bir bölmeden doğan tek bölmeli bölüm.
+  // Fener yok (bölüm kısa: düşen baştan başlar). Taş Kuyu: 6 uzun bölüm → 18 kısa. Oyunda 101–118 numarasıyla, ayrı kayıtta (save.kisaBest).
+  // kaynak: [uzun bölüm, bölme sırası]. Notlar ve final eski uzun bölümün son kısa bölümünde.
+  var KISA = [
+    { no: 1, ad: 'İlk Halka', kaynak: [1, 0], bolge: 0, akis: 6, su: 0,
+      ipucu: 'Halka hangi yandaysa ekranın o yanına bas. Basılı tut: ipe sarıl. Bırak: savrul.',
+      bolmeler: [{ tur: 'ogret', n: 15, dy: [150, 170], duzen: 'zikzak', ff: 1, yazilar: [
+        [0, 'Halka hangi yandaysa ekranın o yanına bas.'],
+        [2, 'Basılı tut: ipe sarılırsın.'],
+        [5, 'Bırak: savrulursun. Sonra sıradakine bas.']
+      ] }] },
+    { no: 2, ad: 'Bırak ve Savrul', kaynak: [1, 1], bolge: 0, akis: 7, su: 0,
+      ipucu: 'Parlayan halkada ateşböceği var: içinden geç ya da tutun.',
+      bolmeler: [{ tur: 'uygula', n: 18, dy: [160, 195], ff: 2, yazilar: [
+        [1, 'Parlayan halkada ateşböceği var. İçinden geç ya da tutun.']
+      ] }] },
+    { no: 3, ad: 'Kova', kaynak: [1, 2], bolge: 0, akis: 8, su: 0,
+      ipucu: 'En üstteki kovaya tutun: gün ışığı!',
+      bolmeler: [{ tur: 'sina', n: 20, dy: [170, 210], ff: 2, yazilar: [
+        ['kova', 'En üstteki kovaya tutun: gün ışığı!']
+      ] }] },
+    { no: 4, ad: 'Savrul', kaynak: [2, 0], bolge: 0, akis: 7, su: 0,
+      ipucu: 'İpi halkaya varmadan bırak: fırlarsın. Havadayken sıradakine bas: akış başlar.',
+      bolmeler: [{ tur: 'ogret', n: 15, dy: [190, 222], duzen: 'zikzak', ff: 1, yazilar: [
+        [0, 'İpi halkaya varmadan bırak: yukarı fırlarsın.'],
+        [2, 'Havadayken sıradakine bas: akış!'],
+        [6, 'Asılı kalmadan zincirle: x2, x3…']
+      ] }] },
+    { no: 5, ad: 'Havadan Tutun', kaynak: [2, 1], bolge: 0, akis: 8, su: 0,
+      ipucu: 'Ateşböceği uzaksa fırla, havadan tutun.',
+      bolmeler: [{ tur: 'uygula', n: 18, dy: [180, 225], ff: 2, yazilar: [
+        [2, 'Ateşböceği uzaksa fırla, havadan tutun.']
+      ] }] },
+    { no: 6, ad: 'Akış Zinciri', kaynak: [2, 2], bolge: 0, akis: 9, su: 0, not: 1,
+      ipucu: 'Asılı kalmadan zincirle. Zincir koparsa dert değil, yeniden başla.',
+      bolmeler: [{ tur: 'sina', n: 20, dy: [185, 232], ff: 3, yazilar: [] }] },
+    { no: 7, ad: 'Ahşap ve Taş', kaynak: [3, 0], bolge: 0, akis: 7, su: 0,
+      ipucu: 'Kanca ahşaba saplanır, taştan seker. Kahverengi panelin olduğu yana bas.',
+      bolmeler: [{ tur: 'ogret', n: 15, dy: [165, 195], panel: 0.75, ff: 1, yazilar: [
+        [0, 'Kanca ahşaba saplanır, taştan seker.'],
+        [4, 'Panel hangi yandaysa o yana bas.'],
+        [8, 'Panelden de fırlayabilirsin: erken bırak.']
+      ] }] },
+    { no: 8, ad: 'Panelin Karşısı', kaynak: [3, 1], bolge: 0, akis: 8, su: 0,
+      ipucu: 'Ateşböceği halkaları bazen panelin karşısında.',
+      bolmeler: [{ tur: 'uygula', n: 18, dy: [170, 210], panel: 0.35, ff: 2, yazilar: [
+        [4, 'Ateşböceği halkaları bazen panelin karşısında.']
+      ] }] },
+    { no: 9, ad: 'Taş Duvar', kaynak: [3, 2], bolge: 0, akis: 9, su: 0,
+      ipucu: 'Ahşap da halka da senin. Taşa atarsan kanca seker.',
+      bolmeler: [{ tur: 'sina', n: 20, dy: [180, 230], panel: 0.3, ff: 2, yazilar: [] }] },
+    { no: 10, ad: 'Hız Halkası', kaynak: [4, 0], bolge: 0, akis: 7, su: 0,
+      ipucu: 'Mavi oklu halkaya tutun ve bırak: yukarı fırlarsın. Çekilirken bırakırsan daha da hızlanırsın.',
+      bolmeler: [{ tur: 'ogret', n: 15, dy: [170, 205], hiz: 3, ff: 1, yazilar: [
+        [0, 'Mavi oklu halka: tutun, bırak, yukarı fırla.'],
+        [4, 'Çekilirken bırakırsan daha da hızlanırsın.'],
+        [8, 'Hız halkası yolun yanında: istersen al.']
+      ] }] },
+    { no: 11, ad: 'Çekilirken Bırak', kaynak: [4, 1], bolge: 0, akis: 8, su: 0,
+      ipucu: 'İp seni çekerken bırak: hız halkasından daha da hızlı fırlarsın.',
+      bolmeler: [{ tur: 'uygula', n: 18, dy: [175, 215], hiz: 2, ff: 2, yazilar: [] }] },
+    { no: 12, ad: 'Mavi Yol', kaynak: [4, 2], bolge: 0, akis: 9, su: 0, not: 2,
+      ipucu: 'Hız halkası ve ahşap bir arada. Panelin yanına bas.',
+      bolmeler: [{ tur: 'sina', n: 20, dy: [180, 230], hiz: 2, panel: 0.2, ff: 2, yazilar: [] }] },
+    { no: 13, ad: 'TAM', kaynak: [5, 0], bolge: 0, akis: 8, su: 0,
+      ipucu: 'İp halkaya varmadan hemen önce bırak: TAM! Seni biraz daha yükseğe iter.',
+      bolmeler: [{ tur: 'ogret', n: 15, dy: [185, 220], duzen: 'zikzak', ff: 1, yazilar: [
+        [0, 'İp halkaya varmadan hemen önce bırak: TAM!'],
+        [3, 'TAM bırakış seni biraz daha yükseğe iter.'],
+        [7, 'Asılı kalmadan zincirle: akış uzadıkça puan artar.']
+      ] }] },
+    { no: 14, ad: 'Uzun Akış', kaynak: [5, 1], bolge: 0, akis: 10, su: 0,
+      ipucu: 'Asılı kalmadan zincirle: akış uzadıkça puan artar.',
+      bolmeler: [{ tur: 'uygula', n: 18, dy: [180, 225], ff: 2, hiz: 1, yazilar: [] }] },
+    { no: 15, ad: 'Hepsi Bir Arada', kaynak: [5, 2], bolge: 0, akis: 11, su: 0,
+      ipucu: 'Halka, ahşap, hız halkası: hepsi bir arada. TAM bırak, akışı koru.',
+      bolmeler: [{ tur: 'sina', n: 20, dy: [185, 232], ff: 2, hiz: 1, panel: 0.2, yazilar: [] }] },
+    { no: 16, ad: 'Kutu ve Kapak', kaynak: [6, 0], bolge: 0, akis: 7, su: 0,
+      ipucu: 'Kanca hafif şeyleri sana çeker. Halkaya çık, sonra sağa bas: kanca raftaki kutuyu çeker, kutu düğmeye düşer, kapak açılır.',
+      bolmeler: [{ tur: 'ogret', n: 15, dy: [170, 205], kutu: true, ff: 1, yazilar: [
+        [0, 'Önce halkaya çık.'],
+        [1, 'Kapak kapalı. Kutu sağda: sağa bas, kanca onu sana çeker. Düğmeye düşünce kapak açılır.']
+      ] }] },
+    { no: 17, ad: 'Panel ve Hız', kaynak: [6, 1], bolge: 0, akis: 8, su: 0,
+      ipucu: 'Ahşap ve hız halkası: panelin yanına bas, mavi halkadan fırla.',
+      bolmeler: [{ tur: 'uygula', n: 18, dy: [175, 215], panel: 0.3, hiz: 1, ff: 2, yazilar: [] }] },
+    { no: 18, ad: 'Gün Işığı', kaynak: [6, 2], bolge: 0, akis: 9, su: 0, not: 3,
+      ipucu: 'Taş Kuyu\'nun sonu. Gün ışığı yukarıda.',
+      bolmeler: [{ tur: 'sina', n: 20, dy: [180, 230], panel: 0.3, hiz: 1, ff: 2, yazilar: [
+        ['kova', 'Gün ışığı yukarıda.']
+      ] }] }
+  ];
   function bul(no) { for (var i = 0; i < BOLUMLER.length; i++) if (BOLUMLER[i].no === no) return BOLUMLER[i]; return null; }
-  var api = { BOLUMLER: BOLUMLER, bul: bul, sayi: BOLUMLER.length };
+  function kisaBul(no) { for (var i = 0; i < KISA.length; i++) if (KISA[i].no === no) return KISA[i]; return null; }
+  var api = { BOLUMLER: BOLUMLER, bul: bul, sayi: BOLUMLER.length, KISA: KISA, kisaBul: kisaBul, kisaSayi: KISA.length };
   if (typeof module !== 'undefined' && module.exports) module.exports = api;
   else root.KuyuBolumler = api;
 })(typeof window !== 'undefined' ? window : this);

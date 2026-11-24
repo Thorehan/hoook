@@ -1,13 +1,15 @@
-# Kısa bölümler · A1 tasarım kuralları (taslak, 24/11/2026)
+# Kısa bölümler · tasarım kuralları (24/11/2026)
 
-> İstişare 6, Yol A, adım A1. Kararlar Törehan'ın (24/11, `docs/istisare-6-bolum-hesap.md`): uzun bölümler kısa bölümlere bölünür, yıldızlar madalyalardan gelir ve ödülsüzdür, harita ayrı ekrandır. Bu belge kuralları ve Taş Kuyu denemesini (A2) tanımlar. Henüz kod yok.
+> İstişare 6, Yol A. Kararlar Törehan'ın (24/11, `docs/istisare-6-bolum-hesap.md`): uzun bölümler kısa bölümlere bölünür, yıldızlar madalyalardan gelir ve ödülsüzdür, harita ayrı ekrandır. Bu belge kuralları ve Taş Kuyu denemesini tanımlar.
+>
+> **Durum:** ✅ A1 kurallar. ✅ A2 (v0.85, telefonda deneme bekliyor): Taş Kuyu'nun 18 kısa bölümü Hikâye ekranının başında deneme olarak; ölçümler §6'da.
 
 ## 1 · Bölüm kuralları
 
 | Kural | Değer |
 |---|---|
 | Kaynak | Her kısa bölüm bugünkü bir **bölmeden** doğar (fener arası). Tarif, tek bölmeli bir bölüm tarifidir. |
-| Süre (ortalama bot) | Taş Kuyu 30–45 sn · Maden 40–60 sn · Kristal ve Kule 45–90 sn. Kısa kalırsa bölmenin düğüm sayısı (`n`) artırılır. |
+| Süre (insan) | Taş Kuyu 30–45 sn · Maden 40–60 sn · Kristal ve Kule 45–90 sn. **Öğret bölümleri bilerek daha kısa** (20–30 sn): yeni şey hızlı öğrenilir, hemen başarı gelir. Model insandan ~1,8 kat hızlı (`hikaye-olcum.js`): Taş Kuyu modelde öğret 11–16 sn, diğerleri 16–25 sn. Kısa kalırsa bölmenin düğüm sayısı (`n`) artırılır. |
 | Tek fikir | Her bölüm bir şey öğretir ya da bir şeyi sınar. Bölüm adı o fikri söyler. |
 | Başlangıç | Bugünkü gibi geçici çengelde asılı (`asiliBasla`, v0.83). |
 | Bitiş | Kova (gün ışığı). TAM kova bugünkü gibi +50. |
@@ -66,7 +68,7 @@ Notlar ve final, eski uzun bölümün son kısa bölümüne taşınır.
 ## 5 · Teknik yaklaşım
 
 - **Tarifler:** `js/bolumler.js` içine ayrı bir liste (`KISA`): her öğe tek bölmeli bir bölüm tarifi (`no`, `ad`, `bolge`, `akis`, `ipucu`, `su`, `not`, `bolmeler: [tek bölme]`). Bugünkü 24 tarif A5'e kadar değişmez.
-- **Üretici:** bugünkü `gen.createBolum` tek bölmeli tarifle çalışıyor (son bölmeye fener konmuyor). Kısa bölümler kendi tohum alanını kullanır (ör. `rng(9000 + no …)`), böylece eski bölümler ve Günlük/Haftalık tohumları aynı kalır. Rastgele sayı sırası bozulmaz.
+- **Üretici:** bugünkü `gen.createBolum` tek bölmeli tarifle çalışıyor (son bölmeye fener konmuyor). Kısa bölümler kendi tohum alanını kullanır (`gen.createKisa` → `rng(900001 + no × 7919)`, ortak gövde `bolumKur`), böylece eski bölümler ve Günlük/Haftalık tohumları aynı kalır. Rastgele sayı sırası bozulmaz.
 - **Kayıt:** kısa bölümler ayrı anahtarda (`save.kisaBest`). Hayaletler `k` önekiyle (`k1`, `k2` …), eski numaralarla çakışmaz.
 - **A2'de deneme olarak:** v0.59'daki gibi. Hikâye ekranında "Yeni Taş Kuyu (deneme)" girişi; bugünkü 24 bölüm ve ilerleme olduğu gibi kalır. Beğenilirse A5'te geçiş.
 - **A5 geçişi (sonra):** uzun bölüm *k* geçildiyse ondan doğan kısa bölümler "geçildi, madalyasız" sayılır (birebir eşleme; v0.62'deki oranlı taşımaya gerek yok). Notlar, finaller, cüzdan kalır. İkinci yolculuk (25–48) en son ele alınır.
@@ -81,6 +83,13 @@ Notlar ve final, eski uzun bölümün son kısa bölümüne taşınır.
 - `node tools/hikaye-olcum.js`: süreler §1'deki aralıkta.
 - `node tools/ekonomi-olcum.js`: ortalama gün ~119 ateşböceği korunmalı.
 - Botlar kısa bölüm listesini de dolaşacak şekilde genişletilir.
+
+**A2 ölçümleri (v0.85, 24/11):**
+- `bot.js` çıkış 0: 18 kısa bölümün hepsi rahat, akış ve ateşböceği rotasıyla geçiliyor; ateşböceklerinin hepsi alınıyor, akış hedefi tutuyor.
+- `KISA=1 node tools/hikaye-olcum.js`: temkinli %5 modelde öğret 12–16 sn, pekiştir ve sına 16–21 sn.
+- `KISA=1 node tools/hikaye-denge.js`: tek taraf geçen 0/18, temkinli %5'in bitiremediği 0. Spam 18/18 geçiyor; bugünkü uzun Taş Kuyu'da da 6/6 (Taş Kuyu öğretici, yanlış taraf ipi bırakmaz). Spam düşünen oyuncudan (akış) yavaş, temkinliden hızlı: uzun bölümlerle aynı oran.
+- Eski 48 bölüm, Sonsuz ve Haftalık üretici çıktısı birebir aynı. `nisan.js` kurala aykırı 0, `oyuncu.js` tek taraf ölüyor, `spam.js`, `hata.js 6`, `geri.js 16` (%4,4), `ekonomi-olcum.js`, `denge.js` ve birim testleri öncekiyle aynı.
+- Ateşböceği toplamı 31 (eski 29). Deneme ayrı kayıtta olduğu için ekonomiye A5 geçişine kadar girmez.
 
 ## 7 · Değişmeyenler
 

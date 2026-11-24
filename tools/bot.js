@@ -311,6 +311,19 @@ if (!only && G.createBolum) {
     if (!a.ok || !c.ok || ff < ffT - akisli || fener < def.fenerler.length) allOk = false;
     console.log(`${tf.no} ${def.name.padEnd(14)} rahat ${a.ok ? 'GEÇTİ' : 'KALDI ' + a.why} ${a.s.t.toFixed(0)} sn · akış ${b.ok ? 'GEÇTİ' : 'KALDI ' + b.why} ${b.s.t.toFixed(0)} sn x${b.s.maxCombo} (hedef x${def.flow})${akisYedek} · ateşböceği ${ff}/${ffT}${akisli ? ' (' + akisli + ' akışla)' : ''}${def.zincirSay ? ' · zincir ' + def.zincirSay : ''} · fener ${fener}/${def.fenerler.length} · par ${def.par}`);
   }
+  // Kısa bölümler (v0.85 deneme, gen.createKisa): aynı kurallar; fener yok, her bölümde en az bir ateşböceği, rahat koşu par içinde
+  if (G.createKisa && T.kisaSayi) {
+    console.log('\n== Kısa bölümler (deneme) ==');
+    for (let no = 1; no <= T.kisaSayi; no++) {
+      const def = G.createKisa(no);
+      const a = play(def, 'rahat'), b = play(def, 'akis'), c = play(def, 'rahat', def.ffRoute);
+      const ff = c.s.fireflies.filter(f => f.got && f.zincir == null).length, akisli = (def.dalSay || 0), ffT = c.s.fireflies.filter(f => f.zincir == null).length;
+      let akisYedek = '';
+      if (!b.ok) { const y = akisNisanla(def); akisYedek = y.won && y.max >= def.flow ? ` (nişanla akış: GEÇTİ x${y.max})` : ' (nişanla akış da KALDI)'; if (!(y.won && y.max >= def.flow)) allOk = false; }
+      if (!a.ok || !c.ok || ff < ffT - akisli || ffT < 1 || def.fenerler.length) allOk = false;
+      console.log(`k${no} ${def.name.padEnd(16)} rahat ${a.ok ? 'GEÇTİ' : 'KALDI ' + a.why} ${a.s.t.toFixed(0)} sn · akış ${b.ok ? 'GEÇTİ' : 'KALDI ' + b.why} ${b.s.t.toFixed(0)} sn x${b.s.maxCombo} (hedef x${def.flow})${akisYedek} · ateşböceği ${ff}/${ffT} · par ${def.par}`);
+    }
+  }
 }
 
 // 2) Üretilen bölümler

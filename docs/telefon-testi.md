@@ -191,6 +191,15 @@ Yayına çıkmadan yerelde denemek için: bilgisayarda `python3 -m http.server 8
 - [ ] Bir şey alınca ya da giyilince kartın savrulması ve ateşböceği parçacıkları hoş mu, fazla mı?
 - [ ] Koleksiyon'da ad ve GİY alttaki şeritte rahat mı? 3 sütunlu ızgara yeterince büyük mü?
 
+## 28. Kısa bölümler denemesi (v0.85, 8 dk)
+Hikâye ekranının başındaki "Yeni Taş Kuyu · deneme" grubundan oyna (bugünkü bölümler ve ilerleme değişmez).
+- [ ] Bir kısa bölüm ne kadar sürüyor? Çok kısa, tam, uzun? (Hedef: öğret 20–30 sn, diğerleri 30–45 sn.)
+- [ ] Her bölüm bitince "bir şey başardım" hissi var mı? Art arda oynamak isteniyor mu?
+- [ ] Öğret bölümleri (1, 4, 7, 10, 13, 16) yeni şeyi anlatıyor mu? Duvar yazıları yeterli mi?
+- [ ] Fener yokken düşünce baştan başlamak sinir bozucu mu, yoksa bölüm kısa olduğu için sorun değil mi?
+- [ ] Madalyalar (ateşböceği, kusursuz, akış) her bölümde ulaşılabilir mi? Tekrar oynayıp tamamlamak istiyor musun?
+- [ ] 18 kısa bölüm mü, 6 uzun bölüm mü daha iyi? Neden?
+
 ## 5. Genel izlenim (serbest)
 - En sevdiğim an:
 - En çok zorlandığım yer:

@@ -8,7 +8,9 @@
 const E = require('../js/engine.js');
 const G = require('../js/gen.js');
 const C = E.CFG;
-const N = +process.argv[2] || 4, ILK = +process.argv[3] || 1, SON = +process.argv[4] || 48, MAXT = 300;
+//   KISA=1 node tools/hikaye-denge.js [n] [ilk] [son]   → kısa bölümler (v0.85 deneme, gen.createKisa; 1–18)
+const KISA = process.env.KISA === '1';
+const N = +process.argv[2] || 4, ILK = +process.argv[3] || 1, SON = +process.argv[4] || (KISA ? require('../js/bolumler.js').kisaSayi : 48), MAXT = 300;
 function rng(seed) { let x = seed >>> 0 || 1; return () => ((x = (x * 1664525 + 1013904223) >>> 0) / 4294967296); }
 const step = (s, sec, u) => { for (let i = 0; i < Math.round(sec / C.DT) && s.status === 'play'; i++) { E.step(s); if (u && u()) return; } };
 function bekle(s, f, a) { if (!a.bekle) return a; const son = s.t + C.BEKLE_SN; while (s.status === 'play') { E.step(s); a = E.aim(s, f); if (!a.bekle || s.t >= son || s.p.y - s.p.py >= 0) break; } return a; }
@@ -69,7 +71,7 @@ const MOD = SADE ? [['temkinli %5', 'temkinli', 0.05, 2], ['akış %5', 'akis', 
 console.log('Bölüm · ' + MOD.map(m => m[0]).join(' · ') + '   (geçen/deneme süre-ortanca dönüş; spam ve tek tarafta geçemediyse çıktığı yükseklik %)');
 const ozet = { tekGecen: 0, spamGecen: 0, hatasizKalan: 0 };
 for (let no = ILK; no <= SON; no++) {
-  const def = G.createBolum(no);
+  const def = KISA ? G.createKisa(no) : G.createBolum(no);
   const hucre = MOD.map(([ad, tarz, p, n]) => {
     const o = []; for (let k = 1; k <= n; k++) o.push(oyna(def, tarz, p, no * 31 + k));
     const kaz = o.filter(x => x.won).length;

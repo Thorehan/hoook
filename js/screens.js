@@ -744,7 +744,7 @@
   function groupOf(n) { var a = 1 + Math.floor((n - 1) / 6) * 6; return { a: a, b: a + 5, ad: G.bolgeAdi(a) }; }
   function goalsOf(n) {
     var d = G.levelDef(n), ff = (d.rings || []).filter(function (r) { return r[2] === 'ff'; }).length;
-    var b = (save().best || {})[n] || {};
+    var b = (n > G.kisaBas ? save().kisaBest || {} : save().best || {})[n] || {};
     var got = Math.min(ff, b.ff || 0) + (b.perfect ? 1 : 0) + (b.flow ? 1 : 0);
     return { d: d, b: b, ff: ff, total: ff + 2, got: got };
   }
@@ -759,6 +759,27 @@
     var ek = $('ekBolumler');
     if (el) ek.scrollTop = Math.max(0, el.offsetTop - ek.clientHeight / 2 + el.offsetHeight / 2); else ek.scrollTop = 0;
   }
+  // Kısa bölümler denemesi (v0.85, docs/kisa-bolumler-plan.md): Taş Kuyu'nun 18 kısa bölümü, listenin başında ayrı grup.
+  // Kayıt ayrı (save.kisaBest); uzun bölümler, sıradaki bölüm ve özet sayıları değişmez. Kart numarası 1–18, oyunda 101–118.
+  function kisaGrup() {
+    if (!G.kisaSayi || filtre !== 'tumu') return '';
+    var kb = save().kisaBest || {}, sira = 0, gDone = 0, cards = '';
+    for (var i = 1; i <= G.kisaSayi; i++) if (!sira && !(kb[G.kisaBas + i] && kb[G.kisaBas + i].done)) sira = i;
+    for (var k = 1; k <= G.kisaSayi; k++) {
+      var n = G.kisaBas + k, g = goalsOf(n), b = g.b, done = !!b.done, full = done && g.got >= g.total, isNext = k === sira;
+      if (done) gDone++;
+      var dots = '';
+      for (var q = 0; q < g.ff; q++) dots += '<i class="' + (q < (b.ff || 0) ? 'var' : '') + '"></i>';
+      dots += '<i class="m' + (b.perfect ? ' var' : '') + '"></i><i class="m' + (b.flow ? ' var' : '') + '"></i>';
+      cards += '<button type="button" class="bkart' + (done ? ' gecildi' : '') + (full ? ' tam' : '') + (isNext ? ' siradaki' : '') + '" data-n="' + n + '"' +
+        ' aria-label="Deneme bölümü ' + k + ', ' + g.d.name + (done ? ', geçildi' : '') + ', ' + g.got + '/' + g.total + ' hedef">' +
+        '<span class="bk-ust"><span class="no">' + k + '</span>' + (isNext ? '<span class="etiket">Sıradaki</span>' : full ? '<span class="yildiz" aria-hidden="true">★</span>' : done ? '<span class="tik" aria-hidden="true">✓</span>' : '') + '</span>' +
+        '<b>' + g.d.name + '</b><span class="rozet">' + dots + '</span></button>';
+    }
+    return '<div class="bgrup deneme"><div class="bgrup-ust"><b>Yeni Taş Kuyu · deneme</b><span>' + gDone + '/' + G.kisaSayi + ' geçildi</span></div>' +
+      '<p class="bgrup-not">Kısa bölümler: her biri tek bir şey öğretir. Bugünkü bölümlerin ve ilerlemen değişmez.</p>' +
+      '<div class="cubuk ince" aria-hidden="true"><i style="width:' + Math.round(gDone / G.kisaSayi * 100) + '%"></i></div><div class="liste">' + cards + '</div></div>';
+  }
   function renderLevels() {
     var s = save(), best = s.best || {}, nx = nextLevel(), h = '', shown = 0;
     var doneAll = 0, gotAll = 0, totAll = 0;
@@ -769,6 +790,7 @@
     $('ozetGecilen').textContent = doneAll;
     $('ozetHedef').textContent = gotAll + '/' + totAll;
     $('ozetCubuk').style.width = (totAll ? Math.round(gotAll / totAll * 100) : 0) + '%';
+    h += kisaGrup();
     for (var ga = 1; ga <= listUpto;) {
       var gr = groupOf(ga), cards = '', gDone = 0, gGot = 0, gTot = 0;
       for (var n = gr.a; n <= gr.b; n++) {

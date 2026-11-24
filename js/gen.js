@@ -811,7 +811,19 @@
   function createBolum(no) {
     var T = tarifler(), tarif = T && (no > T.sayi ? ikinciTarif(T, no) : T.bul(no));
     if (!tarif) return null;
-    var r = rng(no * 104729 + 31);
+    return bolumKur(tarif, no, no * 104729 + 31);
+  }
+  // Kısa bölümler (v0.85, deneme; docs/kisa-bolumler-plan.md): tek bölmeli tarif (son bölmeye fener konmaz), kendi tohum alanı.
+  // Oyunda 100 + no numarasıyla açılır; uzun bölümler, Günlük ve Haftalık tohumları değişmez.
+  function createKisa(no) {
+    var T = tarifler(), tarif = T && T.kisaBul && T.kisaBul(no);
+    if (!tarif) return null;
+    var d = bolumKur(tarif, 100 + no, 900001 + no * 7919);
+    d.kisa = no; d.fenerli = false;
+    return d;
+  }
+  function bolumKur(tarif, no, tohum) {
+    var r = rng(tohum);
     var nodes = [], hp = { x: 180, y: 0 }, prevKind = null, bolmeler = [];
     var kutu = null, ayniYan = tarif.bolge >= 1 || !!tarif.ikinci, sonYon = 0;
     tarif.bolmeler.forEach(function (B, bi) {
@@ -1050,7 +1062,7 @@
     }, ek);
   }
 
-  var api = { createBolum: createBolum, HAFTALIK_SU: HAFTALIK_SU, createHaftalik: createHaftalik, ENDLESS_WATER: { base: 38, perM: 0.3, perS: 0, cap: 300 }, createLevel: createLevel, bolumSuyu: bolumSuyu, createEndless: createEndless, KURALLAR: KURALLAR, gunKurali: gunKurali, target: target, hangOf: hangOf, ffAlternative: ffAlternative, rng: rng };
+  var api = { createBolum: createBolum, createKisa: createKisa, HAFTALIK_SU: HAFTALIK_SU, createHaftalik: createHaftalik, ENDLESS_WATER: { base: 38, perM: 0.3, perS: 0, cap: 300 }, createLevel: createLevel, bolumSuyu: bolumSuyu, createEndless: createEndless, KURALLAR: KURALLAR, gunKurali: gunKurali, target: target, hangOf: hangOf, ffAlternative: ffAlternative, rng: rng };
   if (typeof module !== 'undefined' && module.exports) module.exports = api;
   else root.KuyuGen = api;
 })(typeof window !== 'undefined' ? window : this);

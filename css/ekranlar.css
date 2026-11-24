@@ -217,6 +217,8 @@ button.oyna { padding: 10px 12px 10px 22px; min-height: 84px; }
 .bgrup-ust { display: flex; align-items: baseline; justify-content: space-between; gap: 8px; }
 .bgrup-ust b { font-family: var(--font-oyun); font-weight: 600; font-size: 17px; }
 .bgrup-ust span { color: var(--soluk); font-size: 12px; font-variant-numeric: tabular-nums; }
+.bgrup-not { margin: -4px 0 0; color: var(--soluk); font-size: 12px; line-height: 1.35; } /* kısa bölümler denemesi (v0.85) */
+.bgrup.deneme { padding-bottom: 10px; margin-bottom: 14px; border-bottom: 1px dashed rgba(255,255,255,.14); }
 .bkart { flex-direction: column; align-items: flex-start; justify-content: flex-start; gap: 3px; padding: 9px 10px; min-height: 82px; text-align: left; border-radius: 12px; }
 .bkart b { font-family: var(--font-oyun); font-weight: 600; font-size: 14px; line-height: 1.1; }
 .bk-ust { display: flex; align-items: center; justify-content: space-between; width: 100%; gap: 4px; }

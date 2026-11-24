@@ -48,9 +48,11 @@ function oyna(def, tarz, p, seed, maxT) {
 }
 const orta = a => a.slice().sort((x, y) => x - y)[a.length >> 1];
 const MODELLER = [['temkinli', 0], ['temkinli', 0.05], ['temkinli', 0.1], ['akis', 0.05]];
-console.log('Hikâye bölümleri · ' + N + ' deneme · süre (ortanca) · fenere dönüş · baştan başlama');
-for (const tf of T.BOLUMLER) {
-  const def = G.createBolum(tf.no);
+// KISA=1: kısa bölümler (v0.85 deneme, docs/kisa-bolumler-plan.md). Hedef (insan): Taş Kuyu 30–45 sn ≈ modelde 17–25 sn.
+const KISA = process.env.KISA === '1';
+console.log((KISA ? 'Kısa bölümler' : 'Hikâye bölümleri') + ' · ' + N + ' deneme · süre (ortanca) · fenere dönüş · baştan başlama');
+for (const tf of (KISA ? T.KISA : T.BOLUMLER)) {
+  const def = KISA ? G.createKisa(tf.no) : G.createBolum(tf.no);
   const satir = MODELLER.map(([tarz, p]) => {
     const o = []; for (let k = 1; k <= N; k++) o.push(oyna(def, tarz, p, k, 600));
     const kaz = o.filter(x => x.won).length;

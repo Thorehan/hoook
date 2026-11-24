@@ -88,9 +88,14 @@
   var genCache = {};
   // Hikâye (v0.62): 24 tarifli bölüm + ikinci yolculuk 25–48 (gen.createBolum). Eski el yapımı ve üretilen bölümler oyundan kalktı.
   var BOLUM_SAYI = 48;
+  // Kısa bölümler (v0.85, deneme; docs/kisa-bolumler-plan.md): Taş Kuyu'nun 18 kısa bölümü 101–118 numarasıyla açılır,
+  // kaydı ayrı (save.kisaBest). Uzun Hikâye, sıradaki bölüm, ödül toplamları ve Günlük/Haftalık etkilenmez.
+  var KISA_BAS = 100, KISA_SAYI = (window.KuyuBolumler && window.KuyuBolumler.kisaSayi) || 0;
+  function kisaMi(n) { return n > KISA_BAS && n <= KISA_BAS + KISA_SAYI; }
+  function noYazi(n) { return kisaMi(n) ? n - KISA_BAS : n; } // ekranda görünen numara
   function levelDef(n) {
-    n = Math.max(1, Math.min(BOLUM_SAYI, Math.floor(n) || 1));
-    if (!genCache[n]) genCache[n] = GEN.createBolum(n);
+    n = kisaMi(n) ? n : Math.max(1, Math.min(BOLUM_SAYI, Math.floor(n) || 1));
+    if (!genCache[n]) genCache[n] = kisaMi(n) ? GEN.createKisa(n - KISA_BAS) : GEN.createBolum(n);
     return genCache[n];
   }
 
@@ -365,13 +370,14 @@
     istatBitir('terk');
     dailyKey = null; weekKey = null; meydan = null;
     mode = 'level'; yeni = true;
-    levelNo = Math.max(1, Math.min(BOLUM_SAYI, Math.floor(n) || 1));
+    levelNo = kisaMi(n) ? n : Math.max(1, Math.min(BOLUM_SAYI, Math.floor(n) || 1));
     def = levelDef(levelNo);
-    save.last = levelNo; if (levelNo > save.maxLevel) save.maxLevel = levelNo; persist();
+    if (!def.kisa) { save.last = levelNo; if (levelNo > save.maxLevel) save.maxLevel = levelNo; }
+    persist();
     deaths = 0;
     $('ipucu').textContent = def.hint;
     $('puan').hidden = true;
-    $('baslik').textContent = levelNo + '. ' + def.name + (def.ikinci ? ' · ikinci yolculuk' : '');
+    $('baslik').textContent = noYazi(levelNo) + '. ' + def.name + (def.ikinci ? ' · ikinci yolculuk' : def.kisa ? ' · deneme' : '');
     levelBolge = def.bolge || 0;
     reset();
     if (def.ikinci) ikinciDuyur(levelBolge); else bolgeDuyur(levelBolge);
@@ -381,9 +387,10 @@
   // Tarifli uzun bölümler (js/bolumler.js → gen.createBolum); v0.62'den beri asıl Hikâye (save.best).
   // Bölmeler arasında fener: ölünce son yanan fenerden dönülür (engine.fenerDon); duvarda bekçinin tebeşir ipuçları.
   var yeni = false, BOL = window.KuyuBolumler;
-  function bestKayit() { return save.best; }
+  function bestKayit() { if (kisaMi(levelNo)) { if (!save.kisaBest) save.kisaBest = {}; return save.kisaBest; } return save.best; }
   function startHikaye(n) { startLevel(n); }
-  function sonrakiBolum() { if (levelNo < BOLUM_SAYI) startLevel(levelNo + 1); else goLevels(); }
+  function sonBolumMu() { return kisaMi(levelNo) ? levelNo >= KISA_BAS + KISA_SAYI : levelNo >= BOLUM_SAYI; }
+  function sonrakiBolum() { if (!sonBolumMu()) startLevel(levelNo + 1); else goLevels(); }
   // Yeni bir bölgeye ilk girişte oyunu durdurmayan kısa duyuru (bölge başına bir kez)
   function bolgeDuyur(bi, ek) {
     if (!save.bolgeler) save.bolgeler = {};
@@ -535,7 +542,7 @@
     notAktif = null; notHalka = null;
     if (mode !== 'level' || !NOT) return;
     // yeni Hikâye: not tarifte (def.not, 1–12); eski bölümlerde bölüm numarasından
-    var n = def.ikinci ? null : NOT.bolumde(levelNo), h = n && NOT.halka(def); // notlar ilk yolculukta (notlar.js, bölüm 2, 4, …, 24)
+    var n = def.ikinci ? null : def.kisa ? (def.not ? NOT.NOTLAR.filter(function (x) { return x.no === def.not; })[0] || null : null) : NOT.bolumde(levelNo), h = n && NOT.halka(def); // notlar ilk yolculukta (notlar.js, bölüm 2, 4, …, 24)
     if (!h || notBulundu(n.no)) return;
     notAktif = n;
     notHalka = sim.rings.find(function (r) { return r.ff && r.x === h[0] && r.y === h[1]; }) || null;
@@ -1875,7 +1882,7 @@
   // kulede fener yeniden yanar. Dokunmak geçer. Sahne bir kez oynar; metni Çıra'nın yolu'nda kalır.
   var FINAL = { 16: 0, 36: 1, 56: 2, 76: 3 }, FINAL_SURE = 7.5, finalCalan = {};
   function finalGoruldu(bi) { return !!(save.finaller && save.finaller[BOLGELER[bi].id]); }
-  var FINAL_YENI = { 6: 0, 12: 1, 18: 2, 24: 3 }; // yeni Hikâye: her bölgenin 6. bölümü
+  var FINAL_YENI = { 6: 0, 12: 1, 18: 2, 24: 3, 118: 0 }; // yeni Hikâye: her bölgenin 6. bölümü; kısa deneme: Taş Kuyu'nun 18.si
   function finalNo() { return FINAL_YENI[levelNo]; }
   function finalBekliyor() { return mode === 'level' && finalNo() != null && !finalGoruldu(finalNo()); }
   function finalBasla() { finalBi = finalNo(); finalT = 0; finalCalan = {}; MZ.kis(true); }
@@ -2155,13 +2162,13 @@
       reward: Math.max(b.reward || 0, reward), speed: Math.max(b.speed || 0, speed)
     };
     noteStats(speed, reward);
-    if (levelNo + 1 > save.maxLevel) save.maxLevel = Math.min(BOLUM_SAYI, levelNo + 1);
+    if (!def.kisa && levelNo + 1 > save.maxLevel) save.maxLevel = Math.min(BOLUM_SAYI, levelNo + 1);
     persist();
     var odenen = EKO.bolumOde(save, b.ff || 0, Math.max(b.ff || 0, ff)); // yalnızca ilk kez alınan ateşböcekleri
     var kaz = recordRun({ mode: 'level', won: true, ff: ff, boosts: sim.boosts, gates: sim.gates, maxCombo: sim.maxCombo, speed: speed, perfect: perfect });
     $('kart').className = 'kart sonuc';
     $('kart').innerHTML =
-      '<div class="sonuc-bas"><h2>Gün ışığı!</h2><span>' + levelNo + '. ' + def.name + (def.ikinci ? ' · ikinci yolculuk' : '') + (first ? ' · ilk kez geçildi' : deaths ? ' · ' + (deaths + 1) + '. deneme' : '') + '</span></div>' +
+      '<div class="sonuc-bas"><h2>Gün ışığı!</h2><span>' + noYazi(levelNo) + '. ' + def.name + (def.ikinci ? ' · ikinci yolculuk' : def.kisa ? ' · deneme' : '') + (first ? ' · ilk kez geçildi' : deaths ? ' · ' + (deaths + 1) + '. deneme' : '') + '</span></div>' +
       '<div class="odul-satir"><i class="ikon-odul" aria-hidden="true"></i><b id="odulSayi">0</b>' + (recReward ? '<em class="rekor-etiket">REKOR</em>' : '') + '</div>' +
       '<p class="odul-hesap">' + (mult > 1 ? base + ' × x' + fmt(mult, 2) + ' çarpan' + (E.ustalikPay(sim) > 0 ? ' (hız x' + fmt(E.hizPay(sim), 2) + ' + ustalık ' + fmt(E.ustalikPay(sim), 2) + ')' : '') : 'Bölüm ödülü · hızlanırsan ve TAM bırakırsan çarpan artar') + '</p>' +
       '<div class="madalyalar">' +
@@ -2176,7 +2183,7 @@
       (sim.tamKova ? stat(IK.tam, 'TAM kova +50', 'kovaya akışla ve TAM bırakışla girdin, ödüle 50 eklendi', false) : '') +
       '</div>' + kazanimHtml(kaz, odenen) +
       dolapKisaYol(cuzdanOnce) +
-      '<button type="button" class="ana buyuk genis" id="sonrakiBtn">' + (levelNo >= BOLUM_SAYI ? 'Hikâye ›' : 'Bölüm ' + (levelNo + 1) + ' ›') + '</button>' +
+      '<button type="button" class="ana buyuk genis" id="sonrakiBtn">' + (sonBolumMu() ? 'Hikâye ›' : 'Bölüm ' + (noYazi(levelNo) + 1) + ' ›') + '</button>' +
       '<div class="dur-iki"><button type="button" id="tekrarBtn">Tekrar</button><button type="button" id="bolumlerDonBtn">Bölümler</button></div>';
     showSheet();
     countUp($('odulSayi'), reward);
@@ -2492,7 +2499,7 @@
       $('dAtlaBtn').hidden = true;
     } else {
       var depth = Math.max(0, Math.round(sim.p.y / 20));
-      $('duraklatBilgi').textContent = levelNo + '. ' + def.name + ' · ' + depth + ' m · atış ' + (sim.shots - sim.misses) + '/' + def.par +
+      $('duraklatBilgi').textContent = noYazi(levelNo) + '. ' + def.name + ' · ' + depth + ' m · atış ' + (sim.shots - sim.misses) + '/' + def.par +
         ' · ateşböceği ' + E.fireflyCount(sim) + '/' + sim.fireflies.length;
       $('bastanBtn').textContent = 'Baştan başla';
       $('dAtlaBtn').hidden = false;
@@ -2668,7 +2675,7 @@
     save: function () { return save; },
     persist: persist,
     levelDef: levelDef,
-    bolumSayi: BOLUM_SAYI,
+    bolumSayi: BOLUM_SAYI, kisaBas: KISA_BAS, kisaSayi: KISA_SAYI,
     toggleMuzik: function () { return muzikDegis(); },
     muzikAcik: muzikAcik,
     muzikSahne: function (s) { MZ.sahne(s); MZ.kis(false); },
