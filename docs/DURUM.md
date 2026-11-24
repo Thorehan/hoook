@@ -22,7 +22,7 @@
 - **v0.76** (23/11/2026, Törehan): İstişare 4 Aşama 2, karakterler ve takılar (9 karakter, Baş/Yüz/Sırt, nadirlik), Koleksiyon ekranı, oyunda seçili karakter. Telefonda denenecek: `docs/telefon-testi.md` §20. Not: katalog büyüdü, ortalama oyuncu için Dolap 83 günde biter (hedef ~8 hafta); fiyat dengesi Aşama 3'te.
 - **v0.75** (23/11/2026, Törehan): İstişare 4 Aşama 1, yeni arayüz: tasarım dili, hybrid-casual ana ekran, 5 sekmeli alt gezinme, Yarışma ekranı. Telefonda denenecek: `docs/telefon-testi.md` §19.
 - **v0.74** (23/11/2026, Törehan): skor tablosu ekranı (Günlük ve Haftalık sekmeleri, ilk 50 ve senin yerin; ana menüden ve sonuç kartından). Telefonda denenecek: `docs/telefon-testi.md` §18.
-- **v0.73** (23/11/2026, Törehan): oyunun adı **Hoook**. Depo `Thorehan/hoook`, adres https://thorehan.github.io/hoook/. Eski adres yönlendiriyor. Mustafa'nın klonunda: `git remote set-url origin https://github.com/Thorehan/hoook.git`.
+- **v0.73** (23/11/2026, Törehan): oyunun adı **Hoook**. Depo `Thorehan/hoook`, adres https://thorehan.github.io/hoook/. Eski /kuyu/ adresi 24/11'de kaldırıldı (yönlendirme deposu silindi). Mustafa'nın klonunda: `git remote set-url origin https://github.com/Thorehan/hoook.git`.
 - **v0.72** (23/11/2026, Törehan): gerçek skor tablosu açık (Firebase + Cloudflare). Günlük ve Haftalık sonuç kartında gerçek sıra. Canlıda denendi.
 - v0.71 (23/11/2026, Törehan): akıntı sütunu (İstişare 3 Aşama C, 3/3). Akış sürerken yukarı süzdürür, kestirme; 21. bölüm öğretir; Günlük/Haftalık kor ve çark ile aynı tarihten (24/11, 30/11 haftası). Telefonda denendi (23/11): yeni mekanikler, bölümler, his ve kontrol iyi; ince ayar gerekmedi.
 - v0.70 (23/11/2026): döner çark (Aşama C, 2/3). Telefonda denendi.
