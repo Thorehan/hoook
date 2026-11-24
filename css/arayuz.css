@@ -256,7 +256,7 @@ button, [role="tab"] { -webkit-tap-highlight-color: transparent; touch-action: m
 }
 
 /* ---------- kiriş: ana ekranın tepesinde tahta; üst şerit onun üstünde durur ---------- */
-#ekAna .kiris { position: absolute; z-index: 1; left: 0; right: 0; top: 0; height: calc(env(safe-area-inset-top, 0px) + 70px); pointer-events: none;
+#ekAna .kiris { position: absolute; z-index: 1; left: 0; right: 0; top: 0; height: calc(env(safe-area-inset-top, 0px) + 70px);
   background:
     radial-gradient(circle at 14px 50%, #3a2615 0 3px, transparent 3.5px) 0 calc(100% - 9px) / 64px 12px repeat-x,
     repeating-linear-gradient(180deg, transparent 0 11px, rgba(0,0,0,.09) 11px 13px),
@@ -272,14 +272,15 @@ button, [role="tab"] { -webkit-tap-highlight-color: transparent; touch-action: m
 #ekAna .cark-btn { background: var(--s-gece2); }
 
 /* ---------- askılar: üç sütun, her biri kirişten iple sarkar ---------- */
-#ekAna .askilar { display: grid; grid-template-columns: 82px minmax(0, 1fr) 82px; gap: 10px; width: 100%; max-width: 448px; margin: 12px auto 0; align-items: start; pointer-events: none; }
+#ekAna .askilar { display: flex; justify-content: space-between; align-items: flex-start; width: 100%; max-width: 448px; margin: 12px auto 0; pointer-events: none; }
+#ekAna .aski-sutun { width: 82px; }
 .aski-sutun { display: flex; justify-content: center; animation: askiIn .55s cubic-bezier(.3, 1.35, .5, 1) both; }
-.aski-sutun.orta { animation-delay: .05s; } .aski-sutun.sag { animation-delay: .1s; }
+.aski-sutun.sag { animation-delay: .08s; }
 @keyframes askiIn { from { transform: translateY(-140px); } }
 .aski { --ip: 10px; --sal: 2.2deg; display: flex; flex-direction: column; align-items: center; width: 100%; transform-origin: 50% 0; pointer-events: none;
   animation: askiSal 3.4s ease-in-out infinite alternate; }
 .aski > button { pointer-events: auto; }
-.aski.a-oyna { --ip: clamp(22px, 20vh, 190px); --sal: 1.3deg; animation-duration: 4.2s; animation-delay: -1.3s; }
+.aski.a-oyna { --ip: 12px; --sal: 2deg; transform-origin: 50% 13px; animation-duration: 3.8s; animation-delay: -1.3s; }
 .aski.a-haftalik { animation-delay: -2.1s; }
 .aski.kisa { --ip: 7px; animation-duration: 2.7s; animation-delay: -.8s; }
 .aski.a-bolum { width: auto; max-width: 100%; animation-duration: 3s; }
@@ -349,10 +350,20 @@ button, [role="tab"] { -webkit-tap-highlight-color: transparent; touch-action: m
 @media (max-height: 700px) {
   #ekAna .kiris { height: calc(env(safe-area-inset-top, 0px) + 66px); }
   #ekAna .askilar { margin-top: 8px; }
-  .aski.a-oyna { --ip: clamp(14px, 6vh, 40px); }
   #ekAna .oyna-dugme { font-size: 38px; padding: 17px 8px 10px; }
   #ekAna .askilar .yan-kart > svg { width: 24px; height: 24px; }
   #ekAna .askilar .yan-kart { padding: 14px 4px 6px; }
 }
-@media (max-width: 359px) { #ekAna .askilar { grid-template-columns: 76px minmax(0, 1fr) 76px; gap: 4px; } }
-@media (prefers-reduced-motion: reduce) { .aski, .aski.savrul, .aski-sutun { animation: none; } .alt-menu .am-ik { transition: none; } }
+@media (max-width: 359px) { #ekAna .aski-sutun { width: 76px; } }
+/* v0.83: OYNA kuyunun ortasındaki duvar halkasından sarkar; altında "Başlamak için dokun" */
+#ekAna .oyna-blok { margin: auto auto 0; display: flex; flex-direction: column; align-items: center; width: 100%; max-width: 210px; pointer-events: none;
+  animation: oynaGel .5s cubic-bezier(.3, 1.3, .5, 1) .1s both; }
+@keyframes oynaGel { from { transform: translateY(-26px); opacity: 0; } }
+.duvar-halka { display: block; position: relative; z-index: 3; width: 26px; height: 26px; flex: none; border-radius: 50%; border: 6px solid #d08a45;
+  box-shadow: 0 0 0 2.5px var(--s-cizgi), inset 0 0 0 2.5px var(--s-cizgi), 0 3px 0 2.5px rgba(21,17,42,.5); }
+.duvar-halka::before { content: ''; position: absolute; left: 50%; top: -15px; width: 10px; height: 9px; margin-left: -5px; background: #3a2a1c; border: 2.5px solid var(--s-cizgi); border-radius: 3px; }
+.a-oyna > .aski-ip { margin-top: -3px; }
+.dokun-ipucu { margin-top: 12px; font-family: var(--font-afis); font-size: 19px; letter-spacing: .4px; color: var(--s-krem); text-align: center; white-space: nowrap;
+  text-shadow: 0 2px 0 var(--s-cizgi), 0 0 14px rgba(255,224,102,.35); animation: noktaAtim 1.6s ease-in-out infinite; }
+@media (max-height: 700px) { .dokun-ipucu { margin-top: 8px; font-size: 17px; } }
+@media (prefers-reduced-motion: reduce) { .aski, .aski.savrul, .aski-sutun, #ekAna .oyna-blok, .dokun-ipucu { animation: none; } .alt-menu .am-ik { transition: none; } }

@@ -8,8 +8,9 @@
 - Devir noktası: v0.55 (yayında). Bu dönemin başı: v0.51, etiket `geri-donus-v0.51`; v0.52–v0.55'in her biri ayrı commit, `git revert` ile tek tek geri alınabilir.
 - Devir Törehan'dayken Mustafa projede geliştirme yapmaz; devir `docs/DEVIR-MUSTAFA.md` §6'daki adımlarla yapılır.
 
-## Son durum (v0.82)
+## Son durum (v0.83)
 
+- **v0.83** (24/11/2026, Törehan): Hikâye bölümlerinde Çıra geçici bir çengelde asılı başlar, sonsuz modlar dipten (zeminden). Ana ekranda OYNA ortadaki duvar halkasından sarkar, Çıra yukarıda, "Başlamak için dokun" geri geldi (boş yere dokunmak başlatır). Bütün mekanik ölçümleri öncekiyle aynı. Telefonda denenecek: `docs/telefon-testi.md` §26.
 - **v0.82** (24/11/2026, Törehan): İstişare 5 Aşama 1: Askıda Menü tasarım dili, yeni ana ekran (kirişe asılı sallanan etiketler) ve alt sekme çubuğu. 360×640, 375×667, 390×844, 430×932 tarandı. Telefonda denenecek: `docs/telefon-testi.md` §25. Sırada Aşama 2 (Market ve Koleksiyon).
 - **v0.81** (24/11/2026, Törehan): kamera nefesi yenilendi: arka plan ve duvarlar artık büyümüyor; yalnız oyun katmanı mini yaklaş-uzaklaş yapıyor (%1,8, 0,34 sn). İstişare 5 (arayüz yeniden tasarımı): Törehan **B · Askıda Menü** yönünü seçti; alt sekme çubuğu kalır, çizim Claude'da. Plan `docs/istisare-5-ui.md`, sırada Aşama 1 (tasarım dili + ana ekran). Telefonda denenecek: `docs/telefon-testi.md` §24.
 - **v0.80** (24/11/2026, Törehan): platform standartları: dokunma alanları ≥44 px, Android geri tuşu, dört ekran boyutunda tarama. Telefonda denenecek: `docs/telefon-testi.md` §23. Arayüz çalışma ilkeleri (Senior Mobile UI/UX): her arayüz işinde önce yaklaşım, sonra uygulama; çalışan özellik izinsiz değişmez.

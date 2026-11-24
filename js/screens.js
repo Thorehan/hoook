@@ -155,6 +155,7 @@
     $('dokunBaslik').textContent = bitti ? 'BÖLÜMLER' : 'OYNA';
     $('dokunAlt').textContent = bitti ? 'Bir bölümü yeniden oyna, hedefleri tamamla' : cur + '. bölüm · ' + curDef.name;
     $('dokunBolge').textContent = bitti ? '48 bölüm geçildi' : G.bolgeAdi(cur) + ' · ' + gGec + '/6';
+    $('dokunIpucu').textContent = bitti ? 'Bölümler için dokun' : 'Başlamak için dokun';
     $('dokunBtn').setAttribute('aria-label', bitti ? 'Hikâye tamam: bölümleri aç' : 'Başla: ' + cur + '. bölüm, ' + curDef.name + ', ' + G.bolgeAdi(cur));
     $('oynaHedef').hidden = bitti;
     // bu bölümün hedefleri: ateşböceği noktaları + kusursuz + akış
@@ -245,6 +246,8 @@
   // dokun ve başla: ilk bölüm geçilene dek öğretici (İlk Halka), sonra Sonsuz Kuyu
   function hakYazi(h, zaman) { return h.kalan > 0 ? h.kalan + '/' + h.toplam + ' deneme' : h.son ? zaman + ' yeni denemeler' : 'Deneme bitti · ▶ +1'; }
   $('dokunBtn').addEventListener('click', function () { if (G.hikayeBitti()) openLevels(); else G.startLevel(G.siradaki()); });
+  // v0.83: "Başlamak için dokun": ana ekranda düğme olmayan her yere dokunmak OYNA ile aynı
+  $('ekAna').addEventListener('click', function (e) { if (!e.target.closest('button, .ana-ust, .kiris')) { if (G.dokunus) G.dokunus(true); $('dokunBtn').click(); } });
   // ---------- deneme hakkı penceresi (v0.64) ----------
   var hakTur = null;
   function openHak(tur) {
@@ -962,15 +965,13 @@
     // halkalar
     var ringY = current === 'ekAna' ? h * 0.47 : h * 0.52;
     if (current === 'ekAna') {
-      // v0.82 (Askıda Menü): Çıra asılı etiketlerin altıyla alt sekme çubuğu arasındaki boşlukta sallanır, ikisine de binmez
-      var cvTop = sceneCanvas.getBoundingClientRect().top, mn = $('altMenu');
-      var lb = document.querySelector('#ekAna .askilar').getBoundingClientRect().bottom - cvTop + 6 * u;
-      var at = (mn && !mn.hidden ? mn.getBoundingClientRect().top : sceneCanvas.getBoundingClientRect().bottom) - cvTop - 40 * u; // OYNA sekmesi çubuktan taşar
-      ringY = lb + Math.max(16 * u, (at - lb - 60 * u - 19 * u) * 0.42); // ip boyu 60u, yarıçap 19u; boşluğun biraz üst yarısında
+      // v0.83: Çıra kirişin altında, yan etiketlerin arasında asılı; OYNA'nın duvar halkasına binmez (ip 60u, yarıçap 19u)
+      var kb = document.querySelector('#ekAna .kiris').offsetHeight, ob = document.querySelector('#ekAna .oyna-blok').offsetTop;
+      ringY = kb + Math.max(18 * u, Math.min((ob - kb - 79 * u) * 0.4, ob - kb - 79 * u - 14 * u));
+      ring(ctx, cx - 118 * u, ob - 70 * u, 9 * u); ring(ctx, cx + 116 * u, ob - 150 * u, 9 * u); // duvarda boş halkalar
     }
     ring(ctx, cx, ringY, 11 * u);
-    ring(ctx, cx - 110 * u, ringY + 150 * u, 9 * u);
-    ring(ctx, cx + 105 * u, ringY - 140 * u, 9 * u);
+    if (current !== 'ekAna') { ring(ctx, cx - 110 * u, ringY + 150 * u, 9 * u); ring(ctx, cx + 105 * u, ringY - 140 * u, 9 * u); }
 
     var r = (current === 'ekAna' ? 19 : 13) * u, rope = (current === 'ekAna' ? 60 : 46) * u; // ana ekranda Çıra büyük (v0.75)
     if (current === 'ekTanitim') {

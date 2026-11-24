@@ -1026,7 +1026,7 @@
     }
     return Object.assign({
       id: no, name: tarif.ad, hikaye: no, ikinci: !!tarif.ikinci, bolge: tarif.bolge, H: H, generated: true, fenerli: true, dusus: 520,
-      hint: tarif.ipucu, start: [180, Math.round(off - 20)], goal: sh(goal), water: tarif.su || 0, suFener: tarif.suFener != null ? tarif.suFener : null, not: tarif.not || 0,
+      hint: tarif.ipucu, start: [180, Math.round(off - 20)], asiliBasla: 50, goal: sh(goal), water: tarif.su || 0, suFener: tarif.suFener != null ? tarif.suFener : null, not: tarif.not || 0,
       rects: rects,
       rings: out.rings.reduce(function (acc, p) {
         var a = sh(p);

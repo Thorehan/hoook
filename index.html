@@ -16,9 +16,9 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@600;800&family=Figtree:wght@400;600;800&family=Lilita+One&display=swap">
-<link rel="stylesheet" href="css/kuyu.css?v=0.82">
-<link rel="stylesheet" href="css/ekranlar.css?v=0.82">
-<link rel="stylesheet" href="css/arayuz.css?v=0.82">
+<link rel="stylesheet" href="css/kuyu.css?v=0.83">
+<link rel="stylesheet" href="css/ekranlar.css?v=0.83">
+<link rel="stylesheet" href="css/arayuz.css?v=0.83">
 </head>
 <body>
 <div class="app" id="oyunEkrani" hidden>
@@ -73,7 +73,7 @@
   <img id="acilisLogo" class="marka-logo" src="assets/funday-morning-logo.webp" alt="Funday Morning Games">
   <div class="yukleme" aria-hidden="true"><div id="yuklemeDolgu"></div></div>
   <div class="yukleme-not" id="yuklemeNot">Yükleniyor…</div>
-  <div class="ek-surum">Hoook v0.82</div>
+  <div class="ek-surum">Hoook v0.83</div>
 </section>
 
 <!-- Giriş: yalnızca ilk açılışta -->
@@ -102,7 +102,7 @@
   <div class="tanitim-imza">© 2026 Funday Morning Games</div>
 </section>
 
-<!-- Ana menü (İstişare 5, v0.82): Askıda Menü. Üstte tahta kiriş (profil, ateşböceği, ayar); kirişe asılı etiketler: Günlük + Görev, OYNA + bölüm çipi, Haftalık + Sıralama; altta sahnede Çıra -->
+<!-- Ana menü (İstişare 5, v0.82–0.83): Askıda Menü. Üstte tahta kiriş (profil, ateşböceği, ayar); kirişe asılı yan etiketler: Günlük + Görev, Haftalık + Sıralama; Çıra kirişin altında asılı; ortada duvar halkasından sarkan OYNA + bölüm çipi; altta "Başlamak için dokun" -->
 <section class="ekran ana-ekran sekmeli" id="ekAna" hidden>
   <canvas id="anaSahne" aria-hidden="true"></canvas>
   <div class="kiris" aria-hidden="true"></div>
@@ -115,10 +115,13 @@
   <!-- İstişare 5 (v0.82): Askıda Menü. Kirişe ip ve çengelle asılı etiketler; alttaki etiket üsttekine zincirli -->
   <div class="askilar">
     <div class="aski-sutun sol"><div class="aski a-gunluk"><i class="aski-ip" aria-hidden="true"></i><i class="cengel" aria-hidden="true"></i><button type="button" class="yan-kart k-cam" id="yanGunluk"><i class="nokta-say" id="yanGunlukNokta" hidden></i><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="5" width="18" height="16" rx="3" fill="#fff" stroke="#1a0f2e" stroke-width="2"/><path d="M3 10h18" stroke="#1a0f2e" stroke-width="2"/><path d="M8 3v4M16 3v4" stroke="#1a0f2e" stroke-width="2.5" stroke-linecap="round"/><path d="M8.5 15.5l2.2 2 4.8-4.6" fill="none" stroke="#1a93b8" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg><b>Günlük</b><small id="yanGunlukAlt"></small></button><div class="aski kisa a-gorev"><i class="aski-ip" aria-hidden="true"></i><i class="cengel" aria-hidden="true"></i><button type="button" class="yan-kart k-yesil" id="anaGorevBtn"><i class="nokta-say" id="anaGorevNokta" hidden>!</i><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="5" y="3.5" width="14" height="17" rx="2.4" fill="#fff" stroke="#1a0f2e" stroke-width="2"/><path d="M8.5 9l1.6 1.6 3-3M8.5 15.5h7" fill="none" stroke="#2a9a43" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg><b id="anaGorevBaslik">Görevler</b><small id="anaGorevAlt"></small><span class="ag-cubuk" id="anaGorevCubuk" aria-hidden="true"></span></button></div></div></div>
-    <div class="aski-sutun orta"><div class="aski a-oyna"><i class="aski-ip" aria-hidden="true"></i><i class="cengel" aria-hidden="true"></i><button type="button" class="oyna-dugme" id="dokunBtn"><span id="dokunBaslik">OYNA</span><small class="oyna-alt" id="dokunAlt">1. bölüm · İlk Halka</small></button><div class="aski kisa a-bolum"><i class="aski-ip" aria-hidden="true"></i><i class="cengel" aria-hidden="true"></i><button type="button" class="bolum-hap" id="bolumHap" aria-label="Hikâye haritasını aç">
-      <span class="bh-alt"><span id="dokunBolge">Taş Kuyu · 0/6</span><span class="hedefler" id="oynaHedef" aria-label="Bu bölümün hedefleri"></span></span>
-    </button></div></div></div>
     <div class="aski-sutun sag"><div class="aski a-haftalik"><i class="aski-ip" aria-hidden="true"></i><i class="cengel" aria-hidden="true"></i><button type="button" class="yan-kart k-mor" id="yanHaftalik"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M7 4h10v4a5 5 0 0 1-10 0z" fill="#ffd23f" stroke="#1a0f2e" stroke-width="2"/><path d="M7 6H4a3 3 0 0 0 3 4M17 6h3a3 3 0 0 1-3 4" fill="none" stroke="#1a0f2e" stroke-width="2"/><path d="M10 13h4v4h-4zM8 20h8" stroke="#1a0f2e" stroke-width="2" fill="#ffd23f"/></svg><b>Haftalık</b><small id="yanHaftalikAlt"></small></button><div class="aski kisa a-tablo"><i class="aski-ip" aria-hidden="true"></i><i class="cengel" aria-hidden="true"></i><button type="button" class="yan-kart k-ates" id="tabloAcBtn" hidden><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="12" width="5" height="9" rx="1" fill="#e0a070" stroke="#1a0f2e" stroke-width="2"/><rect x="9.5" y="6" width="5" height="15" rx="1" fill="#ffd23f" stroke="#1a0f2e" stroke-width="2"/><rect x="16" y="9" width="5" height="12" rx="1" fill="#d7e0e3" stroke="#1a0f2e" stroke-width="2"/></svg><b>Sıralama</b><small>Haftalık</small></button></div></div></div>
+  </div>
+  <!-- v0.83: OYNA kuyunun ortasındaki bir duvar halkasından sarkar; altta "Başlamak için dokun" (boş yere dokunmak da başlatır) -->
+  <div class="oyna-blok"><div class="aski a-oyna"><i class="duvar-halka" aria-hidden="true"></i><i class="aski-ip" aria-hidden="true"></i><i class="cengel" aria-hidden="true"></i><button type="button" class="oyna-dugme" id="dokunBtn"><span id="dokunBaslik">OYNA</span><small class="oyna-alt" id="dokunAlt">1. bölüm · İlk Halka</small></button><div class="aski kisa a-bolum"><i class="aski-ip" aria-hidden="true"></i><i class="cengel" aria-hidden="true"></i><button type="button" class="bolum-hap" id="bolumHap" aria-label="Hikâye haritasını aç">
+      <span class="bh-alt"><span id="dokunBolge">Taş Kuyu · 0/6</span><span class="hedefler" id="oynaHedef" aria-label="Bu bölümün hedefleri"></span></span>
+    </button></div></div>
+    <div class="dokun-ipucu" id="dokunIpucu" aria-hidden="true">Başlamak için dokun</div>
   </div>
 </section>
 
@@ -290,7 +293,7 @@
     <button type="button" id="istatBtn">Oyun istatistikleri</button>
     <button type="button" id="tanitimBtn">Tanıtımı yeniden izle</button>
     <button type="button" id="ipucuSifirBtn">Tanıtım kartlarını yeniden göster</button>
-    <p class="surum">Hoook v0.82 · prototip · Funday Morning Games</p>
+    <p class="surum">Hoook v0.83 · prototip · Funday Morning Games</p>
   </div>
 </section>
 
@@ -364,19 +367,19 @@
 <div class="hikaye-kart" id="hikayeKart" role="status" hidden><b id="hkBaslik"></b><span id="hkMetin"></span></div>
 <div class="bildirim" id="bildirim" role="status" hidden></div>
 
-<script src="js/engine.js?v=0.82"></script>
-<script src="js/levels.js?v=0.82"></script>
-<script src="js/bolumler.js?v=0.82"></script>
-<script src="js/gen.js?v=0.82"></script>
-<script src="js/gorevler.js?v=0.82"></script>
-<script src="js/ekonomi.js?v=0.82"></script>
-<script src="js/istatistik.js?v=0.82"></script>
-<script src="js/muzik.js?v=0.82"></script>
-<script src="js/notlar.js?v=0.82"></script>
-<script src="js/hayalet.js?v=0.82"></script>
-<script src="js/online.js?v=0.82"></script>
-<script src="js/karakter.js?v=0.82"></script>
-<script src="js/game.js?v=0.82"></script>
-<script src="js/screens.js?v=0.82"></script>
+<script src="js/engine.js?v=0.83"></script>
+<script src="js/levels.js?v=0.83"></script>
+<script src="js/bolumler.js?v=0.83"></script>
+<script src="js/gen.js?v=0.83"></script>
+<script src="js/gorevler.js?v=0.83"></script>
+<script src="js/ekonomi.js?v=0.83"></script>
+<script src="js/istatistik.js?v=0.83"></script>
+<script src="js/muzik.js?v=0.83"></script>
+<script src="js/notlar.js?v=0.83"></script>
+<script src="js/hayalet.js?v=0.83"></script>
+<script src="js/online.js?v=0.83"></script>
+<script src="js/karakter.js?v=0.83"></script>
+<script src="js/game.js?v=0.83"></script>
+<script src="js/screens.js?v=0.83"></script>
 </body>
 </html>

@@ -178,6 +178,12 @@ Yayına çıkmadan yerelde denemek için: bilgisayarda `python3 -m http.server 8
 - [ ] Yazılar (Lilita One) okunaklı mı? Görevler, Günlük, Haftalık, Sıralama, bölüm çipi doğru yere gidiyor mu?
 - [ ] Alt çubukta seçili sekmenin kalkıp renklenmesi anlaşılır mı?
 
+## 26. Asılı başlangıç ve dokun-başla (v0.83, 3 dk)
+- [ ] Hikâye bölümüne girince Çıra bir çengelde asılı mı? İlk atışta çengel düşüp kayboluyor mu?
+- [ ] Günlük ve Haftalık'ta Çıra dipte, zeminde mi başlıyor? İki modun farkı anlaşılıyor mu?
+- [ ] Ana ekranda OYNA'nın yeri (ortadaki halkadan sarkan) başparmağa rahat mı?
+- [ ] Boş yere dokununca oyun başlıyor mu? Yanlışlıkla başlatma oluyor mu (üst şerit ve kiriş başlatmaz)?
+
 ## 5. Genel izlenim (serbest)
 - En sevdiğim an:
 - En çok zorlandığım yer:

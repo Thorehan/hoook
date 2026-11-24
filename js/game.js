@@ -686,6 +686,7 @@
         var pts = Math.min(e.combo, CFG.COMBO_CAP) * CFG.COMBO_PTS;
         floatText(e.x, e.y - 16, 'AKIŞ x' + e.combo + (mode === 'endless' ? '  +' + pts : ''), e.combo >= 8 ? COL.atesbocegi : COL.gok, 13 + Math.min(e.combo, 10));
       } else if (e.type === 'comboBreak') { if (e.combo >= 3) SFX.kopus(e.combo); floatText(sim.p.x, sim.p.y - 26, 'akış bitti (' + e.why + ')', '#8fa09c', 12); }
+      else if (e.type === 'basDus') { burst(e.x, e.y, 7, '#c9a27a', 90, 0.45, 260); } // başlangıç çengeli düştü (v0.83)
       else if (e.type === 'slip') { SFX.slip(); buzz(30); floatText(sim.p.x, sim.p.y - 24, 'el kaydı!', COL.kahraman, 15); }
       else if (e.type === 'tam') {
         // Tam zamanında bırakma: altın ışıltı, iki notalı tını; sonsuzda puanı da yazar. Her 3. art arda TAM'da ek itiş.

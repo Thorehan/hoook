@@ -112,6 +112,7 @@
 
   function rect(a) { return { x: a[0], y: a[1], w: a[2], h: a[3], type: a[4], dir: a[5] || 'u' }; }
 
+  function p0(s, x, y) { s.p.x = s.p.px = x; s.p.y = s.p.py = y; s.startY = s.topY = y; }
   function createSim(def) {
     var H = def.H || 0;
     var rects = [
@@ -151,6 +152,16 @@
       akintilar: (def.akintilar || []).map(function (a) { return { x: a[0], y: a[1], w: a[2], h: a[3] }; }), // akıntı sütunları (v0.71): sol, üst, genişlik, boy
       gucler: (def.gucler || []).map(function (g) { return { x: g[0], y: g[1], tur: g[2], got: false }; }), guc: { fener: 0, kanat: 0, kalkan: false }, gucSay: 0
     };
+    // Bölümlerde asılı başlangıç (v0.83, Törehan 24/11): bölüm kuyunun ortasından bir kesit; Çıra başlangıcın üstündeki
+    // bir halkada asılı başlar. Sonsuz modlar (Günlük, Haftalık) dipten, zeminden başlar: su hep dipten yükselir.
+    // Halka listenin sonuna eklenir (üretici rastgele sayı çekmez; eski bölüm ve tohumlar aynı kalır).
+    if (def.asiliBasla && !def.endless) {
+      // Geçici çengel: Çıra başka bir yere tutununca düşüp kaybolur; ilk atıştan sonra bölüm eskisiyle aynıdır
+      var bh = { x: sx, y: sy - def.asiliBasla, basHalka: true };
+      s.rings.push(bh); s.basHalka = bh;
+      s.rope = { kind: 'anchor', x: bh.x, y: bh.y, len: CFG.MIN_LEN, target: 'ring', ref: bh };
+      p0(s, bh.x, bh.y + CFG.MIN_LEN);
+    }
     // geçit çiftlerini bağla
     s.rings.forEach(function (g) {
       if (g.gecitId == null) return;
@@ -611,6 +622,10 @@
           s.rope = { kind: 'anchor', x: ax, y: ay, len: dist(p.x, p.y, ax, ay), target: hit.kind, ref: hit.ring || hit.rect || null };
           s.rope.len0 = s.rope.len;
           if (hit.ring && hit.ring.kor) { s.rope.korBas = s.t; s.korSay = (s.korSay || 0) + 1; s.events.push({ type: 'kor', x: ax, y: ay }); }
+          if (s.basHalka && hit.ring !== s.basHalka) { // başlangıç çengeli düşer (v0.83)
+            var bi = s.rings.indexOf(s.basHalka); if (bi >= 0) s.rings.splice(bi, 1);
+            s.events.push({ type: 'basDus', x: s.basHalka.x, y: s.basHalka.y }); s.basHalka = null;
+          }
           s.hook = null;
           onAttach(s, ax, ay, hit.kind);
           if (hit.ring && hit.ring.sw) s.swings++;
