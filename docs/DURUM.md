@@ -10,7 +10,7 @@
 
 ## Son durum (v0.81)
 
-- **v0.81** (24/11/2026, Törehan): kamera nefesi yenilendi: arka plan ve duvarlar artık büyümüyor; yalnız oyun katmanı mini yaklaş-uzaklaş yapıyor (%1,8, 0,34 sn). Sırada arayüzün özgün hyper-casual yeniden tasarımı (önce yön taslakları). Telefonda denenecek: `docs/telefon-testi.md` §24.
+- **v0.81** (24/11/2026, Törehan): kamera nefesi yenilendi: arka plan ve duvarlar artık büyümüyor; yalnız oyun katmanı mini yaklaş-uzaklaş yapıyor (%1,8, 0,34 sn). İstişare 5 (arayüz yeniden tasarımı): Törehan **B · Askıda Menü** yönünü seçti; alt sekme çubuğu kalır, çizim Claude'da. Plan `docs/istisare-5-ui.md`, sırada Aşama 1 (tasarım dili + ana ekran). Telefonda denenecek: `docs/telefon-testi.md` §24.
 - **v0.80** (24/11/2026, Törehan): platform standartları: dokunma alanları ≥44 px, Android geri tuşu, dört ekran boyutunda tarama. Telefonda denenecek: `docs/telefon-testi.md` §23. Arayüz çalışma ilkeleri (Senior Mobile UI/UX): her arayüz işinde önce yaklaşım, sonra uygulama; çalışan özellik izinsiz değişmez.
 - **v0.79** (24/11/2026, Törehan): menülerde yakınlaşma (büyüme) hissi kaldırıldı; pencere ve ekranlar solarak ve hafif kayarak gelir. Oyun içindeki kamera nefesi (TAM ve uzun akış, %3) duruyor.
 - **v0.78** (24/11/2026, Törehan): yerel uygulama hissi (tarayıcı izleri kapalı, sabit başlıklar, dokunuş sesi ve titreşimi, ekran geçişleri). Arayüzün görsel yönü değişiyor: Törehan "web uygulaması ve yapay zekâ yapımı gibi" dedi; ekip bir UI görseli hazırlayacak, arayüz ondan ilerleyecek (Figma eklentisi önerildi). İstişare 4 Aşama 4–6 görsel gelince. Telefonda denenecek: `docs/telefon-testi.md` §22.
