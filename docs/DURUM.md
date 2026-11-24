@@ -2,11 +2,12 @@
 
 > Her oturumun başında okunur, iş bitince güncellenir. Kısa tutulur (~40 satır).
 
-## Devir kimde: **Törehan** (Windows)
+## Devir kimde: **Muhammed**
 
-- Devir tarihi: 17/11/2026 · Mustafa → Törehan
-- Devir noktası: v0.55 (yayında). Bu dönemin başı: v0.51, etiket `geri-donus-v0.51`; v0.52–v0.55'in her biri ayrı commit, `git revert` ile tek tek geri alınabilir.
-- Devir Törehan'dayken Mustafa projede geliştirme yapmaz; devir `docs/DEVIR-MUSTAFA.md` §6'daki adımlarla yapılır.
+- Devir tarihi: 24/11/2026 · Törehan → Muhammed
+- Devir noktası: v0.83 (yayında), etiket `geri-donus-v0.83`. Bu dönemdeki her sürüm ayrı commit; `git revert` ile tek tek geri alınabilir.
+- Devir Muhammed'deyken Törehan (ve Mustafa) projede geliştirme yapmaz; yalnız oynar, not alır, istişare eder. Geri devir `docs/DEVIR-MUHAMMED.md` §8'deki adımlarla.
+- **Muhammed için başlangıç:** `docs/DEVIR-MUHAMMED.md` (kurulum, ilk oturum metni, yapılacaklar listesi §6, arayüz ilkeleri §5).
 
 ## Son durum (v0.83)
 
@@ -70,3 +71,4 @@
 |---|---|---|---|
 | 11/11/2026 | Törehan → Mustafa | v0.51 | İlk devir; `CLAUDE.md`, bu dosya ve `DEVIR-MUSTAFA.md` eklendi |
 | 17/11/2026 | Mustafa → Törehan | v0.55 | Bölge suyu, ekonomi dengesi ve ışık yolu, Haftalık Kuyu ve lig, meydan okuma, skor tablosu istemcisi (kapalı); yayında, telefonda denenmedi |
+| 24/11/2026 | Törehan → Muhammed | v0.83 | İstişare 3 (his, yeni mekanikler), skor tablosu, Hoook adı, İstişare 4–5 arayüz (Askıda Menü Aşama 1), asılı başlangıç; `DEVIR-MUHAMMED.md` eklendi |

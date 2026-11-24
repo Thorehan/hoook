@@ -1,6 +1,6 @@
 # Hoook (eski adı Kuyu) · Claude için çalışma kuralları
 
-Funday Morning Games'in 2D mobil oyunu **Hoook** (23/11/2026'ya kadar adı Kuyu'ydu; depo `Thorehan/hoook`, eski `/kuyu/` adresi `Thorehan/kuyu` yönlendirme deposuyla yeni adrese gider). İç adlar (`window.Kuyu*`, `kuyu.*` kayıt anahtarları, `KUYU1.` yedek kodu, `css/kuyu.css`) uyumluluk için değişmez. Düz HTML + JS (derleme yok), GitHub Pages'te yayında: https://thorehan.github.io/hoook/ (`main`'e push edilince ~1 dk'da güncellenir). İki ortak **sırayla** çalışır: **Törehan** (Windows) ve **Mustafa** (Mac). Yanıtlar Türkçe.
+Funday Morning Games'in 2D mobil oyunu **Hoook** (23/11/2026'ya kadar adı Kuyu'ydu; depo `Thorehan/hoook`, eski `/kuyu/` adresi `Thorehan/kuyu` yönlendirme deposuyla yeni adrese gider). İç adlar (`window.Kuyu*`, `kuyu.*` kayıt anahtarları, `KUYU1.` yedek kodu, `css/kuyu.css`) uyumluluk için değişmez. Düz HTML + JS (derleme yok), GitHub Pages'te yayında: https://thorehan.github.io/hoook/ (`main`'e push edilince ~1 dk'da güncellenir). Ortaklar **sırayla** çalışır: **Törehan** (Windows), **Muhammed** (24/11/2026'dan beri devir onda) ve **Mustafa** (Mac). Yanıtlar Türkçe.
 
 ## 1 · Devir kuralı (en önemli kural)
 
@@ -9,17 +9,17 @@ Projede aynı anda **yalnız bir kişi** geliştirir. Kimin sırası olduğu `do
 Her oturumun başında, başka hiçbir şey yapmadan önce:
 1. `git pull` (yerelde commit'lenmemiş değişiklik varsa önce kullanıcıya sor, üstüne yazma).
 2. `docs/DURUM.md` → "Devir kimde" satırını oku.
-3. Karşındaki kişiyi belirle: `git config user.name` ipucu verir; emin değilsen kullanıcıya "Sen Törehan mısın, Mustafa mı?" diye sor.
-4. **Devir bu kişide değilse geliştirme yapma:** dosya düzenleme, commit ve push yok. Yalnız okuma, soru yanıtlama ve öneri yapılabilir. Kullanıcıya "Devir şu an X'te; önce X devretmeli (bkz. docs/DEVIR-MUSTAFA.md §6)" de. Kullanıcı ısrar etse bile devri kendin değiştirme: devri yalnız devri elinde tutan kişi devredebilir.
+3. Karşındaki kişiyi belirle: `git config user.name` ipucu verir; emin değilsen kullanıcıya "Sen kimsin: Törehan, Muhammed, Mustafa?" diye sor.
+4. **Devir bu kişide değilse geliştirme yapma:** dosya düzenleme, commit ve push yok. Yalnız okuma, soru yanıtlama ve öneri yapılabilir. Kullanıcıya "Devir şu an X'te; önce X devretmeli (bkz. docs/DEVIR-MUHAMMED.md §8)" de. Devri elinde tutmayan kişiyle yalnız istişare edilir (fikir, plan, öneri; dosyaya dokunmadan). Kullanıcı ısrar etse bile devri kendin değiştirme: devri yalnız devri elinde tutan kişi devredebilir.
 
-Devir elindeyken iş bitirme ve devretme adımları `docs/DEVIR-MUSTAFA.md` §6'da.
+Devir elindeyken iş bitirme ve devretme adımları `docs/DEVIR-MUHAMMED.md` §8'de (güncel devir belgesi; eski devir `docs/DEVIR-MUSTAFA.md`).
 
 ## 2 · Kaynaklar (okuma sırası)
 
 | Dosya | Ne var |
 |---|---|
 | `docs/DURUM.md` | Devir kimde, son sürüm, sıradaki iş, açık sorular (kısa tutulur) |
-| `docs/DEVIR-MUSTAFA.md` | Devir belgesi: kurulum, nasıl çalışılır, nasıl devredilir |
+| `docs/DEVIR-MUHAMMED.md` | Güncel devir belgesi: kurulum, ilk oturum, yapılacaklar listesi, arayüz ilkeleri, nasıl devredilir |
 | `README.md` | Oyunun bütün mekanikleri ve sürüm sürüm açıklaması (uzun; gerektiğinde bölüm bölüm oku) |
 | `docs/gelistirme-sureci.md` | Geliştirme sırası, yapılanlar günlüğü, yapılacaklar |
 | `docs/hikaye.md` | Hikâye "Çıra": tek kaynak, metin kuralları |
@@ -47,6 +47,8 @@ Kod: `js/engine.js` (deterministik fizik ve kurallar, DT 1/120), `js/gen.js` (b�
 - **Ekonomi (v0.53, onaylı; v0.77'de güncellendi):** Tek para birimi; Market ~12 haftalık (Törehan 24/11: katalog 72 eşyaya büyüdü), günlük vitrin + haftanın ürünü, Efsane yalnız haftanın ürünüyken satılır, rastgele kutu yok; ölçüm hata yapan oyuncuyla (`ekonomi-olcum.js`, ortalama gün ~119). **Haftalık Kuyu + lig (v0.54, onaylı):** sahte rakip yok. **Online (23/11, Törehan):** arka uç Firebase (anonim kimlik) + Cloudflare Worker ve D1 (`sunucu/`), Supabase yerine; skor tablosu hesaplar açılana kadar kapalı (`js/online.js` → `AYAR` boş). Kurulum `docs/online-kurulum.md`.
 
 ## 4 · Çalışma biçimi
+
+- **Arayüz işleri (Törehan'ın ilkesi, 24/11):** Kıdemli mobil UI/UX tasarımcısı ve frontend geliştiricisi gibi çalış. Her arayüz işinde önce tasarım yaklaşımını yaz ve onay al, sonra uygula. Çalışan bir özelliği izinsiz değiştirme ya da kaldırma. Dokunma alanı ≥44 px, güvenli alanlar, Android geri tuşu; yükleniyor/boş/hata/başarı durumları; "web uygulaması" ve yapay zekâ şablonu görünümünden kaçın; büyüme ve yakınlaşma (zoom) animasyonu yok, salınım ve kayma var; 360×640, 375×667, 390×844, 430×932'de dene. Ayrıntı `docs/DEVIR-MUHAMMED.md` §5.
 
 - Üretici (`gen.js`) rastgele sayı çağrılarının sırasını değiştirmeden ekleme yapar; böylece eski bölümler ve Günlük tohumları aynı kalır.
 - **Her değişiklikten sonra:** `node tools/kontrol.js` (sözdizimi ve sürüm etiketi). Mekanik değişiklikte ayrıca şunlar çalıştırılır:
