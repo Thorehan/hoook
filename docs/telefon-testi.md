@@ -161,6 +161,12 @@ Yayına çıkmadan yerelde denemek için: bilgisayarda `python3 -m http.server 8
 - [ ] Her düğmede kısa ses ve titreşim: hoş mu, fazla mı? Ayarlardan kapatınca susuyor mu?
 - [ ] Sekmeler arası kayma ve diğer ekranların (v0.79: büyümeden, solarak) gelişi akıcı mı? Hiçbir pencere büyüyerek açılmıyor mu?
 
+## 23. Platform standartları (v0.80, 3 dk; Android'de geri tuşu)
+- [ ] Android geri: ürün kartı açıkken kapanıyor mu? Market'teyken OYNA'ya dönüyor mu? Oyunda duraklatıyor, duraklatmada oyuna dönüyor mu?
+- [ ] OYNA ekranında geri "Çıkmak için tekrar geri" diyor, ikinci geri uygulamadan çıkıyor mu?
+- [ ] Küçük düğmeler (profil, ateşböceği, çark, kategori sekmeleri, ayar anahtarları) ilk dokunuşta tutuyor mu?
+- [ ] Küçük ekranlı telefonda Çıra, bölüm çipi ve OYNA birbirine değmeden görünüyor mu?
+
 ## 5. Genel izlenim (serbest)
 - En sevdiğim an:
 - En çok zorlandığım yer:

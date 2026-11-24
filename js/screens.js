@@ -966,7 +966,7 @@
       var cvTop = sceneCanvas.getBoundingClientRect().top;
       var lb = document.querySelector('#ekAna .ana-ust').getBoundingClientRect().bottom - cvTop + 40 * u;
       var at = document.querySelector('#ekAna .oyna-alan').getBoundingClientRect().top - cvTop; // bölüm ve OYNA'nın üstünde kalsın
-      ringY = Math.max(lb + 16 * u, Math.min(ringY, at - 46 * u - 13 * u - 12));
+      ringY = Math.max(lb + 16 * u, Math.min(ringY, at - 60 * u - 19 * u - 20)); // v0.80: büyük Çıra'nın ip boyu (60u) ve yarıçapı (19u); bölüm çipine değmez
     }
     ring(ctx, cx, ringY, 11 * u);
     ring(ctx, cx - 110 * u, ringY + 150 * u, 9 * u);
@@ -1113,6 +1113,30 @@
   document.addEventListener('touchmove', function (e) { if (e.touches && e.touches.length > 1) e.preventDefault(); }, { passive: false });
   document.addEventListener('contextmenu', function (e) { if (!e.target.closest('input, textarea')) e.preventDefault(); });
   document.addEventListener('dragstart', function (e) { if (e.target.tagName === 'IMG') e.preventDefault(); });
+  // ---------- Android geri tuşu ve geri hareketi (v0.80) ----------
+  // Geçmişte görünmez bir koruma kaydı durur; geri gelince sırayla: açık pencere kapanır → oyunda duraklatılır
+  // (duraklatmadaysa devam eder; sonuç kartında ana menüye dönülür) → OYNA dışındaki ekrandan OYNA'ya dönülür →
+  // OYNA'da "Çıkmak için tekrar geri" uyarısı; 2 sn içinde ikinci geri uygulamadan çıkar.
+  var GERI = { hoook: 'geri' }, cikisT = 0;
+  function geriKur() { try { if (!(history.state && history.state.hoook === 'geri')) history.pushState(GERI, ''); } catch (e) {} }
+  function geriIsle() {
+    if (!$('videoKatman').hidden) return true; // video sürerken geri bir şey yapmaz
+    if (!$('urunKatman').hidden) { urunKapat(); return true; }
+    if (!$('tabloKatman').hidden) { $('tabloKatman').hidden = true; return true; }
+    if (!$('hakKatman').hidden) { $('hakKapat').click(); return true; }
+    if (!$('girisKatman').hidden) { $('girisKapat').click(); return true; }
+    if (G.geri && G.geri()) return true;
+    if (['ekAcilis', 'ekGiris', 'ekTanitim', 'ekAna', 'oyun'].indexOf(current) < 0) { home(); return true; }
+    return false;
+  }
+  window.addEventListener('popstate', function () {
+    if (geriIsle()) { geriKur(); return; }
+    var t = Date.now();
+    if (t - cikisT < 2000) { try { history.back(); } catch (e) {} return; } // ikinci geri: çık
+    cikisT = t; toast('Çıkmak için tekrar geri', 2000); geriKur();
+  });
+  geriKur();
+
   // Her düğmeye basınca kısa ses ve hafif titreşim; ana düğmelerde (OYNA, Al, GİY, sekmeler) daha dolgun
   document.addEventListener('pointerdown', function (e) {
     var b = e.target.closest('button, [role="tab"]');

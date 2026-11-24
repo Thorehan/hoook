@@ -2702,6 +2702,14 @@
     unlockAudio: function () { ac(); },
     pause: function () { pauseGame(); },
     resume: function () { resumeGame(); },
+    // Android geri tuşu (v0.80): oyun ekranında Escape ile aynı sıra; işlendiyse true
+    geri: function () {
+      if ($('oyunEkrani').hidden) return false;
+      if (introOpen) { closeIntro(false); return true; }
+      if (pauseOpen) { resumeGame(); return true; }
+      if (sim && sim.status === 'play' && !paused && $('katman').hidden) { pauseGame(); return true; }
+      goHome(); return true;
+    },
     sfx: SFX
   };
 

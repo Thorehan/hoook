@@ -232,3 +232,14 @@ button, [role="tab"] { -webkit-tap-highlight-color: transparent; touch-action: m
 @keyframes logoGir { from { opacity: 0; } }
 @keyframes madalyaZipla { 0% { transform: translateY(0); } 40% { transform: translateY(-8px); } 70% { transform: translateY(1px); } 100% { transform: none; } }
 @keyframes dokunNabiz { 0%, 100% { opacity: .62; } 50% { opacity: 1; } }
+
+/* ---------- dokunma alanları en az 44 px (v0.80, iOS 44 pt / Android 48 dp ilkesine yakın) ---------- */
+#ekAna button.selam, .para-hap { min-height: 44px; }
+.cark-btn { width: 44px; height: 44px; min-width: 44px; }
+.kol-sekmeler button { min-height: 44px; }
+.metin-btn { min-height: 44px; }
+.g-al { min-height: 44px; }
+.filtre button[data-filtre] { min-height: 44px; }
+/* anahtar: görünüş aynı (54×32), görünmez dokunma payı 44 px'e genişler */
+.anahtar { position: relative; overflow: visible; }
+.anahtar::after { content: ''; position: absolute; inset: -7px -4px; }

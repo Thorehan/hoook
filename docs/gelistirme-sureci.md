@@ -133,6 +133,7 @@ Kullanıcı hikâyeye online'dan önce geçti; online (5) sonra.
 - [?] Bekçinin adı.
 
 ## Yapılanlar
+- 2026-11-24 · v0.80 · Platform standartları: dokunma alanları ≥44 px, Android geri tuşu (pencere → oyun duraklat → OYNA → çıkış uyarısı), 360×640 / 375×667 / 390×844 / 430×932 taraması; küçük ekranda Çıra bölüm çipine değmiyor.
 - 2026-11-24 · v0.79 · Menülerde yakınlaşma hissi kaldırıldı (büyüyen pencere, kart, başlık, OYNA nabzı, rozet, madalya, basış): solma ve kaymaya döndü.
 - 2026-11-24 · v0.78 · Yerel uygulama hissi: tarayıcı izleri kapalı, sabit başlıklar, dokunuş sesi ve titreşimi, ekran geçişleri. Arayüz görseli ekipten gelecek (web/yapay zekâ görünümü geri bildirimi).
 - 2026-11-24 · v0.77 · İstişare 4 Aşama 3: Market (haftanın ürünü, günlük vitrin + video %50, kategoriler, ürün kartı), fiyat dengesi (~12 hafta, onaylı), ekonomi testine vitrin/indirim/haftalık kuralları eklendi.
