@@ -8,6 +8,7 @@
 - Devir noktası: v0.83 (yayında), etiket `geri-donus-v0.83`. Bu dönemdeki her sürüm ayrı commit; `git revert` ile tek tek geri alınabilir.
 - Devir Muhammed'deyken Törehan (ve Mustafa) projede geliştirme yapmaz; yalnız oynar, not alır, istişare eder. Geri devir `docs/DEVIR-MUHAMMED.md` §8'deki adımlarla.
 - **Muhammed için başlangıç:** `docs/DEVIR-MUHAMMED.md` (kurulum, ilk oturum metni, yapılacaklar listesi §6, arayüz ilkeleri §5).
+- **Kapsam (Törehan, 24/11):** yalnız arayüz Aşama 2–4 (Market, Koleksiyon, Yarışma, Profil, pencereler, açılış ve sonuç kartları). Her aşama sonunda Törehan telefonda dener, onaylar. Online, ekonomi, oynanış çekirdeği, görsel yön ve hikâyede son söz Törehan'da (`DEVIR-MUHAMMED.md` §7).
 
 ## Son durum (v0.83)
 
