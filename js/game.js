@@ -1882,7 +1882,7 @@
   // kulede fener yeniden yanar. Dokunmak geçer. Sahne bir kez oynar; metni Çıra'nın yolu'nda kalır.
   var FINAL = { 16: 0, 36: 1, 56: 2, 76: 3 }, FINAL_SURE = 7.5, finalCalan = {};
   function finalGoruldu(bi) { return !!(save.finaller && save.finaller[BOLGELER[bi].id]); }
-  var FINAL_YENI = { 6: 0, 12: 1, 18: 2, 24: 3, 118: 0 }; // yeni Hikâye: her bölgenin 6. bölümü; kısa deneme: Taş Kuyu'nun 18.si
+  var FINAL_YENI = { 6: 0, 12: 1, 18: 2, 24: 3, 118: 0, 136: 1, 160: 2, 183: 3 }; // yeni Hikâye: her bölgenin 6. bölümü; kısa deneme: bölge sonları 18, 36, 60, 83
   function finalNo() { return FINAL_YENI[levelNo]; }
   function finalBekliyor() { return mode === 'level' && finalNo() != null && !finalGoruldu(finalNo()); }
   function finalBasla() { finalBi = finalNo(); finalT = 0; finalCalan = {}; MZ.kis(true); }

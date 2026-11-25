@@ -216,6 +216,15 @@ Ana ekranda OYNA'nın altındaki "harita ›" çipine dokun.
 - [ ] Üstteki "Liste" bugünkü listeyi açıyor mu? Liste mi, harita mı daha çok işine yarıyor?
 - [ ] Çıra giydiğin karakter ve takılarla mı görünüyor?
 
+## 31. Yeni bölgeler kısa bölümlerde (v0.88, 15 dk)
+Hikâye ekranındaki "Yeni Maden", "Yeni Kristal Mağara" ve "Yeni Eski Kule · deneme" gruplarından oyna (bugünkü bölümler ve ilerleme değişmez). Hepsini bitirmek gerekmez; her bölgeden 5–6 bölüm yeter.
+- [ ] Bölüm süreleri nasıl? (Hedef: öğret 20–30 sn, Maden 40–60 sn, Kristal ve Kule 45–90 sn.)
+- [ ] Öğret bölümleri (19 su, 20 kor, 22 yay, 25 rüzgâr, 28 sarkaç, 31 alev, 37 geçit, 41 fırlatma, 45 izleyen su, 49 zincir, 50 çark, 53–55 küreler, 69 akıntı) yeni şeyi anlatıyor mu?
+- [ ] Maden'de su ilk tutunuşta yükselmeye başlıyor. Kısa bölümde bu sıkıştırıyor mu, rahat mı?
+- [ ] Kor, çark ve akıntı birkaç bölüme yayılmış: tekrar görmek pekiştiriyor mu, sıkıcı mı?
+- [ ] Bölge sonları (36 Maden Ağzı, 60 Kristal Kalbi, 83 Fener) final gibi hissettiriyor mu?
+- [ ] Ad önerin var mı? (Bölüm numarasıyla yaz.)
+
 ## 5. Genel izlenim (serbest)
 - En sevdiğim an:
 - En çok zorlandığım yer:

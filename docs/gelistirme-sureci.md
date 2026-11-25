@@ -133,6 +133,7 @@ Kullanıcı hikâyeye online'dan önce geçti; online (5) sonra.
 - [?] Bekçinin adı.
 
 ## Yapılanlar
+- 2026-11-25 · v0.88 · İstişare 6 Yol A5.1 (Muhammed, Törehan'ın kararıyla): Maden, Kristal Mağara ve Eski Kule kısa bölümleri deneme olarak (18 uzun → 65 kısa, tablo `docs/kisa-bolumler-plan.md` §9). Hikâye ekranında bölge bölge dört deneme grubu; bölge finalleri 136, 160, 183. Uzunluk ve akış hedefi `KISA=1 node tools/hikaye-olcum.js` ile ayarlandı. 22 "Yay" zikzak (tek taraf geçiyordu). Bütün testler çalıştı; eski 48 bölüm, Günlük ve Haftalık üretici çıktısı aynı.
 - 2026-11-25 · v0.87 · İstişare 6 Yol A4 (Muhammed, Törehan'ın kararıyla): Hikâye haritası, kuyu duvarı (taslak `docs/istisare-6/harita-taslak.html` onaylandıktan sonra). Halkalar, bölge tabelaları, bölüm sayfası, Çıra'nın atlaması; "harita ›" ve "Bölümler" haritaya, "Liste" listeye. Yalnız arayüz; kontrol, birim testleri ve bot çalıştı, 360×640–430×932 tarayıcıda denendi.
 - 2026-11-25 · v0.86 · İstişare 6 Yol A3 (Muhammed, Törehan'ın kararıyla): yıldızlar (1★ geçiş, 2★ bir madalya, 3★ üç madalya; ödülsüz). Sonuç kartında, bölüm kartlarında, grup başlıklarında ve özette. Yalnız arayüz; kontrol, birim testleri ve bot çalıştı, 360×640–430×932 tarayıcıda denendi.
 - 2026-11-24 · v0.85 · İstişare 6 Yol A2 (Muhammed, Törehan'ın kararıyla): kısa bölümler denemesi, Taş Kuyu 6 uzun → 18 kısa bölüm (Hikâye ekranının başında, ayrı kayıt). Eski bölümler, Günlük ve Haftalık birebir aynı; bot, nişan, tek taraf, spam, hata, geri, ekonomi ve denge testleri çalıştı.

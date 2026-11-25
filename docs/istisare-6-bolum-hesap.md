@@ -16,7 +16,7 @@
 
 ### Uygulama sırası (öneri)
 
-- **Yol A · Bölümler (kod, Muhammed yapabilir):** A1 tasarım kuralları (✅ `docs/kisa-bolumler-plan.md`) → A2 Taş Kuyu kısa bölümleri (+ botlar; ✅ v0.85, deneme) → A3 yıldızlar (✅ v0.86) → A4 kuyu duvarı haritası (✅ v0.87; taslak `docs/istisare-6/harita-taslak.html`) → A5 diğer bölgeler, ikinci yolculuk, kayıt taşıma.
+- **Yol A · Bölümler (kod, Muhammed yapabilir):** A1 tasarım kuralları (✅ `docs/kisa-bolumler-plan.md`) → A2 Taş Kuyu kısa bölümleri (+ botlar; ✅ v0.85, deneme) → A3 yıldızlar (✅ v0.86) → A4 kuyu duvarı haritası (✅ v0.87; taslak `docs/istisare-6/harita-taslak.html`) → A5 diğer bölgeler, ikinci yolculuk, kayıt taşıma: A5.1 Maden, Kristal, Kule kısa bölümleri deneme olarak (✅ v0.88) → A5.2 geçiş ve kayıt taşıma (telefon denemesi ve Törehan onayından sonra) → A5.3 ikinci yolculuk.
 - **Yol B · Hesap (Törehan'ın hesaplarında adım gerekir):** B1 Törehan ortak Firebase projesini açar, Google ve e-posta girişini açar, Workers Paid'i alır → B2 Worker yeni projeye ve ortak oyuncu tablosuna geçer → B3 oyunda ad yönetimi ve hesap bağlama (Profil) → B4 puan doğrulama → B5 hesap silme ve gizlilik metni.
 - İki yol birbirinden bağımsız; Arayüz Aşama 3–4 (İstişare 5) de sürüyor.
 
