@@ -2390,7 +2390,11 @@
       yaz('<b>Skor tablosu' + (oz.sira ? ' · ' + oz.sira + '. sıradasın (' + oz.toplam + ' oyuncu)' : ' · ilk 100 dışındasın') + '</b><ol>' +
         oz.liste.map(function (r) { return '<li class="' + (r.ben ? 'ben' : '') + '"><span>' + r.sira + '. ' + r.ad + '</span><em>' + r.puan + '</em></li>'; }).join('') + '</ol>' +
         '<button type="button" class="metin-btn tablo-tam" id="tamTabloBtn">Tam tablo ›</button>');
-      var tb = $('tamTabloBtn'); if (tb) tb.onclick = function () { if (window.KuyuScreens && window.KuyuScreens.tablo) window.KuyuScreens.tablo(tahta.charAt(0) === 'h' ? 'haftalik' : 'gunluk'); };
+      // v0.89: tam tablo Sıralama sekmesinde; oyundan çıkarken döngü durur (Market kısayolu gibi)
+      var tb = $('tamTabloBtn'); if (tb) tb.onclick = function () {
+        closePause(); paused = true; if (sim) E.release(sim);
+        if (window.KuyuScreens && window.KuyuScreens.tablo) window.KuyuScreens.tablo(tahta.charAt(0) === 'h' ? 'haftalik' : 'gunluk');
+      };
     }).catch(function () { yaz('<small>Skor tablosuna ulaşılamadı. Puanın bu cihazda kayıtlı.</small>'); });
   }
 

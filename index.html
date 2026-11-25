@@ -16,9 +16,9 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@600;800&family=Figtree:wght@400;600;800&family=Lilita+One&display=swap">
-<link rel="stylesheet" href="css/kuyu.css?v=0.88">
-<link rel="stylesheet" href="css/ekranlar.css?v=0.88">
-<link rel="stylesheet" href="css/arayuz.css?v=0.88">
+<link rel="stylesheet" href="css/kuyu.css?v=0.89">
+<link rel="stylesheet" href="css/ekranlar.css?v=0.89">
+<link rel="stylesheet" href="css/arayuz.css?v=0.89">
 </head>
 <body>
 <div class="app" id="oyunEkrani" hidden>
@@ -73,7 +73,7 @@
   <img id="acilisLogo" class="marka-logo" src="assets/funday-morning-logo.webp" alt="Funday Morning Games">
   <div class="yukleme" aria-hidden="true"><div id="yuklemeDolgu"></div></div>
   <div class="yukleme-not" id="yuklemeNot">Yükleniyor…</div>
-  <div class="ek-surum">Hoook v0.88</div>
+  <div class="ek-surum">Hoook v0.89</div>
 </section>
 
 <!-- Giriş: yalnızca ilk açılışta -->
@@ -125,16 +125,22 @@
   </div>
 </section>
 
-<!-- Yarışma (v0.75): Günlük ve Haftalık Kuyu, lig ve skor tablosu tek yerde -->
-<section class="ekran sayfa-ekran sekmeli" id="ekYarisma" hidden>
-  <div class="sayfa-ust"><h2>Yarışma</h2></div>
+<!-- Sıralama (v0.89, İstişare 5 Aşama 3): Yarışma sekmesi skor tablosu oldu (Günlük ve Haftalık ana ekranda).
+     Haftalık | Günlük seçimi, lig kartı, kancalara asılı ilk üç, 4–50 şeritler, altta hep görünen kendi satırın -->
+<section class="ekran sayfa-ekran sekmeli askida siralama" id="ekYarisma" hidden>
+  <div class="sayfa-ust"><h2>Sıralama</h2><button type="button" class="sr-yenile" id="tabloYenile" aria-label="Tabloyu yenile"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M19 12a7 7 0 1 1-2.1-5" fill="none" stroke="#15112a" stroke-width="3" stroke-linecap="round"/><path d="M19.5 3.5v5h-5" fill="none" stroke="#15112a" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/></svg></button></div>
   <div class="sayfa-ic">
-    <div class="ana-kartlar yarisma-kartlar">
-      <button type="button" class="ana-kart gunluk" id="gunlukBtn"><b>Günlük Kuyu</b><span id="gunlukBilgi">Bugünün kuyusu hazır</span><span class="yildizlar kucuk" id="gunlukYildiz" aria-hidden="true"></span><span class="hak" id="gunlukHak"></span><span class="seri" id="gunlukSeri" hidden></span></button>
-      <button type="button" class="ana-kart haftalik" id="haftalikBtn"><b>Haftalık Kuyu</b><span id="haftalikBilgi">Herkes aynı kuyuda</span><span class="yildizlar kucuk" id="haftalikYildiz" aria-hidden="true"></span><span class="lig-rozet" id="haftalikLig">Lig yok</span><span class="hak" id="haftalikHak"></span></button>
+    <div class="kol-sekmeler sr-sekmeler" role="tablist" aria-label="Tablo">
+      <button type="button" role="tab" id="tabloHaftalik" aria-selected="true">Haftalık</button>
+      <button type="button" role="tab" id="tabloGunluk" aria-selected="false">Günlük</button>
     </div>
-    <button type="button" class="ana buyuk genis" id="yarTabloBtn" hidden>Skor tablosu</button>
-    <p class="not">Günlük Kuyu'da günde 3, Haftalık Kuyu'da haftada 5 deneme. Herkes aynı kuyuda yarışır; Haftalık puanın ligini belirler, lig ödülü pazartesi gelir. Sonuç kartındaki "Meydan oku" ile arkadaşına aynı kuyuyu gönderebilirsin.</p>
+    <p class="sr-bilgi" id="tabloBilgi" aria-live="polite"></p>
+    <div class="sr-kart" id="srKart"></div>
+    <div class="sr-durum" id="srDurum" hidden></div>
+    <ol class="sr-podyum" id="srPodyum" hidden></ol>
+    <ol class="sr-liste" id="tabloListe"></ol>
+    <button type="button" class="sr-ben" id="srBen" hidden></button>
+    <p class="not">Herkes aynı kuyuda yarışır. Haftalık Kuyu'daki en iyi puanın ligini belirler, lig ödülü pazartesi gelir. Sonuç kartındaki "Meydan oku" ile arkadaşına aynı kuyuyu gönderebilirsin.</p>
   </div>
 </section>
 
@@ -234,48 +240,64 @@
   </div>
 </section>
 
-<section class="ekran sayfa-ekran sekmeli" id="ekProfil" hidden>
-  <div class="sayfa-ust"><h2>Profil</h2></div>
+<!-- Profil (v0.89, İstişare 5 Aşama 3): oyuncu kartı. İki iple asılı kimlik panosu (canlı Çıra, ad, lig, ışık),
+     büyük çıkartma sayılar, kuyunun ışığı, rekorlar, rekor duvarı; hikâye defteri ve eski rekorlar açılır kapanır -->
+<section class="ekran sayfa-ekran sekmeli askida profil" id="ekProfil" hidden>
+  <div class="sayfa-ust"><h2>Profil</h2><span class="kol-say" id="isikSeviye">Işık 0/10</span></div>
   <div class="sayfa-ic">
-    <div class="profil-kart">
-      <div class="profil-bas"><span class="avatar buyuk" aria-hidden="true"></span><div><b id="pAd">Tırmanıcı</b><span id="pHesap">Misafir · bu cihaz</span></div></div>
-      <h3>Çıra'nın yolu</h3>
-      <p class="not">Fenerden düşen küçük kor Çıra, kuyunun dibinden fenerine dönüyor. Yeni bölgeler açıldıkça hikâye ilerler.</p>
-      <div class="isik-kart"><div class="isik-bas"><b>Kuyunun ışığı</b><span id="isikSeviye">Işık 0/10</span></div>
-        <div class="isik-cubuk" aria-hidden="true"><i id="isikDolu"></i></div>
-        <span class="isik-yazi" id="isikYazi"></span>
-        <span class="isik-not">Topladığın her ateşböceği Çıra'nın saçılan ışığından bir parça. Harcamak söndürmez; ana menüdeki kuyu aydınlanır.</span></div>
-      <div class="hikaye-liste" id="hikayeListe"></div>
-      <div class="profil-hiz"><small>En yüksek hız</small><b id="pHiz">0 m/sn</b><span id="pHizNot">Akışla, ipi erken bırakarak hızlanırsın.</span></div>
-      <h3>Bölümler</h3>
-      <div class="profil-izgara">
-        <div><small>En yüksek bölüm</small><b id="pBolum">–</b></div>
-        <div><small>Geçilen bölüm</small><b id="pGecilen">0</b></div>
-        <div><small>Ateşböceği</small><b id="pAtes">0</b></div>
-        <div><small>Kusursuz · Akış</small><b id="pMadalya">0 · 0</b></div>
-        <div><small>Toplam ödül</small><b id="pOdul">0</b></div>
-        <div><small>En iyi bölüm ödülü</small><b id="pEnIyiOdul">0</b></div>
+    <div class="pr-pano"><span class="ip-cift" aria-hidden="true"><i></i><i></i></span>
+      <canvas id="prCira" aria-hidden="true"></canvas>
+      <div class="pr-kimlik">
+        <div class="pr-ad"><b id="pAd">Tırmanıcı</b><span id="pHesap">Misafir · bu cihaz</span></div>
+        <button type="button" class="pr-duzenle" id="prAdBtn" aria-label="Adını değiştir"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 20l1-5L16 4l4 4L9 19z" fill="#ffe066" stroke="#15112a" stroke-width="2.2" stroke-linejoin="round"/><path d="M13.5 6.5l4 4" stroke="#15112a" stroke-width="2.2"/></svg></button>
       </div>
-      <h3>Günlük Kuyu</h3>
-      <div class="profil-izgara">
-        <div><small>Bugünün en iyisi</small><b id="pGunluk">0</b></div>
-        <div><small>Seri</small><b id="pSeri">0 gün</b></div>
-        <div><small>En uzun seri</small><b id="pMaxSeri">0 gün</b></div>
-        <div><small>Bugünkü deneme</small><b id="pDeneme">0</b></div>
-      </div>
-      <h3>Rekor duvarı</h3>
+      <div class="pr-rozetler"><span class="pr-rozet" id="prLig">Lig yok</span><span class="pr-rozet seri" id="prSeri">Seri 0 gün</span></div>
+    </div>
+    <div class="pr-uclu">
+      <div class="pr-sayi s-bolum"><small>Geçilen bölüm</small><b id="pGecilen">0</b></div>
+      <div class="pr-sayi s-ates"><small>Ateşböceği</small><b id="pAtes">0</b></div>
+      <div class="pr-sayi s-madalya"><small>Kusursuz · Akış</small><b id="pMadalya">0 · 0</b></div>
+    </div>
+    <div class="isik-kart pr-isik"><div class="isik-bas"><b>Kuyunun ışığı</b></div>
+      <div class="isik-cubuk" aria-hidden="true"><i id="isikDolu"></i></div>
+      <span class="isik-yazi" id="isikYazi"></span>
+      <span class="isik-not">Topladığın her ateşböceği Çıra'nın saçılan ışığından bir parça. Harcamak söndürmez; ana menüdeki kuyu aydınlanır.</span></div>
+    <div class="m-bas"><h3>Rekorlar</h3></div>
+    <div class="profil-hiz pr-hiz"><small>En yüksek hız</small><b id="pHiz">0 m/sn</b><span id="pHizNot">Akışla, ipi erken bırakarak hızlanırsın.</span></div>
+    <div class="pr-izgara">
+      <div><small>En yüksek bölüm</small><b id="pBolum">–</b></div>
+      <div><small>Toplam ödül</small><b id="pOdul">0</b></div>
+      <div><small>En iyi bölüm ödülü</small><b id="pEnIyiOdul">0</b></div>
+      <div><small>Haftalık · bu hafta</small><b id="pHafta">0</b></div>
+    </div>
+    <div class="m-bas"><h3>Günlük Kuyu</h3></div>
+    <div class="pr-izgara">
+      <div><small>Bugünün en iyisi</small><b id="pGunluk">0</b></div>
+      <div><small>Bugünkü deneme</small><b id="pDeneme">0</b></div>
+      <div><small>Seri</small><b id="pSeri">0 gün</b></div>
+      <div><small>En uzun seri</small><b id="pMaxSeri">0 gün</b></div>
+    </div>
+    <div class="m-bas"><h3>Rekor duvarı</h3><small>son 28 gün</small></div>
+    <div class="pr-duvar-kart">
       <div class="duvar" id="pDuvar" role="img" aria-label="Son 28 günün Günlük Kuyu yıldızları"></div>
       <ol class="duvar-hafta" id="pHaftalar"></ol>
-      <p class="not">Her kare bir gün: Günlük Kuyu'da kazandığın yıldız (günün hedefi). Haftalar: Haftalık Kuyu yıldızları (haftanın hedefi), ligi ve en iyi puan.</p>
-      <h3>Sonsuz Kuyu rekoru (v0.63'e kadar)</h3>
-      <div class="profil-izgara">
+    </div>
+    <p class="not">Her kare bir gün: Günlük Kuyu'da kazandığın yıldız (günün hedefi). Haftalar: Haftalık Kuyu yıldızları (haftanın hedefi), ligi ve en iyi puan.</p>
+    <details class="pr-defter" id="prDefter">
+      <summary><span><b>Çıra'nın yolu</b><small id="prNotSay">Hikâye ve bekçinin notları</small></span></summary>
+      <p class="pr-defter-not">Fenerden düşen küçük kor Çıra, kuyunun dibinden fenerine dönüyor. Yeni bölgeler açıldıkça hikâye ilerler.</p>
+      <div class="hikaye-liste" id="hikayeListe"></div>
+    </details>
+    <details class="pr-defter eski">
+      <summary><span><b>Eski rekorlar</b><small>Sonsuz Kuyu, v0.63'e kadar</small></span></summary>
+      <div class="pr-izgara">
         <div><small>Rekor puan</small><b id="pRekor">0</b></div>
         <div><small>En yüksek</small><b id="pMetre">0 m</b></div>
         <div><small>Kat</small><b id="pKat">0</b></div>
         <div><small>En uzun akış</small><b id="pAkis">x0</b></div>
       </div>
-      <p class="not">Kat: bir bina katı 3 metre sayılır.</p>
-    </div>
+      <p class="pr-defter-not">Kat: bir bina katı 3 metre sayılır.</p>
+    </details>
   </div>
 </section>
 
@@ -308,7 +330,7 @@
     <button type="button" id="istatBtn">Oyun istatistikleri</button>
     <button type="button" id="tanitimBtn">Tanıtımı yeniden izle</button>
     <button type="button" id="ipucuSifirBtn">Tanıtım kartlarını yeniden göster</button>
-    <p class="surum">Hoook v0.88 · prototip · Funday Morning Games</p>
+    <p class="surum">Hoook v0.89 · prototip · Funday Morning Games</p>
   </div>
 </section>
 
@@ -329,20 +351,6 @@
     <button type="button" class="ana buyuk genis" id="girisAlBtn">Al</button>
     <button type="button" class="genis video-btn" id="girisVideoBtn">Video izle, ikiye katla</button>
     <button type="button" class="metin-btn" id="girisKapat">Sonra</button>
-  </div>
-</div>
-
-<!-- Skor tablosu (v0.73): Günlük ve Haftalık, ilk 50 ve senin yerin -->
-<div class="katman-ust" id="tabloKatman" hidden role="dialog" aria-modal="true" aria-labelledby="tabloBaslik">
-  <div class="kart tablo-kart">
-    <h2 id="tabloBaslik">Skor tablosu</h2>
-    <div class="tablo-sekme" role="tablist" aria-label="Tablo">
-      <button type="button" role="tab" id="tabloHaftalik" aria-selected="true">Haftalık</button>
-      <button type="button" role="tab" id="tabloGunluk" aria-selected="false">Günlük</button>
-    </div>
-    <p class="tablo-bilgi" id="tabloBilgi" aria-live="polite"></p>
-    <ol class="tablo-liste" id="tabloListe"></ol>
-    <div class="dur-iki"><button type="button" id="tabloYenile">Yenile</button><button type="button" id="tabloKapat">Kapat</button></div>
   </div>
 </div>
 
@@ -387,19 +395,19 @@
 <div class="hikaye-kart" id="hikayeKart" role="status" hidden><b id="hkBaslik"></b><span id="hkMetin"></span></div>
 <div class="bildirim" id="bildirim" role="status" hidden></div>
 
-<script src="js/engine.js?v=0.88"></script>
-<script src="js/levels.js?v=0.88"></script>
-<script src="js/bolumler.js?v=0.88"></script>
-<script src="js/gen.js?v=0.88"></script>
-<script src="js/gorevler.js?v=0.88"></script>
-<script src="js/ekonomi.js?v=0.88"></script>
-<script src="js/istatistik.js?v=0.88"></script>
-<script src="js/muzik.js?v=0.88"></script>
-<script src="js/notlar.js?v=0.88"></script>
-<script src="js/hayalet.js?v=0.88"></script>
-<script src="js/online.js?v=0.88"></script>
-<script src="js/karakter.js?v=0.88"></script>
-<script src="js/game.js?v=0.88"></script>
-<script src="js/screens.js?v=0.88"></script>
+<script src="js/engine.js?v=0.89"></script>
+<script src="js/levels.js?v=0.89"></script>
+<script src="js/bolumler.js?v=0.89"></script>
+<script src="js/gen.js?v=0.89"></script>
+<script src="js/gorevler.js?v=0.89"></script>
+<script src="js/ekonomi.js?v=0.89"></script>
+<script src="js/istatistik.js?v=0.89"></script>
+<script src="js/muzik.js?v=0.89"></script>
+<script src="js/notlar.js?v=0.89"></script>
+<script src="js/hayalet.js?v=0.89"></script>
+<script src="js/online.js?v=0.89"></script>
+<script src="js/karakter.js?v=0.89"></script>
+<script src="js/game.js?v=0.89"></script>
+<script src="js/screens.js?v=0.89"></script>
 </body>
 </html>

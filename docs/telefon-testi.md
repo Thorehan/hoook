@@ -225,6 +225,16 @@ Hikâye ekranındaki "Yeni Maden", "Yeni Kristal Mağara" ve "Yeni Eski Kule · 
 - [ ] Bölge sonları (36 Maden Ağzı, 60 Kristal Kalbi, 83 Fener) final gibi hissettiriyor mu?
 - [ ] Ad önerin var mı? (Bölüm numarasıyla yaz.)
 
+## 32. Sıralama, Profil ve duvar (v0.89, 5 dk)
+- [ ] Alttaki **Yarışma** sekmesi artık Sıralama. Haftalık ve Günlük arasında geçiş rahat mı?
+- [ ] Lig tabelası (ligin, sonraki lige kalan puan, lig ödülü) anlaşılıyor mu?
+- [ ] İlk üç oyuncu iple asılı etiketler: hoş mu, okunuyor mu?
+- [ ] Altta hep görünen kendi satırın: dokununca listede yerine kayıyor mu? Puanın yokken "Oyna ›" koşuyu başlatıyor mu?
+- [ ] Ana ekrandaki "Sıralama" etiketi ve sonuç kartındaki "Tam tablo ›" bu sekmeyi açıyor mu? Android geri tuşu ana ekrana dönüyor mu?
+- [ ] Bağlantıyı kapatınca "kopmuş ip" hata durumu ve "Yeniden dene" çalışıyor mu?
+- [ ] **Profil:** canlı Çıra, ad (kalem Ayarlar'daki ad kutusunu açıyor), rozetler, büyük sayılar. "Çıra'nın yolu" ve "Eski rekorlar" açılıp kapanıyor mu?
+- [ ] Bütün panellerde (Market, Koleksiyon, Sıralama, Profil, Görevler, Ayarlar, Hikâye listesi) duvar aynı ve simetrik mi?
+
 ## 5. Genel izlenim (serbest)
 - En sevdiğim an:
 - En çok zorlandığım yer:

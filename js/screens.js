@@ -36,6 +36,7 @@
     if (id === 'ekAna' || id === 'ekTanitim') startScene(); else stopScene();
     if (id !== 'ekDolap' && !$('urunKatman').hidden) urunKapat(true);
     if (id === 'ekKoleksiyon') kolBaslat(); else kolDur();
+    if (id === 'ekProfil') prBaslat(); else prDur();
     if (id !== 'ekHarita') hrDur();
     if (id !== 'oyun' && id !== 'ekAcilis') G.muzikSahne('menu'); // menülerde sakin müzik
     if (SEKMELER.indexOf(id) >= 0) { $('gorevNokta').hidden = !G.gorevBekleyen(); $('marketNokta').hidden = !G.vitrinYeni() || id === 'ekDolap'; } // Market: bugünün vitrini görülmedi
@@ -172,32 +173,21 @@
     $('toplamAtes').textContent = G.cuzdan().ates; // harcanabilir bakiye
     renderAnaGorev();
     var di = G.dailyInfo();
-    $('gunlukBilgi').textContent = di.kural.ad + ' · hedef ' + di.hedef.metre + ' m';
-    $('gunlukYildiz').innerHTML = [0, 1, 2].map(function (i) { return '<i class="' + (i < di.yildiz ? 'var' : '') + '">★</i>'; }).join('');
-    $('gunlukHak').textContent = hakYazi(di.hak, 'Yarın');
-    $('gunlukBtn').setAttribute('aria-label', 'Günlük Kuyu: ' + di.kural.ad + ', hedef ' + di.hedef.metre + ' metre, ' + di.yildiz + ' yıldız, ' + hakYazi(di.hak, 'yarın'));
     // Haftalık Kuyu: geçen haftanın lig ödülü (varsa) ve bu haftanın durumu
     var gecen = G.haftalikKapat();
     if (gecen) { $('toplamAtes').textContent = G.cuzdan().ates; setTimeout(function () { toast('Geçen hafta ' + gecen.ligAd + ' ligindeydin · +' + gecen.odul + ' ateşböceği', 3600); }, 1600); }
     var hf = G.haftalikInfo();
-    $('haftalikBilgi').textContent = 'Hedef ' + hf.hedef.puan + ' puan' + (hf.tries ? ' · en iyi ' + hf.best : ' · ' + hf.kalan + ' kaldı');
-    $('haftalikLig').textContent = hf.ligAd || 'Lig yok';
-    $('haftalikLig').className = 'lig-rozet lig' + hf.lig;
-    $('haftalikHak').textContent = hakYazi(hf.hak, 'Pazartesi');
-    $('haftalikYildiz').innerHTML = [0, 1, 2].map(function (i) { return '<i class="' + (i < hf.yildiz ? 'var' : '') + '">★</i>'; }).join('');
-    $('haftalikBtn').setAttribute('aria-label', 'Haftalık Kuyu: hedef ' + hf.hedef.puan + ' puan, ' + hf.yildiz + ' yıldız, ' + (hf.ligAd ? hf.ligAd + ' ligi' : 'lig yok') + ', ' + hakYazi(hf.hak, 'pazartesi'));
-    // ana ekranın yan kartları (v0.75): kısa durum; ayrıntı Yarışma sekmesinde
+    // ana ekranın yan kartları (v0.75): kısa durum. v0.89: Yarışma sekmesindeki kartlar kalktı (sekme Sıralama oldu)
     var yildizKisa = function (n) { return '★★★'.slice(0, n) + '☆☆☆'.slice(0, 3 - n); };
     $('yanGunlukAlt').textContent = yildizKisa(di.yildiz) + ' · ' + (di.hak.kalan > 0 ? di.hak.kalan + '/' + di.hak.toplam : 'bitti');
     $('yanGunlukNokta').hidden = !(di.hak.kalan > 0 && !di.playedToday);
-    $('yanGunluk').setAttribute('aria-label', $('gunlukBtn').getAttribute('aria-label'));
+    $('yanGunluk').setAttribute('aria-label', 'Günlük Kuyu: ' + di.kural.ad + ', hedef ' + di.hedef.metre + ' metre, ' + di.yildiz + ' yıldız, ' + hakYazi(di.hak, 'yarın') +
+      (di.streak ? ', ' + di.streak + ' gün seri' : ''));
     $('yanHaftalikAlt').textContent = (hf.ligAd ? hf.ligAd + ' · ' : '') + (hf.hak.kalan > 0 ? hf.hak.kalan + '/' + hf.hak.toplam : 'bitti');
-    $('yanHaftalik').setAttribute('aria-label', $('haftalikBtn').getAttribute('aria-label'));
+    $('yanHaftalik').setAttribute('aria-label', 'Haftalık Kuyu: hedef ' + hf.hedef.puan + ' puan, ' + hf.yildiz + ' yıldız, ' + (hf.ligAd ? hf.ligAd + ' ligi' : 'lig yok') + ', ' + hakYazi(hf.hak, 'pazartesi'));
     isikGuncelle();
     var ik = G.isik ? G.isik() : null;
     if (ik && ik.seviye > ik.gorulen) { G.isikGordu(ik.seviye); setTimeout(function () { toast('Kuyu biraz daha aydınlandı · Işık ' + ik.seviye + '/' + ik.en + (ik.odul ? ' · Dolap\'ta yeni: ' + ik.odul.ad + ' ' + window.KuyuEkonomi.TURLER[ik.odul.tur].toLocaleLowerCase('tr-TR') : ''), ik.odul ? 3600 : 2400); }, 700); }
-    $('gunlukSeri').hidden = !di.streak;
-    $('gunlukSeri').textContent = di.streak + ' gün seri' + (di.playedToday ? '' : di.donmada ? ' · donmada, bugün oyna' : ' · bugün oyna, seri sürsün');
     if (yalnizDoldur === true) return;
     show('ekAna');
     // günlük giriş: bugün alınmadıysa ana menüye ilk gelişte bir kez göster
@@ -237,13 +227,14 @@
   $('paraBtn').addEventListener('click', function () { openDolap('market'); });
   $('ayarBtn').addEventListener('click', function () { openSettings(); });
   $('bolumHap').addEventListener('click', function () { openHarita(); }); // v0.87: "harita ›" çipi kuyu duvarı haritasını açar
-  // Yarışma sekmesi: Günlük ve Haftalık kartları home() ile doldurulur (aynı veriler), sonra sekme açılır
-  function openYarisma() {
-    home(true); // kartları tazele
-    $('yarTabloBtn').hidden = !G.onlineAcik();
+  // Yarışma sekmesi = Sıralama (v0.89): skor tablosu tam sayfa. Günlük ve Haftalık Kuyu ana ekranda.
+  // Ana ekrandaki "Sıralama" etiketi ve sonuç kartındaki "Tam tablo ›" da buraya gelir (tur: 'haftalik' | 'gunluk').
+  function openYarisma(tur) {
+    home(true); // geçen haftanın lig ödülü ve sayılar tazelensin
+    if (tur) tabloTur = tur === 'gunluk' ? 'gunluk' : 'haftalik';
     show('ekYarisma'); $('ekYarisma').scrollTop = 0;
+    tabloCiz();
   }
-  $('yarTabloBtn').addEventListener('click', function () { openTablo('haftalik'); });
   // dokun ve başla: ilk bölüm geçilene dek öğretici (İlk Halka), sonra Sonsuz Kuyu
   function hakYazi(h, zaman) { return h.kalan > 0 ? h.kalan + '/' + h.toplam + ' deneme' : h.son ? zaman + ' yeni denemeler' : 'Deneme bitti · ▶ +1'; }
   $('dokunBtn').addEventListener('click', function () { if (G.hikayeBitti()) openLevels(); else G.startLevel(G.siradaki()); });
@@ -277,57 +268,113 @@
   });
   $('hakHikayeBtn').addEventListener('click', function () { $('hakKatman').hidden = true; if (G.hikayeBitti()) openLevels(); else G.startLevel(G.siradaki()); });
   $('hakKapat').addEventListener('click', function () { $('hakKatman').hidden = true; if (current === 'ekAna') home(); });
-  // ---------- skor tablosu (v0.73) ----------
-  // Günlük ve Haftalık sekmeleri; ilk 50 oyuncu, senin satırın vurgulu (50 dışındaysan altta). Sunucu kapalıysa düğme görünmez.
-  var tabloTur = 'haftalik', tabloIstek = 0;
+  // ---------- skor tablosu (v0.73; v0.89 Sıralama sekmesi) ----------
+  // Haftalık | Günlük. Üstte lig (ya da günün) kartı; ilk 3 kancalara asılı etiketler, 4–50 şeritler.
+  // Senin satırın altta hep görünür (50 dışındaysan da); dokununca listede kendi yerine kayar. Durumlar: yükleniyor, boş, hata, kapalı.
+  var tabloTur = 'haftalik', tabloIstek = 0, tabloBen = null;
+  var KANCA_SVG = '<svg viewBox="0 0 40 64" aria-hidden="true"><path d="M20 2v30a10 10 0 1 1-10 10" fill="none" stroke="#15112a" stroke-width="9" stroke-linecap="round"/><path d="M20 2v30a10 10 0 1 1-10 10" fill="none" stroke="#d9dde0" stroke-width="4.5" stroke-linecap="round"/><path d="M10 42l-4-5" stroke="#15112a" stroke-width="9" stroke-linecap="round"/><path d="M10 42l-4-5" stroke="#d9dde0" stroke-width="4.5" stroke-linecap="round"/></svg>';
   function sayi(n) { return (+n || 0).toLocaleString('tr-TR'); }
-  function tabloSatir(sira, ad, puan, metre, ben) {
-    var li = document.createElement('li');
-    li.className = (ben ? 'ben ' : '') + (sira <= 3 ? 'ilk' + sira : '');
-    var a = document.createElement('b'); a.textContent = sira + '.';
-    var b = document.createElement('span'); b.textContent = ad + (ben ? ' (sen)' : '');
-    var c = document.createElement('em'); c.textContent = sayi(puan);
-    var d = document.createElement('small'); d.textContent = metre ? sayi(metre) + ' m' : '';
-    li.appendChild(a); li.appendChild(b); li.appendChild(d); li.appendChild(c);
+  function yeniEl(tag, cls, yazi) { var e = document.createElement(tag); if (cls) e.className = cls; if (yazi != null) e.textContent = yazi; return e; }
+  function oynaTur(tur) { if (tur === 'gunluk') G.startDaily(); else G.startWeekly(); }
+  function tabloSatir(sira, r, ben) {
+    var li = yeniEl('li', ben ? 'ben' : '');
+    li.appendChild(yeniEl('b', 'sr-halka', sira));
+    var ad = yeniEl('span', 'sr-ad', r.ad); if (ben) ad.appendChild(yeniEl('i', 'sr-sen', 'sen'));
+    li.appendChild(ad);
+    li.appendChild(yeniEl('small', '', r.metre ? sayi(r.metre) + ' m' : ''));
+    li.appendChild(yeniEl('em', '', sayi(r.puan)));
     return li;
   }
+  function podyumEtiket(sira, r, ben) {
+    var li = yeniEl('li', 'sr-p p' + sira + (ben ? ' ben' : ''));
+    li.appendChild(yeniEl('b', 'sr-madalya', sira));
+    var ad = yeniEl('span', 'sr-ad', r.ad); li.appendChild(ad);
+    li.appendChild(yeniEl('em', '', sayi(r.puan)));
+    li.appendChild(yeniEl('small', '', ben ? 'sen' : r.metre ? sayi(r.metre) + ' m' : ''));
+    return li;
+  }
+  // üst kart: Haftalık'ta ligin ve sonraki lige kalan puan; Günlük'te bugünkü en iyin ve yıldızların
+  function tabloKart(tur) {
+    var k = $('srKart'), L = window.KuyuEkonomi.LIG;
+    if (tur === 'haftalik') {
+      var hf = G.haftalikInfo(), alt = hf.lig < 0 ? 0 : L[hf.lig].puan, ust = hf.sonraki ? hf.sonraki.puan : 0;
+      var oran = ust ? Math.max(0, Math.min(1, (hf.best - alt) / (ust - alt))) : 1;
+      k.className = 'sr-kart lig' + hf.lig;
+      k.innerHTML = '<span class="sr-rozet" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M12 2.5l8 3v6.2c0 4.6-3.3 8.3-8 9.8-4.7-1.5-8-5.2-8-9.8V5.5z"/><path class="yildiz" d="M12 7l1.5 3.1 3.4.4-2.5 2.3.7 3.4L12 14.5l-3.1 1.7.7-3.4-2.5-2.3 3.4-.4z"/></svg></span>' +
+        '<span class="sr-kart-yazi"><small>Bu haftaki ligin</small><b>' + (hf.ligAd || 'Lig yok') + '</b>' +
+        '<span class="sr-cubuk" aria-hidden="true"><i style="width:' + Math.round(oran * 100) + '%"></i></span>' +
+        '<span>' + (hf.sonraki ? hf.sonraki.ad + ' ligine ' + sayi(hf.sonraki.puan - hf.best) + ' puan' : 'En üst lig') + (hf.best ? ' · en iyin ' + sayi(hf.best) : '') + '</span></span>' +
+        '<span class="sr-odul"><small>Lig ödülü</small><b><i class="ikon-ates" aria-hidden="true"></i>' + (hf.odul || 0) + '</b><small>pazartesi</small></span>';
+    } else {
+      var di = G.dailyInfo();
+      k.className = 'sr-kart gun';
+      k.innerHTML = '<span class="sr-rozet gun" aria-hidden="true"><svg viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="16" rx="3"/><path class="cizgi" d="M3 10h18M8 3v4M16 3v4"/></svg></span>' +
+        '<span class="sr-kart-yazi"><small>Bugünkü en iyin</small><b>' + (di.best ? sayi(di.best) + ' puan' : 'Henüz yok') + '</b>' +
+        '<span class="sr-yildiz">' + [0, 1, 2].map(function (i) { return '<i class="' + (i < di.yildiz ? 'var' : '') + '">★</i>'; }).join('') + '</span>' +
+        '<span>' + di.kural.ad + ' · hedef ' + di.hedef.metre + ' m' + (di.streak ? ' · ' + di.streak + ' gün seri' : '') + '</span></span>' +
+        '<span class="sr-odul"><small>Deneme</small><b>' + di.hak.kalan + '/' + di.hak.toplam + '</b><small>bugün</small></span>';
+    }
+  }
+  function srDurum(tur, metin, dugme) {
+    var d = $('srDurum');
+    if (!tur) { d.hidden = true; d.innerHTML = ''; return; }
+    d.hidden = false; d.className = 'sr-durum ' + tur;
+    d.innerHTML = '<span class="sr-kanca" aria-hidden="true"><i class="ip"></i>' + KANCA_SVG + '</span>';
+    d.appendChild(yeniEl('p', '', metin));
+    if (dugme) { var b = yeniEl('button', 'ana', dugme.ad); b.type = 'button'; b.addEventListener('click', dugme.fn); d.appendChild(b); }
+  }
+  function benCiz(tur, ben) {
+    var b = $('srBen'), s = save(), ad = (s.profile && s.profile.name) || 'Tırmanıcı';
+    tabloBen = ben; b.hidden = false; b.innerHTML = '';
+    b.className = 'sr-ben' + (ben ? '' : ' yok');
+    if (ben) {
+      b.appendChild(yeniEl('b', 'sr-halka', ben.sira));
+      var a = yeniEl('span', 'sr-ad', ben.ad || ad); a.appendChild(yeniEl('i', 'sr-sen', ben.eski ? 'son gönderim' : 'sen')); b.appendChild(a);
+      b.appendChild(yeniEl('em', '', sayi(ben.puan)));
+      b.setAttribute('aria-label', 'Senin sıran ' + ben.sira + ', ' + sayi(ben.puan) + ' puan' + (ben.eski ? ', son gönderimindeki sıra' : '') + '. Listede göster');
+    } else {
+      b.appendChild(yeniEl('b', 'sr-halka', '–'));
+      b.appendChild(yeniEl('span', 'sr-ad', (tur === 'haftalik' ? 'Bu hafta' : 'Bugün') + ' henüz puanın yok'));
+      b.appendChild(yeniEl('em', 'sr-oyna', 'Oyna ›'));
+      b.setAttribute('aria-label', (tur === 'haftalik' ? 'Haftalık' : 'Günlük') + ' Kuyu\'yu oyna: henüz puanın yok');
+    }
+  }
   function tabloCiz() {
-    var tur = tabloTur, istek = ++tabloIstek, T = G.tahtalar(), tahta = T[tur], liste = $('tabloListe'), bilgi = $('tabloBilgi');
+    var tur = tabloTur, istek = ++tabloIstek, liste = $('tabloListe'), bilgi = $('tabloBilgi'), pod = $('srPodyum');
     $('tabloHaftalik').setAttribute('aria-selected', tur === 'haftalik'); $('tabloGunluk').setAttribute('aria-selected', tur === 'gunluk');
-    $('tabloHaftalik').classList.toggle('secili', tur === 'haftalik'); $('tabloGunluk').classList.toggle('secili', tur === 'gunluk');
-    liste.innerHTML = ''; bilgi.textContent = 'Yükleniyor…';
-    window.KuyuOnline.tamTablo(tahta, 200).then(function (t) {
+    tabloKart(tur);
+    liste.innerHTML = ''; pod.innerHTML = ''; pod.hidden = true; bilgi.textContent = ''; $('srBen').hidden = true; tabloBen = null;
+    if (!G.onlineAcik()) { srDurum('kapali', 'Sıralama şu an kapalı. Puanların bu cihazda kayıtlı; bağlantı açılınca burada görünür.'); return; }
+    srDurum('yukleniyor', 'Sıralama yükleniyor…');
+    var T = G.tahtalar();
+    window.KuyuOnline.tamTablo(T[tur], 200).then(function (t) {
       if (istek !== tabloIstek) return;
-      var kalan = tur === 'haftalik' ? 'Hafta bitimine ' + T.haftaKalan : 'Gün bitimine ' + T.gunKalan;
-      if (!t.satirlar.length) { bilgi.textContent = (tur === 'haftalik' ? 'Bu hafta' : 'Bugün') + ' henüz kimse yok. İlk sen ol! · ' + kalan; return; }
-      var ben = t.ben;
-      bilgi.textContent = sayi(t.toplam) + ' oyuncu · ' + kalan + (ben ? ' · Sen: ' + ben.sira + '. (' + sayi(ben.puan) + ' puan)' + (ben.eski ? ', son gönderimindeki sıra' : '') : ' · ' + (tur === 'haftalik' ? 'Bu hafta' : 'Bugün') + ' henüz puanın yok');
-      var n = Math.min(50, t.satirlar.length);
-      for (var i = 0; i < n; i++) { var r = t.satirlar[i]; liste.appendChild(tabloSatir(i + 1, r.ad, r.puan, r.metre, !!(ben && !ben.eski && ben.sira === i + 1))); }
-      if (ben && (ben.eski || ben.sira > n)) {
-        var ay = document.createElement('li'); ay.className = 'ayrac'; ay.textContent = '…'; liste.appendChild(ay);
-        var bs = ben.eski ? null : t.satirlar[ben.sira - 1];
-        liste.appendChild(tabloSatir(ben.sira, ben.ad, ben.puan, bs ? bs.metre : 0, true));
+      bilgi.textContent = (t.satirlar.length ? sayi(t.toplam) + ' oyuncu · ' : '') + (tur === 'haftalik' ? 'Hafta bitimine ' + T.haftaKalan : 'Gün bitimine ' + T.gunKalan);
+      if (!t.satirlar.length) {
+        srDurum('bos', (tur === 'haftalik' ? 'Bu hafta' : 'Bugün') + ' henüz kimse yok. İlk sen ol!', { ad: (tur === 'haftalik' ? 'Haftalık' : 'Günlük') + ' Kuyu\'yu oyna', fn: function () { oynaTur(tur); } });
+        return;
       }
-      var benLi = liste.querySelector('li.ben'); if (benLi && benLi.scrollIntoView) benLi.scrollIntoView({ block: 'nearest' });
-    }).catch(function () { if (istek === tabloIstek) bilgi.textContent = 'Skor tablosuna ulaşılamadı. Bağlantını kontrol edip Yenile\'ye bas.'; });
+      srDurum(null);
+      var ben = t.ben, benSira = ben && !ben.eski ? ben.sira : 0, n = Math.min(50, t.satirlar.length);
+      pod.hidden = false;
+      for (var i = 0; i < Math.min(3, n); i++) pod.appendChild(podyumEtiket(i + 1, t.satirlar[i], benSira === i + 1));
+      for (i = 3; i < n; i++) liste.appendChild(tabloSatir(i + 1, t.satirlar[i], benSira === i + 1));
+      benCiz(tur, ben);
+    }).catch(function () {
+      if (istek === tabloIstek) srDurum('hata', 'Sıralamaya ulaşılamadı. Bağlantını kontrol et.', { ad: 'Yeniden dene', fn: tabloCiz });
+    });
   }
-  function openTablo(tur) {
-    if (!G.onlineAcik()) return;
-    tabloTur = tur === 'gunluk' ? 'gunluk' : 'haftalik';
-    $('tabloKatman').hidden = false;
-    tabloCiz();
-    $('tabloKapat').focus({ preventScroll: true });
-  }
-  $('tabloHaftalik').addEventListener('click', function () { tabloTur = 'haftalik'; tabloCiz(); });
-  $('tabloGunluk').addEventListener('click', function () { tabloTur = 'gunluk'; tabloCiz(); });
+  $('srBen').addEventListener('click', function () {
+    if (!tabloBen) { oynaTur(tabloTur); return; }
+    var li = document.querySelector('#ekYarisma li.ben');
+    if (!li) { toast(tabloBen.sira + '. sıradasın · ilk 50\'nin dışında', 2200); return; }
+    li.scrollIntoView({ block: 'center', behavior: reduceMotion ? 'auto' : 'smooth' });
+    li.classList.remove('vurgu'); void li.offsetWidth; li.classList.add('vurgu');
+  });
+  $('tabloHaftalik').addEventListener('click', function () { if (tabloTur !== 'haftalik') { tabloTur = 'haftalik'; tabloCiz(); } });
+  $('tabloGunluk').addEventListener('click', function () { if (tabloTur !== 'gunluk') { tabloTur = 'gunluk'; tabloCiz(); } });
   $('tabloYenile').addEventListener('click', tabloCiz);
-  $('tabloKapat').addEventListener('click', function () { $('tabloKatman').hidden = true; });
-  $('tabloKatman').addEventListener('keydown', function (e) { if (e.key === 'Escape') { e.stopPropagation(); $('tabloKatman').hidden = true; } });
-  $('tabloAcBtn').addEventListener('click', function () { openTablo('haftalik'); });
-
-  $('gunlukBtn').addEventListener('click', function () { G.startDaily(); });
-  $('haftalikBtn').addEventListener('click', function () { G.startWeekly(); });
+  $('tabloAcBtn').addEventListener('click', function () { openYarisma('haftalik'); });
   $('profilBtn').addEventListener('click', function () { openProfile(); });
 
   // ---------- profil kartı ----------
@@ -387,8 +434,33 @@
     $('pMaxSeri').textContent = di.maxStreak + ' gün';
     $('pDeneme').textContent = di.tries;
     renderDuvar(di.key);
-    show('ekProfil');
+    // v0.89: kimlik panosunun rozetleri (lig, seri), haftanın en iyisi, defterdeki bulunan not sayısı
+    var hf = G.haftalikInfo();
+    $('prLig').textContent = hf.ligAd ? hf.ligAd + ' ligi' : 'Lig yok'; $('prLig').className = 'pr-rozet lig' + hf.lig;
+    $('prSeri').textContent = di.streak ? di.streak + ' gün seri' + (di.donmada ? ' · donmada' : '') : 'Seri yok';
+    $('prSeri').className = 'pr-rozet' + (di.streak ? ' seri' : '');
+    $('pHafta').textContent = hf.best;
+    var notVar = 0, notHep = 0;
+    G.hikaye().forEach(function (hb) { (hb.notlar || []).forEach(function (n) { notHep++; if (n.metin) notVar++; }); });
+    $('prNotSay').textContent = 'Hikâye · bekçinin notları ' + notVar + '/' + notHep;
+    show('ekProfil'); $('ekProfil').scrollTop = 0;
   }
+  // Ad değiştirme Ayarlar'da; kalem düğmesi oraya götürür ve ad kutusunu açar
+  $('prAdBtn').addEventListener('click', function () { openSettings(); setTimeout(function () { var a = $('adDegis'); a.scrollIntoView({ block: 'center' }); a.focus({ preventScroll: true }); }, 60); });
+  // Profil panosundaki canlı Çıra: kuşandığın görünüşle halkada sallanır (Koleksiyon önizlemesi gibi)
+  var prRaf = 0;
+  function prBaslat() {
+    var cv = $('prCira'), dpr = Math.min(2, window.devicePixelRatio || 1), w = cv.clientWidth || 320, h = window.innerHeight <= 700 ? 130 : 150;
+    cv.width = w * dpr; cv.height = h * dpr; cv.style.height = h + 'px';
+    var c = cv.getContext('2d'), L = G.gorunum();
+    cancelAnimationFrame(prRaf);
+    (function tick(now) {
+      c.setTransform(dpr, 0, 0, dpr, 0, 0);
+      onizlemeCiz(c, w, h, reduceMotion ? 900 : now, L, false, '#1c1838', 1.3);
+      if (!reduceMotion) prRaf = requestAnimationFrame(tick);
+    })(performance.now());
+  }
+  function prDur() { cancelAnimationFrame(prRaf); }
   document.querySelectorAll('[data-geri]').forEach(function (b) { b.addEventListener('click', home); });
   document.querySelectorAll('#altMenu [data-sekme]').forEach(function (b) {
     b.addEventListener('click', function () {
@@ -1376,7 +1448,7 @@
   window.KuyuScreens = {
     home: home,
     hak: openHak,
-    tablo: openTablo, // skor tablosu (v0.73)
+    tablo: openYarisma, // skor tablosu (v0.73); v0.89: Sıralama sekmesi
     // sonuç kartındaki kısa yol: Dolap o ürünün önizlemesiyle açılır
     koleksiyon: function (tur, id) { openKol(tur, id); },
     dolap: function (id) {
@@ -1408,7 +1480,6 @@
     if (!$('videoKatman').hidden) return true; // video sürerken geri bir şey yapmaz
     if (!$('urunKatman').hidden) { urunKapat(); return true; }
     if (!$('hrKatman').hidden) { hrKapat(); return true; }
-    if (!$('tabloKatman').hidden) { $('tabloKatman').hidden = true; return true; }
     if (!$('hakKatman').hidden) { $('hakKapat').click(); return true; }
     if (!$('girisKatman').hidden) { $('girisKapat').click(); return true; }
     if (G.geri && G.geri()) return true;
