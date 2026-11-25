@@ -2,7 +2,7 @@
 
 > İstişare 6, Yol A. Kararlar Törehan'ın (24/11, `docs/istisare-6-bolum-hesap.md`): uzun bölümler kısa bölümlere bölünür, yıldızlar madalyalardan gelir ve ödülsüzdür, harita ayrı ekrandır. Bu belge kuralları ve Taş Kuyu denemesini tanımlar.
 >
-> **Durum:** ✅ A1 kurallar. ✅ A2 (v0.85, telefonda deneme bekliyor): Taş Kuyu'nun 18 kısa bölümü Hikâye ekranının başında deneme olarak; ölçümler §6'da. ✅ A3 (v0.86): yıldızlar sonuç kartında, bölüm kartlarında, grup başlıklarında ve özette (§3). ✅ A4 (v0.87): kuyu duvarı haritası, bugünkü 48 bölümle; A5'te kısa bölümlere geçince aynı harita kullanılır. ✅ A5.1 (v0.88, telefonda deneme bekliyor): Maden, Kristal ve Kule'nin 65 kısa bölümü deneme olarak; tablo ve ölçümler §9'da.
+> **Durum:** ✅ A1 kurallar. ✅ A2 (v0.85, telefonda deneme bekliyor): Taş Kuyu'nun 18 kısa bölümü Hikâye ekranının başında deneme olarak; ölçümler §6'da. ✅ A3 (v0.86): yıldızlar sonuç kartında, bölüm kartlarında, grup başlıklarında ve özette (§3). ✅ A4 (v0.87): kuyu duvarı haritası, bugünkü 48 bölümle; A5'te kısa bölümlere geçince aynı harita kullanılır. ✅ A5.1 (v0.88, telefonda deneme bekliyor): Maden, Kristal ve Kule'nin 65 kısa bölümü deneme olarak; tablo ve ölçümler §9'da. ✅ A5.2 (v0.92): geçiş; kısa bölümler 1–83 asıl Hikâye, ikinci yolculuk 84–107 (uzun, A5.3'e kadar), kayıt taşındı (§10).
 
 ## 1 · Bölüm kuralları
 
@@ -220,6 +220,21 @@ Adlar taslak (tablodaki "Ad: öğrettiği" sütununun başı bölüm adıdır); 
   - Tek taraf geçen 0. 22 "Yay" önce sağa basarak geçiliyordu, zikzak düzenle düzeldi.
   - Spam 65/65 geçiyor; bugünkü uzun bölümlerde de 18/18. Spam ile temkinli oyuncunun süre oranı kısa bölümlerde Maden 0,85, Kristal 0,90, Kule 1,19; uzun bölümlerde 0,80, 0,74, 0,81. Yani spam kısa bölümlerde uzun bölümlerden kolay değil.
 - Eski 48 bölüm, Günlük ve Haftalık değişmedi (`gen.js` değişmedi). `nisan.js` kurala aykırı 0, `geri.js 16` %4,4. `oyuncu.js`, `spam.js`, `hata.js 6`, `ekonomi-olcum.js`, `denge.js` ve birim testleri öncekiyle aynı.
+
+## 10 · A5.2 geçişi (v0.92, 25/11)
+
+- **Numaralar:** kısa bölümler 1–83 (deneme numaraları 101–183 kalktı), ikinci yolculuk 84–107 (`gen.createBolum(n − 59)`, eski 25–48 birebir). Bölge aralıkları kısa tariflerin `bolge` alanından (`game.js` → `BOLGE_ARALIK`); ikinci yolculukta bölge başına 6.
+- **Kayıt taşıma** (`js/gecis.js`, bir kez, `save.hikayeV` 3; test `tools/gecis-test.js`):
+  - Denemede geçilen kısa bölüm (`save.kisaBest[100 + no]`) aynen taşınır; deneme kaydı `save.kisaDeneme`'de arşiv.
+  - Uzun bölüm k geçildiyse ondan doğan kısa bölümler (tarifteki `kaynak`) "geçildi, madalyasız" (`tasindi`), 1 yıldız; ilk gerçek geçişte "ilk kez geçildi" sayılır.
+  - Ateşböceği tekrar ödenmez: `odenen` = kısa bölümün ateşböceği × uzun bölümde toplanan oran; `EKO.bolumOde` önceki en iyiyi `max(ff, odenen)` alır.
+  - İkinci yolculuğun kaydı 25–48 → 84–107. Eski uzun kayıtlar `save.uzunBest`'te.
+  - Hayaletler (`kuyu.hayalet`) ve bölüm istatistikleri yeni numaraya geçer; eski uzun 1–24'ünkiler bırakılır (istatistikte `eskiBolum`).
+  - `save.last`, `maxLevel`, `haritaSon` sıradaki bölüme kurulur (haritada uzun atlama gösterilmez).
+- **Finaller ve notlar:** bölge finalleri 18, 36, 60, 83 (ilk yolculuk); bekçinin notları kısa tariflerdeki `not` ile (6, 12, 18, 24, 30, 36, 44, 52, 60, 68, 76, 83).
+- **Kâşif:** 18 / 60 / 107 (kazanılmış kademe geri alınmaz).
+- **Ölçüm:** `ekonomi-olcum.js` kısa bölümler 19–60 ile (`UZUN=1` eski uzun 7–18): ortalama gün ~147 ateşböceği (uzunla ~157). Bot notların 12/12'sini kısa bölümlerde ateşböceği rotasıyla alıyor.
+- **Geri dönüş:** `geri-donus-v0.91` etiketi.
 
 **A5.1'de (v0.88) yapılanlar:**
 - 65 tarif `KISA` listesine eklenir.

@@ -5,24 +5,25 @@
    Metin kuralları: kısa cümle, en çok iki cümle, "ölmek" yok. */
 (function (root) {
   'use strict';
-  // v0.62: Hikâye 24 uzun bölüm oldu; notlar her bölgenin 2., 4. ve 6. bölümünde (eskiden 4, 9, 14, 20, … 74)
+  // v0.92 (A5.2): Hikâye kısa bölümler oldu; notlar kısa bölüm tariflerinde (bolumler.js → not), bölüm numaraları burada yalnız gösterim için
+  // (v0.62–v0.91: uzun bölümlerin 2., 4. ve 6. bölümünde)
   var NOTLAR = [
     // Taş Kuyu
-    { bolum: 2, metin: 'Fırtına dindi ama fener sönük. Kuyuya fitili sarkıttım; tutun ona, küçük kor.' },
-    { bolum: 4, metin: 'Su her gece biraz yükseliyor. Acele et Çıra, ama korkma.' },
-    { bolum: 6, metin: 'Duvarlarda ateşböcekleri gördüm. Hepsi senin ışığın; topladıkça yolun aydınlanır.' },
+    { bolum: 6, metin: 'Fırtına dindi ama fener sönük. Kuyuya fitili sarkıttım; tutun ona, küçük kor.' },
+    { bolum: 12, metin: 'Su her gece biraz yükseliyor. Acele et Çıra, ama korkma.' },
+    { bolum: 18, metin: 'Duvarlarda ateşböcekleri gördüm. Hepsi senin ışığın; topladıkça yolun aydınlanır.' },
     // Maden
-    { bolum: 8, metin: 'Gençken bu madende yağ taşırdım. Duvardaki fenerleri ben asmıştım.' },
-    { bolum: 10, metin: 'Madenciler ışığı paylaşırdı. Bir fener sönerse yanındaki onu yeniden yakardı.' },
-    { bolum: 12, metin: 'Kovayı her sabah biraz daha yukarıda bekletiyorum. Kolum eskisi kadar güçlü değil.' },
+    { bolum: 24, metin: 'Gençken bu madende yağ taşırdım. Duvardaki fenerleri ben asmıştım.' },
+    { bolum: 30, metin: 'Madenciler ışığı paylaşırdı. Bir fener sönerse yanındaki onu yeniden yakardı.' },
+    { bolum: 36, metin: 'Kovayı her sabah biraz daha yukarıda bekletiyorum. Kolum eskisi kadar güçlü değil.' },
     // Kristal Mağara
-    { bolum: 14, metin: 'Kristaller ışığı unutmaz. Bak, senin ışığın hâlâ içlerinde parlıyor.' },
-    { bolum: 16, metin: 'Mağarada çan gibi bir ses var. Bence kristaller seni karşılıyor.' },
-    { bolum: 18, metin: 'Köyde artık kimse kuyuya inmiyor. Ama ben geleceğini biliyorum.' },
+    { bolum: 44, metin: 'Kristaller ışığı unutmaz. Bak, senin ışığın hâlâ içlerinde parlıyor.' },
+    { bolum: 52, metin: 'Mağarada çan gibi bir ses var. Bence kristaller seni karşılıyor.' },
+    { bolum: 60, metin: 'Köyde artık kimse kuyuya inmiyor. Ama ben geleceğini biliyorum.' },
     // Eski Kule
-    { bolum: 20, metin: 'Kulenin merdiveni yüz on iki basamak. Her gece sayıyorum, her gece pencereye bakıyorum.' },
-    { bolum: 22, metin: 'Fenerin camını sildim, yağını doldurdum. Bir tek sen eksiksin.' },
-    { bolum: 24, metin: 'Az kaldı Çıra. Pencerede seni bekliyorum.' }
+    { bolum: 68, metin: 'Kulenin merdiveni yüz on iki basamak. Her gece sayıyorum, her gece pencereye bakıyorum.' },
+    { bolum: 76, metin: 'Fenerin camını sildim, yağını doldurdum. Bir tek sen eksiksin.' },
+    { bolum: 83, metin: 'Az kaldı Çıra. Pencerede seni bekliyorum.' }
   ];
   NOTLAR.forEach(function (n, i) { n.no = i + 1; n.bolge = Math.floor(i / 3); });
 

@@ -154,11 +154,11 @@
     $('selamAd').textContent = (s.profile && s.profile.name) || 'Tırmanıcı';
     // dokun ve başla (v0.64): Hikâye'de sıradaki bölüm (geçilmemiş ilk bölüm); bölge ve bölgedeki ilerleme yazar
     var cur = G.siradaki(), bitti = G.hikayeBitti(), curDef = G.levelDef(cur), cb = (s.best || {})[cur] || {};
-    var ga = 1 + Math.floor((cur - 1) / 6) * 6, gGec = 0;
-    for (var gn = ga; gn < ga + 6; gn++) if (s.best[gn] && s.best[gn].done) gGec++;
+    var bA = G.bolgeAraligi(cur), gGec = 0; // v0.92: bölge kısa bölüm aralığı (Taş 1–18, Maden 19–36 …)
+    for (var gn = bA.a; gn <= bA.b; gn++) if (s.best[gn] && s.best[gn].done) gGec++;
     $('dokunBaslik').textContent = bitti ? 'BÖLÜMLER' : 'OYNA';
     $('dokunAlt').textContent = bitti ? 'Bir bölümü yeniden oyna, hedefleri tamamla' : cur + '. bölüm · ' + curDef.name;
-    $('dokunBolge').textContent = bitti ? '48 bölüm geçildi' : G.bolgeAdi(cur) + ' · ' + gGec + '/6';
+    $('dokunBolge').textContent = bitti ? G.bolumSayi + ' bölüm geçildi' : G.bolgeAdi(cur) + ' · ' + gGec + '/' + (bA.b - bA.a + 1);
     $('dokunIpucu').textContent = bitti ? 'Bölümler için dokun' : 'Başlamak için dokun';
     $('dokunBtn').setAttribute('aria-label', bitti ? 'Hikâye tamam: bölümleri aç' : 'Başla: ' + cur + '. bölüm, ' + curDef.name + ', ' + G.bolgeAdi(cur));
     $('oynaHedef').hidden = bitti;
@@ -827,11 +827,11 @@
   // ---------- bölümler ----------
   // Gruplar: 1–6 Öğrenme (el yapımı), sonra 10'arlı. Sıradaki bölüm = geçilmemiş ilk bölüm.
   var listUpto = 0, filtre = 'tumu';
-  // v0.62: Hikâye 4 bölge × 6 bölüm + ikinci yolculuk (25–48); her bölge bir grup
-  function groupOf(n) { var a = 1 + Math.floor((n - 1) / 6) * 6; return { a: a, b: a + 5, ad: G.bolgeAdi(a) }; }
+  // v0.92: Hikâye 83 kısa bölüm (dört bölge) + ikinci yolculuk (84–107, bölge başına 6); her bölge bir grup
+  function groupOf(n) { var r = G.bolgeAraligi(n); return { a: r.a, b: r.b, ad: G.bolgeAdi(r.a) }; }
   function goalsOf(n) {
     var d = G.levelDef(n), ff = (d.rings || []).filter(function (r) { return r[2] === 'ff'; }).length;
-    var b = (n > G.kisaBas ? save().kisaBest || {} : save().best || {})[n] || {};
+    var b = (save().best || {})[n] || {};
     var got = Math.min(ff, b.ff || 0) + (b.perfect ? 1 : 0) + (b.flow ? 1 : 0);
     return { d: d, b: b, ff: ff, total: ff + 2, got: got, y: G.yildiz ? G.yildiz(b, ff) : 0 };
   }
@@ -841,7 +841,7 @@
     if (!g.b.done) return '';
     return G.yildizHtml ? G.yildizHtml(g.y, 'bk-yildiz') : '<span class="tik" aria-hidden="true">' + IK.svg('tik') + '</span>';
   }
-  function nextLevel() { var best = save().best || {}, n = 1; while (best[n] && best[n].done) n++; return n; }
+  function nextLevel() { var best = save().best || {}, n = 1; while (best[n] && best[n].done && n <= G.bolumSayi) n++; return n; }
   function openLevels() {
     var s = save(), nx = nextLevel();
     listUpto = G.bolumSayi;
@@ -851,37 +851,6 @@
     var el = $('liste').querySelector('[data-siradaki]');
     var ek = $('ekBolumler');
     if (el) ek.scrollTop = Math.max(0, el.offsetTop - ek.clientHeight / 2 + el.offsetHeight / 2); else ek.scrollTop = 0;
-  }
-  // Kısa bölümler denemesi (v0.85, docs/kisa-bolumler-plan.md): Taş Kuyu'nun 18 kısa bölümü, listenin başında ayrı grup.
-  // Kayıt ayrı (save.kisaBest); uzun bölümler, sıradaki bölüm ve özet sayıları değişmez. Kart numarası 1–18, oyunda 101–118.
-  // v0.88 (A5.1): Maden, Kristal Mağara ve Eski Kule de (19–83, oyunda 119–183); her bölge ayrı deneme grubu, sıradaki tek (geçilmemiş ilk kısa bölüm).
-  function kisaGrup() {
-    if (!G.kisaSayi || filtre !== 'tumu') return '';
-    var kb = save().kisaBest || {}, sira = 0, h = '', grup = null;
-    for (var i = 1; i <= G.kisaSayi; i++) if (!sira && !(kb[G.kisaBas + i] && kb[G.kisaBas + i].done)) sira = i;
-    function kapat() {
-      if (!grup) return;
-      var say = grup.son - grup.ilk + 1;
-      h += '<div class="bgrup deneme"><div class="bgrup-ust"><b>Yeni ' + grup.ad + ' · deneme</b><span>' + grup.done + '/' + say + ' geçildi · ' + grup.y + '/' + say * 3 + IK.svg('yildiz') + '</span></div>' +
-        (grup.ilk === 1 ? '<p class="bgrup-not">Kısa bölümler: her biri tek bir şey öğretir. Bugünkü bölümlerin ve ilerlemen değişmez.</p>' : '') +
-        '<div class="cubuk ince" aria-hidden="true"><i style="width:' + Math.round(grup.done / say * 100) + '%"></i></div><div class="liste">' + grup.cards + '</div></div>';
-    }
-    for (var k = 1; k <= G.kisaSayi; k++) {
-      var n = G.kisaBas + k, g = goalsOf(n), b = g.b, done = !!b.done, full = done && g.got >= g.total, isNext = k === sira;
-      if (!grup || grup.bolge !== (g.d.bolge || 0)) { kapat(); grup = { bolge: g.d.bolge || 0, ad: G.bolgeAdi(n), ilk: k, son: k, done: 0, y: 0, cards: '' }; }
-      grup.son = k;
-      if (done) grup.done++;
-      grup.y += g.y;
-      var dots = '';
-      for (var q = 0; q < g.ff; q++) dots += '<i class="' + (q < (b.ff || 0) ? 'var' : '') + '"></i>';
-      dots += '<i class="m' + (b.perfect ? ' var' : '') + '"></i><i class="m' + (b.flow ? ' var' : '') + '"></i>';
-      grup.cards += '<button type="button" class="bkart' + (done ? ' gecildi' : '') + (full ? ' tam' : '') + (isNext ? ' siradaki' : '') + '" data-n="' + n + '"' +
-        ' aria-label="Deneme bölümü ' + k + ', ' + g.d.name + (done ? ', geçildi, ' + g.y + ' yıldız' : '') + ', ' + g.got + '/' + g.total + ' hedef">' +
-        '<span class="bk-ust"><span class="no">' + k + '</span>' + kartIsaret(g, isNext) + '</span>' +
-        '<b>' + g.d.name + '</b><span class="rozet">' + dots + '</span></button>';
-    }
-    kapat();
-    return h;
   }
   function renderLevels() {
     var s = save(), best = s.best || {}, nx = nextLevel(), h = '', shown = 0;
@@ -894,7 +863,6 @@
     $('ozetHedef').textContent = gotAll + '/' + totAll;
     if ($('ozetYildiz')) $('ozetYildiz').textContent = yAll + '/' + G.bolumSayi * 3;
     $('ozetCubuk').style.width = (totAll ? Math.round(gotAll / totAll * 100) : 0) + '%';
-    h += kisaGrup();
     for (var ga = 1; ga <= listUpto;) {
       var gr = groupOf(ga), cards = '', gDone = 0, gGot = 0, gTot = 0, gY = 0;
       for (var n = gr.a; n <= gr.b; n++) {
@@ -919,7 +887,7 @@
     }
     if (!shown) h = '<p class="bos">Eksik hedefi olan geçilmiş bölüm yok. Tümü sekmesinden yeni bölümlere geçebilirsin.</p>';
     $('liste').innerHTML = h;
-    $('dahaBtn').hidden = true; // v0.62: liste sınırlı (48 bölüm), hepsi görünür
+    $('dahaBtn').hidden = true; // v0.62: liste sınırlı, hepsi görünür (v0.92: 107 bölüm)
   }
   $('liste').addEventListener('click', function (e) {
     var b = e.target.closest('button[data-n]'); if (!b) return;
@@ -939,20 +907,21 @@
     gunes: '<svg class="hr-isaret" viewBox="0 0 26 26" aria-hidden="true"><g stroke-linecap="round"><path d="M13 2v3M13 21v3M2 13h3M21 13h3M5.2 5.2l2.1 2.1M18.7 18.7l2.1 2.1M5.2 20.8l2.1-2.1M18.7 7.3l2.1-2.1" stroke="#15112a" stroke-width="5"/><path d="M13 2v3M13 21v3M2 13h3M21 13h3M5.2 5.2l2.1 2.1M18.7 18.7l2.1 2.1M5.2 20.8l2.1-2.1M18.7 7.3l2.1-2.1" stroke="#ffe066" stroke-width="2.2"/></g><circle cx="13" cy="13" r="5.6" fill="#ffe066" stroke="#15112a" stroke-width="2.4"/></svg>',
     kagit: '<svg class="hr-isaret" viewBox="0 0 26 26" aria-hidden="true"><path d="M5 4h12l4 4v14H5z" fill="#fff4dc" stroke="#15112a" stroke-width="2.4" stroke-linejoin="round"/><path d="M9 11h8M9 15h8M9 19h5" stroke="#15112a" stroke-width="2" stroke-linecap="round"/></svg>'
   };
-  function hrYaricap(n) { return n % 6 === 0 ? 34 : 28; }
+  function hrBuyuk(n) { return n === G.bolgeAraligi(n).b; } // bölge sonu: büyük halka (ilk yolculukta bölge finali)
+  function hrYaricap(n) { return hrBuyuk(n) ? 34 : 28; }
   function hrUstten(y) { return hrH - y; }
-  // aşağıdan yukarı yerleşim: her bölge (6 bölüm) bir bant; bandın dibinde kiriş ve tabela, ikinci yolculuk öncesi ek tabela
+  // aşağıdan yukarı yerleşim: her bölge bir bant (v0.92: kısa bölümlerde 18–24 halka); bandın dibinde kiriş ve tabela, ikinci yolculuk öncesi ek tabela
   function hrYerlesim(W) {
-    var bantlar = [], y = HR.DIP, grup = Math.ceil(G.bolumSayi / 6);
+    var bantlar = [], y = HR.DIP, ARL = G.bolgeAraliklari;
     hrKonum = {};
-    for (var g = 0; g < grup; g++) {
-      var alt = y, ikinciBas = g === 4;
+    ARL.forEach(function (r, g) {
+      var alt = y, ikinciBas = r.ikinci && (g === 0 || !ARL[g - 1].ikinci);
       if (ikinciBas) y += 130;
       var tabelaY = y + 64; y += 146;
-      for (var k = 0; k < 6 && g * 6 + k < G.bolumSayi; k++) { hrKonum[g * 6 + k + 1] = { x: Math.round(HR.XS[k] * W), y: y }; y += HR.ARALIK; }
+      for (var n = r.a, k = 0; n <= r.b; n++, k++) { hrKonum[n] = { x: Math.round(HR.XS[k % 6] * W), y: y }; y += HR.ARALIK; }
       y += 10;
-      bantlar.push({ g: g, alt: alt, ust: y, tabelaY: tabelaY, ikinciBas: ikinciBas });
-    }
+      bantlar.push({ g: g, r: r, alt: alt, ust: y, tabelaY: tabelaY, ikinciBas: ikinciBas });
+    });
     hrH = y + HR.UST;
     bantlar[bantlar.length - 1].ust = hrH;
     return bantlar;
@@ -963,7 +932,7 @@
     hrSonW = W;
     duvar.style.height = hrH + 'px';
     bantlar.forEach(function (b) {
-      var bolge = HR.BOLGE[b.g % 4], ikinci = b.g >= 4, a = b.g * 6 + 1, son = Math.min(G.bolumSayi, a + 5), top = 0;
+      var ikinci = b.r.ikinci, a = b.r.a, son = b.r.b, top = 0;
       for (var m = a; m <= son; m++) top += gs[m].y;
       var ad = String(G.bolgeAdi(a)).replace(' · ikinci yolculuk', '') + (ikinci ? ' · II' : '');
       var ky = hrUstten(b.tabelaY + 30);
@@ -971,9 +940,10 @@
       h += '<div class="hr-btabela" style="top:' + (ky + 32) + 'px;--egim:' + (b.g % 2 ? 2 : -2) + 'deg"><b>' + ad + '</b><small>' + a + '–' + son + ' · ' + top + '/' + (son - a + 1) * 3 + IK.svg('yildiz') + '</small></div>';
       if (b.ikinciBas) h += '<div class="hr-btabela buyuk" style="top:' + hrUstten(b.alt + 78) + 'px;--egim:-1.5deg"><b>İkinci yolculuk</b><small>Su baştan izler</small></div>';
     });
-    var renk = bantlar.slice().reverse().map(function (b) { return (b.g >= 4 ? HR_RENK2 : HR_RENK)[b.g % 4] + ' ' + (hrUstten((b.alt + b.ust) / 2) / hrH * 100).toFixed(2) + '%'; });
+    var renk = bantlar.slice().reverse().map(function (b) { return (b.r.ikinci ? HR_RENK2 : HR_RENK)[b.r.bi] + ' ' + (hrUstten((b.alt + b.ust) / 2) / hrH * 100).toFixed(2) + '%'; });
     duvar.style.setProperty('--hr-renk', 'linear-gradient(180deg, ' + renk.join(', ') + ')');
-    if (hrKonum[24]) h += '<div class="hr-gun" style="top:' + hrUstten(hrKonum[24].y + 190) + 'px;height:300px" aria-hidden="true"></div>';
+    var ilkSon = hrKonum[G.kisaSayi]; // ilk yolculuğun sonu: gün ışığı
+    if (ilkSon) h += '<div class="hr-gun" style="top:' + hrUstten(ilkSon.y + 190) + 'px;height:300px" aria-hidden="true"></div>';
     h += '<div class="hr-gun tepe" style="top:60px;height:' + (HR.UST + 80) + 'px" aria-hidden="true"></div>';
     // ip: geçilen kısım krem, sonrası noktalı; halkalar arasında hafif sarkar
     var yolG = '', yolS = '';
@@ -985,8 +955,8 @@
     h += '<svg class="hr-ipler" width="' + W + '" height="' + hrH + '" aria-hidden="true"><path class="golge" d="' + yolG + '"/><path class="gecti" d="' + yolG + '"/><path class="sonra" d="' + yolS + '"/></svg>';
     var T = window.KuyuBolumler;
     for (var r = 1; r <= G.bolumSayi; r++) {
-      var g = gs[r], done = !!g.b.done, durum = done ? 'gecildi' : r === sira ? 'siradaki' : 'bekliyor', final = r % 6 === 0, tf = T && r <= 24 ? T.bul(r) : null;
-      h += '<button type="button" class="hr-halka ' + durum + (final ? ' final' : '') + (r > 24 ? ' ikinci' : '') + '" data-n="' + r + '" style="left:' + hrKonum[r].x + 'px;top:' + hrUstten(hrKonum[r].y) + 'px"' +
+      var g = gs[r], done = !!g.b.done, durum = done ? 'gecildi' : r === sira ? 'siradaki' : 'bekliyor', final = hrBuyuk(r), tf = T && r <= G.kisaSayi ? T.kisaBul(r) : null;
+      h += '<button type="button" class="hr-halka ' + durum + (final ? ' final' : '') + (r > G.kisaSayi ? ' ikinci' : '') + '" data-n="' + r + '" style="left:' + hrKonum[r].x + 'px;top:' + hrUstten(hrKonum[r].y) + 'px"' +
         (durum === 'siradaki' ? ' aria-current="step"' : '') + ' aria-label="Bölüm ' + r + ', ' + g.d.name + (done ? ', ' + g.y + ' yıldız' : durum === 'siradaki' ? ', sıradaki' : '') + '">' +
         '<i class="h" aria-hidden="true"></i><span class="no" aria-hidden="true">' + r + '</span>' +
         (final ? HR_IK.gunes : tf && tf.not ? HR_IK.kagit : '') +
@@ -1009,7 +979,7 @@
     hrCiraN = n; var c = $('hrCira'), p = hrAsili(n);
     if (!c) return;
     c.style.left = p.x + 'px'; c.style.top = p.y + 'px';
-    // Çıra'nın asılı olduğu geçilmiş halkada (hikâye bitince 48) yıldızlar yana kayar, Çıra'nın altında kalmasın
+    // Çıra'nın asılı olduğu geçilmiş halkada (hikâye bitince son bölüm) yıldızlar yana kayar, Çıra'nın altında kalmasın
     $('hrDuvar').querySelectorAll('.hr-halka.cira-burada').forEach(function (b) { b.classList.remove('cira-burada'); });
     var hb = $('hrDuvar').querySelector('.hr-halka[data-n="' + n + '"]'); if (hb) hb.classList.add('cira-burada');
   }

@@ -42,6 +42,7 @@ Kod: `js/engine.js` (deterministik fizik ve kurallar, DT 1/120), `js/gen.js` (b�
 - **Zorluk yok:** Diken ve taş yok, tek tehlike su.
 - **Başlangıç (v0.83, Törehan 24/11):** Hikâye bölümlerinde Çıra geçici bir çengelde asılı başlar (`asiliBasla`, ilk başka tutunmada çengel düşer); sonsuz modlar (Günlük, Haftalık) dipten, zeminden başlar. Böylece bölüm ve sonsuz mod ilk bakışta ayrılır.
 - **Yeni mekanikler (İstişare 3 Aşama C, 23/11):** mevcut Hikâye bölümlerine bölme olarak girer (bölüm sayısı 24 kalır), sıra kor halka (v0.69) → döner çark (v0.70) → akıntı sütunu (v0.71, yalnız akışla çalışır); Hikâye'de öğretildikten sonra Günlük/Haftalık'a yeni günden/haftadan itibaren girer (eski tohumlar aynı kalmalı; yeni mekanik rastgele sayı çekmez). Kor halka 1,5 sn sonra söner ve bırakır.
+- **Kısa bölümler asıl Hikâye (v0.92, İstişare 6 A5.2, Törehan onayı 25/11):** 83 kısa bölüm 1–83 (`gen.createKisa`, tarifler `bolumler.js` → `KISA`) + ikinci yolculuk 84–107 (eski uzun 25–48, `gen.createBolum(n − 59)`; A5.3'te kısalacak). Eski uzun 1–24 oyundan kalktı (`save.uzunBest`). Kayıt taşıma `js/gecis.js` (test `node tools/gecis-test.js`); ateşböceği tekrar ödenmez (`odenen`). Plan `docs/kisa-bolumler-plan.md` §10. Aşağıdaki v0.62 maddesi uzun bölümlerin ve ikinci yolculuğun kurallarıdır.
 - **Hikâye (v0.62, Törehan'ın planı, 18–19/11):** 24 uzun öğretici bölüm (`js/bolumler.js` tarifleri, `gen.createBolum`) + ikinci yolculuk 25–48. Bölmeler arasında fener (kontrol noktası). Taş Kuyu susuz, Maden zamanla yükselen su (ilk fenerden sonra), Kristal 15'ten sonra ve Kule izleyen su (22/18/15 m, yanlış taraf ipi bırakır), ikinci yolculukta su baştan izler. Plan `docs/hikaye-bolumleri-plan.md`. Eski bölümler ve v0.52 bölge suyu oyundan kalktı; eski kayıtlar `save.eskiBest`.
   - Test: `node tools/bot.js` 48 bölümü dener; denge tablosu `node tools/hikaye-denge.js` (modeller, spam, tek taraf; `SADE=1` yalnız spam karşılaştırması); süre ve fener `node tools/hikaye-olcum.js`.
   - Denge kuralı (v0.63): boş atış her bölümde 0,4 sn kilit; Maden'den sonra yanlış taraf ipi bırakır; Maden'den sonra halkalar %40 aynı yanda (spam sırayla basarak geçmesin).
@@ -59,14 +60,14 @@ Kod: `js/engine.js` (deterministik fizik ve kurallar, DT 1/120), `js/gen.js` (b�
   - `node tools/spam.js`
   - `node tools/hata.js 6`
   - `node tools/geri.js 16` (geriye kanca: v0.57'de %4,1; artmamalı) ve Hikâye bölümleri için `node tools/hikaye-olcum.js`
-  - ekonomi ölçümü: `node tools/ekonomi-olcum.js` (ortalama oyuncu günde ~119 ateşböceği; v0.53'ten beri hata yapan oyuncularla ölçülür)
+  - ekonomi ölçümü: `node tools/ekonomi-olcum.js` (v0.92: kısa bölümler 19–60 ile, ortalama oyuncu günde ~147 ateşböceği; `UZUN=1` eski uzun bölüm ölçümü ~157; v0.53'ten beri hata yapan oyuncularla ölçülür)
   - zorluk eğrisi: `node tools/denge.js` (bölümlerde geçme oranı bölgeyle düşmeli, hatasız oyuncu geçmeli)
-  - birim testleri: `node tools/ekonomi-test.js`, `node tools/gorev-test.js`, `node tools/hayalet-test.js`, `node tools/istatistik-test.js`, `node tools/online-test.js`
+  - birim testleri: `node tools/ekonomi-test.js`, `node tools/gorev-test.js`, `node tools/hayalet-test.js`, `node tools/istatistik-test.js`, `node tools/online-test.js`, `node tools/gecis-test.js` (kısa bölümlere kayıt taşıma)
 - **Yerelde deneme:** Proje klasöründe `python3 -m http.server 8766` (Windows'ta `python`), sonra http://localhost:8766. Tarayıcıda servis çalışanı önbellekler; değişiklik görünmüyorsa kayıtlı servis çalışanını sil ve sayfayı yenile.
 - **Sürüm:** Her yayında `index.html` içindeki `?v=0.xx` ve "Hoook v0.xx" etiketleri birlikte artırılır (`kontrol.js` denetler). README'nin başındaki sürüm ve `docs/gelistirme-sureci.md` "Yapılanlar" bölümü güncellenir.
 - **Git:**
   - Commit mesajı "Hoook v0.xx: kısa başlık" ve madde madde açıklama.
   - Yalnız `main` var. Push edilince Pages yayınlar; `curl https://thorehan.github.io/hoook/index.html` ile yeni sürüm etiketi doğrulanır.
   - **`main`'e zorla push (force push) yok.** Geri dönüş gerekirse `git revert` ya da etiketten yeni dal açılır.
-  - Geri dönüş etiketleri (`geri-donus-v0.17`, `v0.45`, `v0.47`, `v0.51`) silinmez.
+  - Geri dönüş etiketleri (`geri-donus-v0.17`, `v0.45`, `v0.47`, `v0.51`, … `v0.91`) silinmez.
 - **Gizlilik:** E-posta, anahtar ya da parola dosyalara ve commit'lere yazılmaz.

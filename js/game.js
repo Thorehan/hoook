@@ -44,6 +44,16 @@
     save.hikayeV = 2;
     try { localStorage.setItem(KEY, JSON.stringify(save)); } catch (e) {}
   })();
+  // Kısa bölümlere geçiş (v0.92, İstişare 6 A5.2): js/gecis.js. Bir kez çalışır (save.hikayeV 3); hayaletler de taşınır.
+  (function kisaGecisi() {
+    var GC = window.KuyuGecis, T = window.KuyuBolumler;
+    if (!GC || !T || !T.kisaSayi || (save.hikayeV || 0) >= GC.SURUM) return;
+    function ffSay(d) { return (d.rings || []).filter(function (r) { return r[2] === 'ff'; }).length; }
+    var hk = null; try { hk = JSON.parse(localStorage.getItem('kuyu.hayalet') || 'null'); } catch (e) {}
+    GC.kisaGecis(save, { kisaSayi: T.kisaSayi, kaynak: function (c) { var t = T.kisaBul(c); return t && t.kaynak ? t.kaynak[0] : 0; },
+      ffKisa: function (c) { return ffSay(GEN.createKisa(c)); }, ffUzun: function (k) { return ffSay(GEN.createBolum(k)); } }, hk);
+    try { if (hk) localStorage.setItem('kuyu.hayalet', JSON.stringify(hk)); localStorage.setItem(KEY, JSON.stringify(save)); } catch (e) {}
+  })();
   GOREV.ensure(save);
   EKO.ensure(save);
   IST.ensure(save);
@@ -86,18 +96,27 @@
 
   // ---------- bölümler ----------
   var genCache = {};
-  // Hikâye (v0.62): 24 tarifli bölüm + ikinci yolculuk 25–48 (gen.createBolum). Eski el yapımı ve üretilen bölümler oyundan kalktı.
-  var BOLUM_SAYI = 48;
-  // Kısa bölümler (v0.85, deneme; docs/kisa-bolumler-plan.md): Taş Kuyu'nun 18 kısa bölümü 101–118 numarasıyla açılır,
-  // kaydı ayrı (save.kisaBest). Uzun Hikâye, sıradaki bölüm, ödül toplamları ve Günlük/Haftalık etkilenmez.
-  var KISA_BAS = 100, KISA_SAYI = (window.KuyuBolumler && window.KuyuBolumler.kisaSayi) || 0;
-  function kisaMi(n) { return n > KISA_BAS && n <= KISA_BAS + KISA_SAYI; }
-  function noYazi(n) { return kisaMi(n) ? n - KISA_BAS : n; } // ekranda görünen numara
+  // Hikâye (v0.92, İstişare 6 A5.2): 83 kısa bölüm (1–83, gen.createKisa; her biri tek fikir, fener yok) + ikinci yolculuk
+  // 84–107 (eski uzun 25–48, gen.createBolum(n − 59); A5.3'te kısa bölümlere döner). Eski 24 uzun bölüm oyundan kalktı (save.uzunBest).
+  var KISA_SAYI = (window.KuyuBolumler && window.KuyuBolumler.kisaSayi) || 0, IKINCI_FARK = 59, BOLUM_SAYI = KISA_SAYI + 24;
+  function kisaMi(n) { return n >= 1 && n <= KISA_SAYI; }
+  function noYazi(n) { return n; } // ekranda görünen numara (v0.92'den beri bölüm numarasıyla aynı)
   function levelDef(n) {
-    n = kisaMi(n) ? n : Math.max(1, Math.min(BOLUM_SAYI, Math.floor(n) || 1));
-    if (!genCache[n]) genCache[n] = kisaMi(n) ? GEN.createKisa(n - KISA_BAS) : GEN.createBolum(n);
+    n = Math.max(1, Math.min(BOLUM_SAYI, Math.floor(n) || 1));
+    if (!genCache[n]) genCache[n] = kisaMi(n) ? GEN.createKisa(n) : GEN.createBolum(n - IKINCI_FARK);
     return genCache[n];
   }
+  // Bölgeler: kısa bölümlerin tarifindeki bölgeden (Taş 1–18, Maden 19–36, Kristal 37–60, Kule 61–83), ikinci yolculukta 6'şar
+  var BOLGE_ARALIK = (function () {
+    var T = window.KuyuBolumler, out = [], son = null;
+    for (var n = 1; n <= KISA_SAYI; n++) {
+      var bi = (T.kisaBul(n) || {}).bolge || 0;
+      if (!son || son.bi !== bi) { son = { bi: bi, a: n, b: n, ikinci: false }; out.push(son); } else son.b = n;
+    }
+    for (var g = 0; g < 4; g++) out.push({ bi: g, a: KISA_SAYI + 1 + g * 6, b: KISA_SAYI + 6 + g * 6, ikinci: true });
+    return out;
+  })();
+  function bolgeAraligi(n) { for (var i = 0; i < BOLGE_ARALIK.length; i++) if (n >= BOLGE_ARALIK[i].a && n <= BOLGE_ARALIK[i].b) return BOLGE_ARALIK[i]; return BOLGE_ARALIK[0]; }
 
   // ---------- ses ----------
   var audio = null;
@@ -228,7 +247,7 @@
       ikinci: 'Kulenin penceresinde artık iki ışık var: biri fener, biri bekçinin lambası. Ateşböcekleri eve dönüyor.',
       final: { baslik: 'Fener yeniden yandı', metin: 'Çıra fenerine kavuştu. Bekçinin penceresinde ışık var; kuyunun her köşesi aydınlandı.' } }
   ];
-  var BOLGE_ILK = [1, 7, 13, 19]; // her bölgenin açıldığı bölüm (v0.62: 24 bölümlük Hikâye)
+  var BOLGE_ILK = [1, 19, 37, 61]; // her bölgenin açıldığı bölüm (v0.92: kısa bölümler)
   // Bölüm numarasından bölge: 1–16 Taş Kuyu, 17–36 Maden, 37–56 Kristal Mağara, 57–76 Eski Kule, sonra baştan (20'şer).
   function bolgeBolum(n) { return n <= 16 ? 0 : (1 + Math.floor((n - 17) / 20)) % BOLGELER.length; }
   // Kaçıncı yolculuk: 1–76 ilk (0), 77–156 ikinci (1), sonra her 80 bölümde bir
@@ -375,14 +394,14 @@
     istatBitir('terk');
     dailyKey = null; weekKey = null; meydan = null;
     mode = 'level'; yeni = true;
-    levelNo = kisaMi(n) ? n : Math.max(1, Math.min(BOLUM_SAYI, Math.floor(n) || 1));
+    levelNo = Math.max(1, Math.min(BOLUM_SAYI, Math.floor(n) || 1));
     def = levelDef(levelNo);
-    if (!def.kisa) { save.last = levelNo; if (levelNo > save.maxLevel) save.maxLevel = levelNo; }
+    save.last = levelNo; if (levelNo > save.maxLevel) save.maxLevel = levelNo;
     persist();
     deaths = 0;
     $('ipucu').textContent = def.hint;
     $('puan').hidden = true;
-    $('baslik').textContent = noYazi(levelNo) + '. ' + def.name + (def.ikinci ? ' · ikinci yolculuk' : def.kisa ? ' · deneme' : '');
+    $('baslik').textContent = noYazi(levelNo) + '. ' + def.name + (def.ikinci ? ' · ikinci yolculuk' : '');
     levelBolge = def.bolge || 0;
     reset();
     if (def.ikinci) ikinciDuyur(levelBolge); else bolgeDuyur(levelBolge);
@@ -392,9 +411,9 @@
   // Tarifli uzun bölümler (js/bolumler.js → gen.createBolum); v0.62'den beri asıl Hikâye (save.best).
   // Bölmeler arasında fener: ölünce son yanan fenerden dönülür (engine.fenerDon); duvarda bekçinin tebeşir ipuçları.
   var yeni = false, BOL = window.KuyuBolumler;
-  function bestKayit() { if (kisaMi(levelNo)) { if (!save.kisaBest) save.kisaBest = {}; return save.kisaBest; } return save.best; }
+  function bestKayit() { return save.best; }
   function startHikaye(n) { startLevel(n); }
-  function sonBolumMu() { return kisaMi(levelNo) ? levelNo >= KISA_BAS + KISA_SAYI : levelNo >= BOLUM_SAYI; }
+  function sonBolumMu() { return levelNo >= BOLUM_SAYI; }
   function sonrakiBolum() { if (!sonBolumMu()) startLevel(levelNo + 1); else goLevels(); }
   // Yeni bir bölgeye ilk girişte oyunu durdurmayan kısa duyuru (bölge başına bir kez)
   function bolgeDuyur(bi, ek) {
@@ -1924,7 +1943,8 @@
   // kulede fener yeniden yanar. Dokunmak geçer. Sahne bir kez oynar; metni Çıra'nın yolu'nda kalır.
   var FINAL = { 16: 0, 36: 1, 56: 2, 76: 3 }, FINAL_SURE = 7.5, finalCalan = {};
   function finalGoruldu(bi) { return !!(save.finaller && save.finaller[BOLGELER[bi].id]); }
-  var FINAL_YENI = { 6: 0, 12: 1, 18: 2, 24: 3, 118: 0, 136: 1, 160: 2, 183: 3 }; // yeni Hikâye: her bölgenin 6. bölümü; kısa deneme: bölge sonları 18, 36, 60, 83
+  var FINAL_YENI = {}; // v0.92: bölge finalleri ilk yolculukta her bölgenin son kısa bölümünde (18, 36, 60, 83)
+  BOLGE_ARALIK.forEach(function (r) { if (!r.ikinci) FINAL_YENI[r.b] = r.bi; });
   function finalNo() { return FINAL_YENI[levelNo]; }
   function finalBekliyor() { return mode === 'level' && finalNo() != null && !finalGoruldu(finalNo()); }
   function finalBasla() { finalBi = finalNo(); finalT = 0; finalCalan = {}; MZ.kis(true); }
@@ -2230,14 +2250,16 @@
     };
     var yYeni = yildiz(yeniKayit, ffT), yIpucu = yildizIpucu(yeniKayit, ffT);
     noteStats(speed, reward);
-    if (!def.kisa && levelNo + 1 > save.maxLevel) save.maxLevel = Math.min(BOLUM_SAYI, levelNo + 1);
+    if (levelNo + 1 > save.maxLevel) save.maxLevel = Math.min(BOLUM_SAYI, levelNo + 1);
     persist();
-    var odenen = EKO.bolumOde(save, b.ff || 0, Math.max(b.ff || 0, ff)); // yalnızca ilk kez alınan ateşböcekleri
+    // yalnızca ilk kez alınan ateşböcekleri (v0.92: kısa bölüme taşınan uzun bölümde toplananlar odenen'de, ikinci kez ödenmez)
+    var onceOd = Math.max(b.ff || 0, b.odenen || 0), odenen = EKO.bolumOde(save, onceOd, Math.max(onceOd, ff));
+    if (b.odenen) yeniKayit.odenen = b.odenen;
     var kaz = recordRun({ mode: 'level', won: true, ff: ff, boosts: sim.boosts, gates: sim.gates, maxCombo: sim.maxCombo, speed: speed, perfect: perfect });
     $('kart').className = 'kart sonuc';
     $('kart').innerHTML =
       '<div class="sonuc-bas"><div class="sonuc-baslik"><h2>Gün ışığı!</h2>' + yildizHtml(yYeni, 'sonuc-yildiz') +
-      (yYeni > yEski ? '<em class="yildiz-yeni">YENİ</em>' : '') + '</div><span>' + noYazi(levelNo) + '. ' + def.name + (def.ikinci ? ' · ikinci yolculuk' : def.kisa ? ' · deneme' : '') + (first ? ' · ilk kez geçildi' : deaths ? ' · ' + (deaths + 1) + '. deneme' : '') + '</span></div>' +
+      (yYeni > yEski ? '<em class="yildiz-yeni">YENİ</em>' : '') + '</div><span>' + noYazi(levelNo) + '. ' + def.name + (def.ikinci ? ' · ikinci yolculuk' : '') + (first ? ' · ilk kez geçildi' : deaths ? ' · ' + (deaths + 1) + '. deneme' : '') + '</span></div>' +
       '<div class="odul-satir"><i class="ikon-odul" aria-hidden="true"></i><b id="odulSayi">0</b>' + (recReward ? '<em class="rekor-etiket">REKOR</em>' : '') + '</div>' +
       '<p class="odul-hesap">' + (mult > 1 ? base + ' × x' + fmt(mult, 2) + ' çarpan' + (E.ustalikPay(sim) > 0 ? ' (hız x' + fmt(E.hizPay(sim), 2) + ' + ustalık ' + fmt(E.ustalikPay(sim), 2) + (sim.halkaUsta ? ', ' + sim.halkaUsta + ' halka ustalığı' : '') + ')' : '') : 'Bölüm ödülü · hızlanırsan, TAM bırakırsan ve özel halkaları kullanırsan çarpan artar') + '</p>' +
       '<div class="madalyalar">' +
@@ -2448,7 +2470,7 @@
     paused = true;
     if (sim) E.release(sim);
     // v0.87: Hikâye bölümünden haritaya (Çıra'nın atlaması orada görülür); kısa deneme bölümünden listeye (deneme grubu orada)
-    if (window.KuyuScreens && window.KuyuScreens.levels) window.KuyuScreens.levels(mode === 'level' && kisaMi(levelNo)); else goHome();
+    if (window.KuyuScreens && window.KuyuScreens.levels) window.KuyuScreens.levels(); else goHome();
   }
   function goHome() {
     istatBitir('terk');
@@ -2768,7 +2790,8 @@
     save: function () { return save; },
     persist: persist,
     levelDef: levelDef,
-    bolumSayi: BOLUM_SAYI, kisaBas: KISA_BAS, kisaSayi: KISA_SAYI,
+    bolumSayi: BOLUM_SAYI, kisaSayi: KISA_SAYI, bolgeAraliklari: BOLGE_ARALIK, bolgeAraligi: bolgeAraligi,
+    finalMi: function (n) { return FINAL_YENI[n] != null; },
     yildiz: yildiz, yildizHtml: yildizHtml, yildizIpucu: yildizIpucu, madalyaIkon: ICON,
     toggleMuzik: function () { return muzikDegis(); },
     muzikAcik: muzikAcik,

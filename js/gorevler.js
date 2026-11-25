@@ -68,7 +68,8 @@
     { id: 'ruzgar', ad: 'Rüzgâr', acik: 'Toplam hız halkası', t: [25, 200, 1000], val: function (s) { return s.totals.boosts; } },
     { id: 'akis', ad: 'Akış ustası', acik: 'Bir koşuda en uzun akış', t: [10, 30, 80], val: function (s) { return s.totals.maxCombo; }, fmt: function (n) { return 'x' + n; } },
     { id: 'hizli', ad: 'Işık hızı', acik: 'En yüksek hız', t: [30, 45, 55], val: function (s) { return Math.floor((s.stats && s.stats.maxSpeed) || 0); }, fmt: function (n) { return n + ' m/sn'; } },
-    { id: 'kasif', ad: 'Kâşif', acik: 'Geçilen bölüm', t: [6, 24, 48], val: function (s) { return count(s, 'done'); } },
+    { id: 'kasif', ad: 'Kâşif', acik: 'Geçilen bölüm', t: [18, 60, 107], // v0.92: 107 kısa bölüm (eskiden 6 / 24 / 48)
+       val: function (s) { return count(s, 'done'); } },
     { id: 'kusursuz', ad: 'Kusursuz', acik: 'Kusursuz geçilen bölüm', t: [3, 12, 30], val: function (s) { return count(s, 'perfect'); } },
     { id: 'derin', ad: 'Derin kuyu', acik: 'Bir koşuda en yüksek metre', t: [500, 2000, 5000], val: function (s) { return Math.max(s.totals.maxMeters, (s.endless && s.endless.meters) || 0); }, fmt: function (n) { return n + ' m'; } },
     { id: 'sadik', ad: 'Sadık', acik: 'En uzun Günlük Kuyu serisi', t: [3, 7, 30], val: function (s) { return (s.streak && s.streak.max) || 0; }, fmt: function (n) { return n + ' gün'; } },

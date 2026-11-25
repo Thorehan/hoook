@@ -71,12 +71,14 @@ for (const [ad, tarz, p, ates] of PROFIL) {
   if (G.createHaftalik) for (let sd = 1; sd <= 4; sd++) { let en = 0; for (let d = 0; d < EKO.HAK.haftalik; d++) { const s = oyna(G.createHaftalik(sd * 7), tarz, p, sd * 11 + d, KOSU_SN, false); hff += E.fireflyCount(s); en = Math.max(en, E.finalScore(s)); } puan.push(en);
     if (EKO.haftaYildizSay) { const hk = '2026-12-' + String(sd * 7).padStart(2, '0'); haftaYildiz += EKO.HAFTA_YILDIZ_ODUL.slice(0, EKO.haftaYildizSay(hk, en)).reduce((a, b) => a + b, 0); } }
   puan.sort((a, b) => a - b);
-  // Hikâye bölümleri 7–18 (v0.62, tarifli uzun bölümler, fenerden devam): ilk geçişe kadar yeniden dene (en çok 3); deneme arası 6 sn, sonuç kartı 6 sn
+  // Hikâye bölümleri: v0.92'den beri kısa bölümler 19–60 (Maden ve Kristal; eski uzun 7–18'in yerini aldılar). UZUN=1: eski ölçüm (uzun 7–18).
+  // İlk geçişe kadar yeniden dene (en çok 3); deneme arası 6 sn, sonuç kartı 6 sn
   let lff = 0, lsn = 0, den = 0, gecilen = 0;
-  for (let k = 7; k <= 18; k++) {
+  const UZUN = !!process.env.UZUN, ILK = UZUN ? 7 : 19, SON = UZUN ? 18 : 60;
+  for (let k = ILK; k <= SON; k++) {
     let best = 0;
     for (let d = 0; d < 3; d++) {
-      const s = oyna(G.createBolum(k), tarz, p, k * 10 + d, 400, ates); den++; lsn += s.t + 6; best = Math.max(best, E.fireflyCount(s));
+      const s = oyna(UZUN ? G.createBolum(k) : G.createKisa(k), tarz, p, k * 10 + d, 400, ates); den++; lsn += s.t + 6; best = Math.max(best, E.fireflyCount(s));
       if (s.status === 'won') { lff += best; lsn += 6; gecilen++; break; }
     }
   }
@@ -89,7 +91,7 @@ for (const [ad, tarz, p, ates] of PROFIL) {
   gunler.push(gun);
   console.log(`[${ad}]`);
   console.log(`  günlük:   3 denemede ${gunlukGun.toFixed(1)} ateşböceği, en iyi ${Math.round(gm / N)} m, günün hedefi ${yildizGun.toFixed(1)} · haftalık koşu payı ${haftalikKosu.toFixed(1)} · seri payı ${seri.toFixed(1)} · haftalık en iyi puan (ortanca) ${puan.length ? puan[puan.length >> 1] : 0}, hafta yıldızı payı ${haftaYildizGun.toFixed(1)}`);
-  console.log(`  bölümler: 7–18 arası ${gecilen}/12 bölüm, ${lff} ateşböceği, ${den} deneme, ${Math.round(lsn / 60)} dk → saatte ${Math.round(bolumSaat)}`);
+  console.log(`  bölümler: ${ILK}–${SON} arası (${UZUN ? 'uzun' : 'kısa'}) ${gecilen}/${SON - ILK + 1} bölüm, ${lff} ateşböceği, ${den} deneme, ${Math.round(lsn / 60)} dk → saatte ${Math.round(bolumSaat)}`);
   console.log(`  tipik gün (10 dk bölüm + 3 Günlük + 5/7 Haftalık koşu, 3 görev ${gorev}, giriş ort. ${giris.toFixed(0)}${haftalik ? ', haftalık lig payı ' + haftalik.toFixed(0) : ''}): ~${gun} ateşböceği, videolarla ~${gun + gorev + Math.round(giris)}`);
   console.log(`  Dolap ${Math.ceil(Math.max(0, dolapToplam - basarimToplam) / gun)} günde biter (başarımların ${basarimToplam} ateşböceği düşülerek); ışık yolu ${EKO.ISIK.length - 1}. seviye ${Math.ceil(EKO.ISIK[EKO.ISIK.length - 1] / gun)} günde`);
 }

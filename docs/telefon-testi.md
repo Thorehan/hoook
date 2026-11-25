@@ -252,6 +252,14 @@ Hikâye ekranındaki "Yeni Maden", "Yeni Kristal Mağara" ve "Yeni Eski Kule · 
 - [ ] Bölüm sonu ve Günlük/Haftalık sonuç kartları: başlık tabelası, madalya renkleri, ödül sayısı okunuyor mu? Kart oyun göstergelerinin üstünde mi?
 - [ ] Hikâye kartı (krem not) ve kısa bildirimler okunuyor mu, oyunda göstergeleri kapatıyor mu?
 
+## 35. Kısa bölümler asıl Hikâye (v0.92, 6 dk)
+- [ ] Açınca ilerlemen yerinde mi? Eskiden geçtiğin bölgelerin kısa bölümleri geçilmiş (1 yıldız) görünüyor mu, sıradaki bölüm doğru mu?
+- [ ] Ana ekranda OYNA altında "N. bölüm · ad" ve bölge çipi ("Maden · 3/18" gibi) doğru mu?
+- [ ] Haritada 107 halka: bölge tabelaları, sıradaki, ikinci yolculuk (84–107) düzgün mü? Liste aynı gruplarla mı?
+- [ ] Geçilmiş (taşınan) bir bölümü yeniden oyna: madalyalar ve yıldız geliyor mu? Ateşböcekleri ikinci kez cüzdana yazılmıyor mu (yalnız yenileri)?
+- [ ] Bölge sonu (18, 36, 60, 83) final sahnesi ve bekçinin notları (6, 12, …) çıkıyor mu?
+- [ ] Görevler → Başarımlar: Kâşif yeni eşiklerle (18 / 60 / 107) mantıklı mı?
+
 ## 5. Genel izlenim (serbest)
 - En sevdiğim an:
 - En çok zorlandığım yer:

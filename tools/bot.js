@@ -185,7 +185,7 @@ if (!args.includes('--gen') || only) {
 if (!only) {
   let notOk = 0;
   for (const n of NOT.NOTLAR) {
-    const def = G.createBolum(n.bolum); // v0.62: notlar Hikâye'nin 24 bölümünde
+    const def = G.createKisa(n.bolum); // v0.92: notlar kısa bölümlerde (v0.62–v0.91: 24 uzun bölümde)
     const h = NOT.halka(def);
     const c = h ? play(def, 'rahat', def.ffRoute) : null;
     const rg = c && c.s.rings.find(r => r.ff && r.x === h[0] && r.y === h[1]);
