@@ -13,6 +13,8 @@
   var meydanLink = ONL && q.get('meydan') ? ONL.meydanCoz(q.get('meydan')) : null;
   var deepLink = meydanLink ? { mode: 'meydan', m: meydanLink } : q.get('mod') === 'gunluk' ? { mode: 'daily' } : q.get('mod') === 'haftalik' ? { mode: 'weekly' } : q.get('mod') === 'sonsuz' ? { mode: 'endless' } : q.get('bolum') ? { mode: 'level', n: parseInt(q.get('bolum'), 10) || 1 } : q.get('hikaye') ? { mode: 'hikaye', n: parseInt(q.get('hikaye'), 10) || 1 } : null;
   var save = function () { return G.save(); };
+  var IK = window.KuyuIkon; // v0.90: çizilmiş SVG ikonlar (js/ikon.js), yazı simgeleri yerine
+  function yildizTekrar(n) { var h = ''; for (var i = 0; i < n; i++) h += IK.svg('yildiz'); return h; }
 
   var SEKMELER = ['ekAna', 'ekBolumler', 'ekGorevler', 'ekDolap', 'ekProfil', 'ekAyarlar', 'ekIstat', 'ekYarisma', 'ekKoleksiyon', 'ekHarita'];
   // Ekran geçişi (v0.78): alt sekmeler arasında yöne göre kayma, diğer ekranlarda hafif büyüyerek gelme
@@ -178,8 +180,7 @@
     if (gecen) { $('toplamAtes').textContent = G.cuzdan().ates; setTimeout(function () { toast('Geçen hafta ' + gecen.ligAd + ' ligindeydin · +' + gecen.odul + ' ateşböceği', 3600); }, 1600); }
     var hf = G.haftalikInfo();
     // ana ekranın yan kartları (v0.75): kısa durum. v0.89: Yarışma sekmesindeki kartlar kalktı (sekme Sıralama oldu)
-    var yildizKisa = function (n) { return '★★★'.slice(0, n) + '☆☆☆'.slice(0, 3 - n); };
-    $('yanGunlukAlt').textContent = yildizKisa(di.yildiz) + ' · ' + (di.hak.kalan > 0 ? di.hak.kalan + '/' + di.hak.toplam : 'bitti');
+    $('yanGunlukAlt').innerHTML = IK.yildizlar(di.yildiz, 'mini') + ' · ' + (di.hak.kalan > 0 ? di.hak.kalan + '/' + di.hak.toplam : 'bitti');
     $('yanGunlukNokta').hidden = !(di.hak.kalan > 0 && !di.playedToday);
     $('yanGunluk').setAttribute('aria-label', 'Günlük Kuyu: ' + di.kural.ad + ', hedef ' + di.hedef.metre + ' metre, ' + di.yildiz + ' yıldız, ' + hakYazi(di.hak, 'yarın') +
       (di.streak ? ', ' + di.streak + ' gün seri' : ''));
@@ -207,7 +208,7 @@
     if (bekleyen) alt = bekleyen === 1 ? 'Ödül hazır · almak için dokun' : bekleyen + ' ödül hazır · almak için dokun';
     else if (bitti === list.length) {
       var left = G.yeniGune(), hh = Math.floor(left / 3600000), mm = Math.floor(left % 3600000 / 60000);
-      alt = 'Hepsi tamam ✓ · yenileri ' + (hh ? hh + ' sa ' : '') + mm + ' dk sonra';
+      alt = 'Hepsi tamam · yenileri ' + (hh ? hh + ' sa ' : '') + mm + ' dk sonra';
     } else {
       // tamamlanmaya en yakın görev
       var en = list.filter(function (m) { return !m.done; }).sort(function (a, b) { return b.prog / b.target - a.prog / a.target; })[0];
@@ -236,38 +237,47 @@
     tabloCiz();
   }
   // dokun ve başla: ilk bölüm geçilene dek öğretici (İlk Halka), sonra Sonsuz Kuyu
-  function hakYazi(h, zaman) { return h.kalan > 0 ? h.kalan + '/' + h.toplam + ' deneme' : h.son ? zaman + ' yeni denemeler' : 'Deneme bitti · ▶ +1'; }
+  function hakYazi(h, zaman) { return h.kalan > 0 ? h.kalan + '/' + h.toplam + ' deneme' : h.son ? zaman + ' yeni denemeler' : 'Deneme bitti, videoyla 1 deneme'; }
   $('dokunBtn').addEventListener('click', function () { if (G.hikayeBitti()) openLevels(); else G.startLevel(G.siradaki()); });
   // v0.83: "Başlamak için dokun": ana ekranda düğme olmayan her yere dokunmak OYNA ile aynı
   $('ekAna').addEventListener('click', function (e) { if (!e.target.closest('button, .ana-ust, .kiris')) { if (G.dokunus) G.dokunus(true); $('dokunBtn').click(); } });
+  // ---------- pencereler (v0.90, İstişare 5 Aşama 3): yukarıdan iki iple inen pano; kapanınca yukarı çekilir ----------
+  function pencereAc(id) { var k = $(id); clearTimeout(k._kapaT); k.classList.remove('kapaniyor'); k.hidden = false; }
+  function pencereKapat(id) {
+    var k = $(id); if (k.hidden) return; clearTimeout(k._kapaT);
+    if (reduceMotion) { k.hidden = true; return; }
+    k.classList.add('kapaniyor');
+    k._kapaT = setTimeout(function () { k.hidden = true; k.classList.remove('kapaniyor'); }, 230);
+  }
+  function pencereAcik(id) { var k = $(id); return !k.hidden && !k.classList.contains('kapaniyor'); }
   // ---------- deneme hakkı penceresi (v0.64) ----------
   var hakTur = null;
   function openHak(tur) {
     hakTur = tur;
     var d = G.hakDurum(tur), ad = tur === 'gunluk' ? 'Günlük Kuyu' : 'Haftalık Kuyu', taban = window.KuyuEkonomi.HAK[tur];
-    $('hakBaslik').textContent = ad + ': denemeler bitti';
+    $('hakBaslik').textContent = 'Denemeler bitti'; // v0.90: kısa tabela; mod adı metnin başında
     if (d.son) {
-      $('hakMetin').textContent = (tur === 'gunluk' ? 'Bugün' : 'Bu hafta') + ' başka deneme yok. ' + (tur === 'gunluk' ? 'Yarın' : 'Pazartesi') + ' ' + taban + ' yeni deneme. Bu arada Hikâye seni bekliyor.';
+      $('hakMetin').textContent = ad + ' · ' + (tur === 'gunluk' ? 'bugün' : 'bu hafta') + ' başka deneme yok. ' + (tur === 'gunluk' ? 'Yarın' : 'Pazartesi') + ' ' + taban + ' yeni deneme. Bu arada Hikâye seni bekliyor.';
       $('hakVideoBtn').hidden = true; $('hakVideoSay').innerHTML = '';
     } else {
-      $('hakMetin').textContent = 'Video izleyerek 1 deneme daha alabilirsin. Her yenilemede bir video daha gerekir (1, 2, 3, 4, 5); ' + window.KuyuEkonomi.YENILEME_EN + ' yenilemeden sonra ' + (tur === 'gunluk' ? 'yarına' : 'haftaya') + ' kadar başka deneme yok.';
+      $('hakMetin').textContent = ad + ' · video izleyerek 1 deneme daha alabilirsin. Her yenilemede bir video daha gerekir (1, 2, 3, 4, 5); ' + window.KuyuEkonomi.YENILEME_EN + ' yenilemeden sonra ' + (tur === 'gunluk' ? 'yarına' : 'haftaya') + ' kadar başka deneme yok.';
       $('hakVideoSay').innerHTML = (d.yenileme + 1) + '. yenileme: ' + Array.apply(null, Array(d.bedel)).map(function (x, i) { return '<i class="' + (i < d.izlenen ? 'var' : '') + '"></i>'; }).join('');
-      $('hakVideoBtn').hidden = false; $('hakVideoBtn').textContent = '▶ Video izle (' + (d.izlenen + 1) + '/' + d.bedel + ')';
+      $('hakVideoBtn').hidden = false; $('hakVideoBtn').innerHTML = IK.svg('video') + 'Video izle (' + (d.izlenen + 1) + '/' + d.bedel + ')';
     }
     $('hakHikayeBtn').textContent = G.hikayeBitti() ? 'Hikâye' : 'Hikâye\'ye devam · ' + G.siradaki() + '. bölüm';
-    $('hakKatman').hidden = false;
+    pencereAc('hakKatman');
     ($('hakVideoBtn').hidden ? $('hakHikayeBtn') : $('hakVideoBtn')).focus({ preventScroll: true });
   }
   $('hakVideoBtn').addEventListener('click', function () {
-    $('hakKatman').hidden = true;
+    pencereKapat('hakKatman');
     video(function () {
       var r = G.hakVideo(hakTur);
       if (r && r.yenilendi) { toast('+1 deneme', 1800); if (hakTur === 'gunluk') G.startDaily(); else G.startWeekly(); }
       else openHak(hakTur);
     });
   });
-  $('hakHikayeBtn').addEventListener('click', function () { $('hakKatman').hidden = true; if (G.hikayeBitti()) openLevels(); else G.startLevel(G.siradaki()); });
-  $('hakKapat').addEventListener('click', function () { $('hakKatman').hidden = true; if (current === 'ekAna') home(); });
+  $('hakHikayeBtn').addEventListener('click', function () { pencereKapat('hakKatman'); if (G.hikayeBitti()) openLevels(); else G.startLevel(G.siradaki()); });
+  $('hakKapat').addEventListener('click', function () { pencereKapat('hakKatman'); if (current === 'ekAna') home(); });
   // ---------- skor tablosu (v0.73; v0.89 Sıralama sekmesi) ----------
   // Haftalık | Günlük. Üstte lig (ya da günün) kartı; ilk 3 kancalara asılı etiketler, 4–50 şeritler.
   // Senin satırın altta hep görünür (50 dışındaysan da); dokununca listede kendi yerine kayar. Durumlar: yükleniyor, boş, hata, kapalı.
@@ -310,7 +320,7 @@
       k.className = 'sr-kart gun';
       k.innerHTML = '<span class="sr-rozet gun" aria-hidden="true"><svg viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="16" rx="3"/><path class="cizgi" d="M3 10h18M8 3v4M16 3v4"/></svg></span>' +
         '<span class="sr-kart-yazi"><small>Bugünkü en iyin</small><b>' + (di.best ? sayi(di.best) + ' puan' : 'Henüz yok') + '</b>' +
-        '<span class="sr-yildiz">' + [0, 1, 2].map(function (i) { return '<i class="' + (i < di.yildiz ? 'var' : '') + '">★</i>'; }).join('') + '</span>' +
+        '<span class="sr-yildiz">' + [0, 1, 2].map(function (i) { return '<i class="' + (i < di.yildiz ? 'var' : '') + '">' + IK.svg('yildiz') + '</i>'; }).join('') + '</span>' +
         '<span>' + di.kural.ad + ' · hedef ' + di.hedef.metre + ' m' + (di.streak ? ' · ' + di.streak + ' gün seri' : '') + '</span></span>' +
         '<span class="sr-odul"><small>Deneme</small><b>' + di.hak.kalan + '/' + di.hak.toplam + '</b><small>bugün</small></span>';
     }
@@ -385,12 +395,12 @@
     for (var i = 27; i >= 0; i--) {
       var d = new Date(bugun + 'T12:00:00Z'); d.setUTCDate(d.getUTCDate() - i);
       var k = d.toISOString().slice(0, 10), o = gun[k];
-      h += '<i class="g' + (o ? ' y' + (o.yildiz || 0) : '') + (i === 0 ? ' bugun' : '') + '" title="' + d.getUTCDate() + ' · ' + (o ? (o.yildiz || 0) + ' yıldız, ' + (o.metre || 0) + ' m' : 'oynanmadı') + '"><b>' + d.getUTCDate() + '</b>' + (o && o.yildiz ? '<em>' + '★'.repeat(o.yildiz) + '</em>' : '') + '</i>';
+      h += '<i class="g' + (o ? ' y' + (o.yildiz || 0) : '') + (i === 0 ? ' bugun' : '') + '" title="' + d.getUTCDate() + ' · ' + (o ? (o.yildiz || 0) + ' yıldız, ' + (o.metre || 0) + ' m' : 'oynanmadı') + '"><b>' + d.getUTCDate() + '</b>' + (o && o.yildiz ? '<em>' + yildizTekrar(o.yildiz) + '</em>' : '') + '</i>';
     }
     $('pDuvar').innerHTML = h;
     var L = window.KuyuEkonomi.LIG;
     $('pHaftalar').innerHTML = Object.keys(hf).sort().reverse().slice(0, 8).map(function (k) {
-      var o = hf[k]; return '<li><span>' + new Date(k + 'T12:00:00Z').toLocaleDateString('tr-TR', { day: 'numeric', month: 'short' }) + ' haftası' + (o.yildiz ? ' <i class="duvar-yildiz">' + '★'.repeat(o.yildiz) + '</i>' : '') + '</span><b>' + (o.lig >= 0 ? L[o.lig].ad : 'Lig yok') + '</b><em>' + (o.puan || 0) + '</em></li>';
+      var o = hf[k]; return '<li><span>' + new Date(k + 'T12:00:00Z').toLocaleDateString('tr-TR', { day: 'numeric', month: 'short' }) + ' haftası' + (o.yildiz ? ' <i class="duvar-yildiz">' + yildizTekrar(o.yildiz) + '</i>' : '') + '</span><b>' + (o.lig >= 0 ? L[o.lig].ad : 'Lig yok') + '</b><em>' + (o.puan || 0) + '</em></li>';
     }).join('') || '<li class="bos">Henüz Haftalık Kuyu koşusu yok.</li>';
   }
   function openProfile() {
@@ -478,7 +488,7 @@
     var gd = G.giris();
     $('girisSatir').innerHTML = '<i class="ikon-ates" aria-hidden="true"></i><span><b>Günlük giriş · ' + (gd.gun + 1) + '. gün</b><small>' +
       (gd.hazir ? 'Bugünün ödülü ' + gd.odul + ' ateşböceği' : 'Bugün alındı · yarın ' + gd.odul + ' ateşböceği') + '</small></span>' +
-      (gd.hazir ? '<button type="button" class="ana g-al" id="girisSatirBtn">Aç</button>' : '<span class="g-alindi">✓</span>');
+      (gd.hazir ? '<button type="button" class="ana g-al" id="girisSatirBtn">Aç</button>' : '<span class="g-alindi" aria-label="alındı">' + IK.svg('tik') + '</span>');
     var b = $('girisSatirBtn'); if (b) b.onclick = openGiris;
   }
   function renderTasks() {
@@ -487,9 +497,9 @@
     $('gorevSure').textContent = 'yenisi ' + (hh ? hh + ' sa ' : '') + mm + ' dk sonra';
     $('gorevListe').innerHTML = G.gorevler().map(function (m, i) {
       var pct = Math.round(m.prog / m.target * 100), text = window.KuyuGorev.missionText(m);
-      var sag = m.claimed ? '<span class="g-alindi">✓ Alındı</span>'
+      var sag = m.claimed ? '<span class="g-alindi">' + IK.svg('tik') + 'Alındı</span>'
         : m.done ? '<span class="g-al-ikili"><button type="button" class="ana g-al" data-al="' + i + '">Al +' + ODUL[m.tier] + '</button>' +
-          '<button type="button" class="g-al video-btn" data-al2="' + i + '" aria-label="Video izle, ' + ODUL[m.tier] * 2 + ' ateşböceği al">▶ +' + ODUL[m.tier] * 2 + '</button></span>'
+          '<button type="button" class="g-al video-btn" data-al2="' + i + '" aria-label="Video izle, ' + ODUL[m.tier] * 2 + ' ateşböceği al">' + IK.svg('video') + '+' + ODUL[m.tier] * 2 + '</button></span>'
         : '<span class="g-odul"><i class="ikon-ates" aria-hidden="true"></i>' + ODUL[m.tier] + '</span>';
       return '<div class="gorev' + (m.done ? ' tamam' : '') + (m.claimed ? ' alindi' : '') + '">' +
         '<div class="g-ic"><small class="g-zor z' + m.tier + '">' + ZORLUK[m.tier] + '</small><b>' + text + '</b>' +
@@ -523,11 +533,11 @@
   // ---------- ödüllü video (yer tutucu) ----------
   // Web sürümünde reklam yok. Unity'de burada ödüllü reklam oynar; yalnızca oyuncu seçerse (Pofi kuralı).
   function video(done) {
-    var k = $('videoKatman'), n = 3;
-    k.hidden = false; $('videoSayac').textContent = n;
+    var n = 3;
+    pencereAc('videoKatman'); $('videoSayac').textContent = n;
     var iv = setInterval(function () {
       n--; $('videoSayac').textContent = Math.max(0, n);
-      if (n <= 0) { clearInterval(iv); k.hidden = true; done(); }
+      if (n <= 0) { clearInterval(iv); pencereKapat('videoKatman'); done(); }
     }, 1000);
   }
 
@@ -537,17 +547,21 @@
     for (var i = 0; i < gd.takvim.length; i++) {
       var durum = i < gd.gun ? 'alindi' : i === gd.gun ? (gd.hazir ? 'bugun' : 'alindi') : '';
       if (!gd.hazir && i === gd.gun) durum = 'yarin';
-      h += '<div class="gun ' + durum + (i === 6 ? ' buyuk-gun' : '') + '"><small>' + (i + 1) + '. gün</small><i class="ikon-ates" aria-hidden="true"></i><b>' + gd.takvim[i] + '</b>' +
-        (durum === 'alindi' ? '<em>✓</em>' : durum === 'yarin' ? '<em>yarın</em>' : '') + '</div>';
+      // v0.90: her gün ipe asılı bir etiket (hafif eğik); alınanda yeşil damga, bugünkü sarı ve parlak, 7. gün hediye
+      var egim = [-2.5, 2, -1.5, 2.5, -2, 1.5, -1][i % 7];
+      h += '<div class="gun ' + durum + (i === 6 ? ' buyuk-gun' : '') + '" style="--e:' + egim + 'deg" aria-label="' + (i + 1) + '. gün, ' + gd.takvim[i] + ' ateşböceği' +
+        (durum === 'alindi' ? ', alındı' : durum === 'bugun' ? ', bugün' : durum === 'yarin' ? ', yarın' : '') + '"><small>' + (i + 1) + '. gün</small>' +
+        (i === 6 ? IK.svg('hediye') : '<i class="ikon-ates" aria-hidden="true"></i>') + '<b>' + gd.takvim[i] + '</b>' +
+        (durum === 'alindi' ? '<span class="gun-damga" aria-hidden="true">' + IK.svg('tik') + '</span>' : durum === 'bugun' ? '<em aria-hidden="true">BUGÜN</em>' : durum === 'yarin' ? '<em aria-hidden="true">YARIN</em>' : '') + '</div>';
     }
     $('girisTakvim').innerHTML = h;
     $('girisAlBtn').hidden = $('girisVideoBtn').hidden = !gd.hazir;
     $('girisAlBtn').textContent = 'Al +' + gd.odul;
-    $('girisVideoBtn').textContent = '▶ Video izle, +' + gd.odul * 2 + ' al';
+    $('girisVideoBtn').innerHTML = IK.svg('video') + 'Video izle, +' + gd.odul * 2 + ' al';
     $('girisKapat').textContent = gd.hazir ? 'Sonra' : 'Kapat';
-    $('girisKatman').hidden = false;
+    pencereAc('girisKatman');
   }
-  function closeGiris() { $('girisKatman').hidden = true; if (current === 'ekAna') home2(); else if (current === 'ekGorevler') renderTasks(); }
+  function closeGiris() { pencereKapat('girisKatman'); if (current === 'ekAna') home2(); else if (current === 'ekGorevler') renderTasks(); }
   function home2() { $('toplamAtes').textContent = G.cuzdan().ates; }
   function girisAl(kat) {
     var r = G.girisAl(kat);
@@ -555,7 +569,7 @@
     closeGiris();
   }
   $('girisAlBtn').addEventListener('click', function () { girisAl(1); });
-  $('girisVideoBtn').addEventListener('click', function () { $('girisKatman').hidden = true; video(function () { girisAl(2); }); });
+  $('girisVideoBtn').addEventListener('click', function () { pencereKapat('girisKatman'); video(function () { girisAl(2); }); });
   $('girisKapat').addEventListener('click', closeGiris);
 
   // ---------- Market (v0.77, İstişare 4 Aşama 3) ----------
@@ -588,15 +602,15 @@
       var dh = urunDurum(hu);
       $('mHaftalik').className = 'm-haftalik n-' + EK.nadirlik(hu); $('mHaftalik').dataset.urun = hu.id;
       $('mHaftalikImg').src = resim(hu); $('mHaftalikAd').textContent = hu.ad;
-      $('mHaftalikSure').textContent = '⏱ ' + T.haftaKalan;
+      $('mHaftalikSure').innerHTML = IK.svg('saat') + T.haftaKalan;
       $('mHaftalikFiyat').innerHTML = dh.metin; $('mHaftalikFiyat').className = 'm-fiyat ' + dh.sinif;
     }
     // günlük vitrin: indirimli ürünün üstünde video şeridi
     var v = G.vitrin();
-    $('mVitrinSure').textContent = '⏱ ' + T.gunKalan;
+    $('mVitrinSure').innerHTML = IK.svg('saat') + T.gunKalan;
     $('mVitrin').innerHTML = v.urunler.map(function (id) {
       var it = EK.item(id), ind = id === v.indirimli && !sahipMi(id);
-      return urunKart(it, ind ? '<span class="m-serit">' + (G.vitrinIndirimde(id) ? '%50 İNDİRİM' : '▶ %50') + '</span>' : '');
+      return urunKart(it, ind ? '<span class="m-serit">' + (G.vitrinIndirimde(id) ? '%50 İNDİRİM' : IK.svg('video') + '%50') + '</span>' : '');
     }).join('');
     // kategoriler
     $('mSekmeler').innerHTML = Object.keys(EK.TURLER).map(function (t) { return '<button type="button" role="tab" data-mtur="' + t + '" aria-selected="' + (t === dolapTur) + '">' + EK.TURLER[t] + '</button>'; }).join('');
@@ -770,7 +784,7 @@
     $('kolIzgara').innerHTML = liste.map(function (it) {
       var has = sahipMi(it.id), on = kus[it.tur] === it.id, nad = EK.nadirlik(it);
       return '<button type="button" class="kol-kart n-' + nad + (has ? '' : ' kilit') + (it.id === kolSecili ? ' secili' : '') + '" data-kol-id="' + it.id + '" aria-label="' + it.ad + ', ' + EK.NADIRLIK[nad] + (on ? ', kuşanıldı' : has ? ', sende' : ', kilitli') + '">' +
-        '<img src="' + resim(it) + '" alt="">' + (on ? '<span class="tik" aria-hidden="true">✓</span>' : '') + (has ? '' : '<span class="kilit-ik" aria-hidden="true">🔒</span>') + (it.etkinlik ? '<span class="etk" aria-hidden="true">ETKİNLİK</span>' : '') + '<b>' + it.ad + '</b></button>';
+        '<img src="' + resim(it) + '" alt="">' + (on ? '<span class="tik" aria-hidden="true">' + IK.svg('tik') + '</span>' : '') + (has ? '' : '<span class="kilit-ik" aria-hidden="true">' + IK.svg('kilit') + '</span>') + (it.etkinlik ? '<span class="etk" aria-hidden="true">ETKİNLİK</span>' : '') + '<b>' + it.ad + '</b></button>';
     }).join('');
     kolBilgi();
   }
@@ -825,7 +839,7 @@
   function kartIsaret(g, isNext) {
     if (isNext) return '<span class="etiket">Sıradaki</span>';
     if (!g.b.done) return '';
-    return G.yildizHtml ? G.yildizHtml(g.y, 'bk-yildiz') : '<span class="tik" aria-hidden="true">✓</span>';
+    return G.yildizHtml ? G.yildizHtml(g.y, 'bk-yildiz') : '<span class="tik" aria-hidden="true">' + IK.svg('tik') + '</span>';
   }
   function nextLevel() { var best = save().best || {}, n = 1; while (best[n] && best[n].done) n++; return n; }
   function openLevels() {
@@ -848,7 +862,7 @@
     function kapat() {
       if (!grup) return;
       var say = grup.son - grup.ilk + 1;
-      h += '<div class="bgrup deneme"><div class="bgrup-ust"><b>Yeni ' + grup.ad + ' · deneme</b><span>' + grup.done + '/' + say + ' geçildi · ' + grup.y + '/' + say * 3 + '★</span></div>' +
+      h += '<div class="bgrup deneme"><div class="bgrup-ust"><b>Yeni ' + grup.ad + ' · deneme</b><span>' + grup.done + '/' + say + ' geçildi · ' + grup.y + '/' + say * 3 + IK.svg('yildiz') + '</span></div>' +
         (grup.ilk === 1 ? '<p class="bgrup-not">Kısa bölümler: her biri tek bir şey öğretir. Bugünkü bölümlerin ve ilerlemen değişmez.</p>' : '') +
         '<div class="cubuk ince" aria-hidden="true"><i style="width:' + Math.round(grup.done / say * 100) + '%"></i></div><div class="liste">' + grup.cards + '</div></div>';
     }
@@ -898,7 +912,7 @@
       }
       if (cards) {
         var pct = gTot ? Math.round(gGot / gTot * 100) : 0;
-        h += '<div class="bgrup"><div class="bgrup-ust"><b>' + (gr.ad ? gr.ad + ' · ' : '') + gr.a + '–' + gr.b + '</b><span>' + gDone + '/' + (gr.b - gr.a + 1) + ' geçildi · ' + gY + '/' + (gr.b - gr.a + 1) * 3 + '★</span></div>' +
+        h += '<div class="bgrup"><div class="bgrup-ust"><b>' + (gr.ad ? gr.ad + ' · ' : '') + gr.a + '–' + gr.b + '</b><span>' + gDone + '/' + (gr.b - gr.a + 1) + ' geçildi · ' + gY + '/' + (gr.b - gr.a + 1) * 3 + IK.svg('yildiz') + '</span></div>' +
           '<div class="cubuk ince" aria-hidden="true"><i style="width:' + pct + '%"></i></div><div class="liste">' + cards + '</div></div>';
       }
       ga = gr.b + 1;
@@ -917,6 +931,9 @@
   // Kilit yok (liste gibi her bölüme girilir). Bölüm geçildikten sonra harita açılınca Çıra ip atıp bir üst halkaya atlar
   // (save.haritaSon: haritada en son gösterilen halka; yalnız görünüş). Liste düğmesi bugünkü bölüm listesini açar.
   var HR = { ARALIK: 92, DIP: 190, UST: 240, XS: [0.30, 0.56, 0.74, 0.62, 0.34, 0.50], BOLGE: ['tas', 'maden', 'kristal', 'kule'] };
+  // v0.90: tek duvar. Tuğlalar her yerde aynı (simetrik, yarı saydam); altındaki renk yukarı doğru bölgeden bölgeye yavaşça geçer.
+  // İkinci yolculuk aynı sırayla, biraz daha gece. Sıradaki bölümün üstü giderek kararır: yukarıdaki bölümler zor seçilir.
+  var HR_RENK = ['#222b2d', '#30241a', '#251f45', '#1b2a44'], HR_RENK2 = ['#1c2330', '#2a1f28', '#211b3d', '#17223a'];
   var hrKonum = {}, hrH = 0, hrCiraN = 1, hrRaf = 0, hrUcus = null, hrSavrulT = 0, hrSonW = 0, hrAcikN = 0;
   var HR_IK = {
     gunes: '<svg class="hr-isaret" viewBox="0 0 26 26" aria-hidden="true"><g stroke-linecap="round"><path d="M13 2v3M13 21v3M2 13h3M21 13h3M5.2 5.2l2.1 2.1M18.7 18.7l2.1 2.1M5.2 20.8l2.1-2.1M18.7 7.3l2.1-2.1" stroke="#15112a" stroke-width="5"/><path d="M13 2v3M13 21v3M2 13h3M21 13h3M5.2 5.2l2.1 2.1M18.7 18.7l2.1 2.1M5.2 20.8l2.1-2.1M18.7 7.3l2.1-2.1" stroke="#ffe066" stroke-width="2.2"/></g><circle cx="13" cy="13" r="5.6" fill="#ffe066" stroke="#15112a" stroke-width="2.4"/></svg>',
@@ -949,12 +966,13 @@
       var bolge = HR.BOLGE[b.g % 4], ikinci = b.g >= 4, a = b.g * 6 + 1, son = Math.min(G.bolumSayi, a + 5), top = 0;
       for (var m = a; m <= son; m++) top += gs[m].y;
       var ad = String(G.bolgeAdi(a)).replace(' · ikinci yolculuk', '') + (ikinci ? ' · II' : '');
-      h += '<div class="hr-bant b-' + bolge + (ikinci ? ' ikinci' : '') + '" style="top:' + hrUstten(b.ust) + 'px;height:' + (b.ust - b.alt) + 'px"></div>';
       var ky = hrUstten(b.tabelaY + 30);
       h += '<div class="hr-bkiris" style="top:' + ky + 'px" aria-hidden="true"></div>';
-      h += '<div class="hr-btabela" style="top:' + (ky + 32) + 'px;--egim:' + (b.g % 2 ? 2 : -2) + 'deg"><b>' + ad + '</b><small>' + a + '–' + son + ' · ' + top + '/' + (son - a + 1) * 3 + '★</small></div>';
+      h += '<div class="hr-btabela" style="top:' + (ky + 32) + 'px;--egim:' + (b.g % 2 ? 2 : -2) + 'deg"><b>' + ad + '</b><small>' + a + '–' + son + ' · ' + top + '/' + (son - a + 1) * 3 + IK.svg('yildiz') + '</small></div>';
       if (b.ikinciBas) h += '<div class="hr-btabela buyuk" style="top:' + hrUstten(b.alt + 78) + 'px;--egim:-1.5deg"><b>İkinci yolculuk</b><small>Su baştan izler</small></div>';
     });
+    var renk = bantlar.slice().reverse().map(function (b) { return (b.g >= 4 ? HR_RENK2 : HR_RENK)[b.g % 4] + ' ' + (hrUstten((b.alt + b.ust) / 2) / hrH * 100).toFixed(2) + '%'; });
+    duvar.style.setProperty('--hr-renk', 'linear-gradient(180deg, ' + renk.join(', ') + ')');
     if (hrKonum[24]) h += '<div class="hr-gun" style="top:' + hrUstten(hrKonum[24].y + 190) + 'px;height:300px" aria-hidden="true"></div>';
     h += '<div class="hr-gun tepe" style="top:60px;height:' + (HR.UST + 80) + 'px" aria-hidden="true"></div>';
     // ip: geçilen kısım krem, sonrası noktalı; halkalar arasında hafif sarkar
@@ -976,6 +994,8 @@
         (durum === 'siradaki' ? '<span class="hr-sira" aria-hidden="true">Sıradaki</span>' : '') + '</button>';
     }
     h += '<div class="hr-dip" aria-hidden="true"></div>';
+    // karanlık: sıradaki halkanın biraz üstünden tepeye doğru koyulaşır (halkalar dokunulabilir kalır)
+    if (hrKonum[sira]) h += '<div class="hr-karanlik" style="height:' + Math.max(0, hrUstten(hrKonum[sira].y) - 54) + 'px" aria-hidden="true"></div>';
     h += '<svg class="hr-atis" width="' + W + '" height="' + hrH + '" aria-hidden="true"><line id="hrAtisIp" x1="0" y1="0" x2="0" y2="0"/></svg>';
     h += '<canvas class="hr-cira" id="hrCira" width="128" height="168" aria-hidden="true"></canvas>';
     duvar.innerHTML = h;
@@ -1477,11 +1497,11 @@
   var GERI = { hoook: 'geri' }, cikisT = 0;
   function geriKur() { try { if (!(history.state && history.state.hoook === 'geri')) history.pushState(GERI, ''); } catch (e) {} }
   function geriIsle() {
-    if (!$('videoKatman').hidden) return true; // video sürerken geri bir şey yapmaz
+    if (pencereAcik('videoKatman')) return true; // video sürerken geri bir şey yapmaz
     if (!$('urunKatman').hidden) { urunKapat(); return true; }
     if (!$('hrKatman').hidden) { hrKapat(); return true; }
-    if (!$('hakKatman').hidden) { $('hakKapat').click(); return true; }
-    if (!$('girisKatman').hidden) { $('girisKapat').click(); return true; }
+    if (pencereAcik('hakKatman')) { $('hakKapat').click(); return true; }
+    if (pencereAcik('girisKatman')) { $('girisKapat').click(); return true; }
     if (G.geri && G.geri()) return true;
     if (['ekAcilis', 'ekGiris', 'ekTanitim', 'ekAna', 'oyun'].indexOf(current) < 0) { home(); return true; }
     return false;

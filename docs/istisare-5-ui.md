@@ -35,7 +35,7 @@ Bütün özellikler ve akışlar aynı kalır: Hikâye, Günlük, Haftalık, Gö
 
 1. ✅ (v0.82, telefonda deneme bekliyor) **Tasarım dili + ana ekran + alt sekme çubuğu** (asılı etiketler, salınım, yeni yazı tipi). OYNA uzun ipte ekranın ortasına iner (başparmağa yakın); bölüm adı OYNA etiketinde, bölüm çipi altına zincirli.
 2. ✅ (v0.84, telefonda deneme bekliyor) **Market ve Koleksiyon** (çıkartma kartlar, ürün sayfası).
-3. **Yarışma, Profil, pencereler ve durumlar.** ✅ İlk kısım (v0.89, telefonda deneme bekliyor): Yarışma sekmesi Sıralama oldu (Muhammed'in isteği, 25/11: Günlük ve Haftalık ana ekranda, sekme skor tablosu), Profil oyuncu kartı, tablonun yükleniyor/boş/hata/kapalı durumları, bütün sayfa ekranlarında simetrik tek renk tuğla duvar. Kalan: pencereler (günlük giriş, hak bitti) yukarıdan iple inen tahta; Görevler, İstatistikler, Ayarlar kartları.
+3. **Yarışma, Profil, pencereler ve durumlar.** ✅ İlk kısım (v0.89, telefonda deneme bekliyor): Yarışma sekmesi Sıralama oldu (Muhammed'in isteği, 25/11: Günlük ve Haftalık ana ekranda, sekme skor tablosu), Profil oyuncu kartı, tablonun yükleniyor/boş/hata/kapalı durumları, bütün sayfa ekranlarında simetrik tek renk tuğla duvar. Kalan: pencereler (günlük giriş, hak bitti) yukarıdan iple inen tahta; Görevler, İstatistikler, Ayarlar kartları. ✅ Kalan da yapıldı (v0.90): iple inen pano pencereler (günlük giriş baştan, hak, video, duraklatma), Görevler, İstatistikler, Ayarlar, Bölüm listesi, oyun içi kartlar, çizilmiş SVG ikonlar, tam ekran oyun alanı, harita tek duvar. **Aşama 3 tamam.**
 4. Açılış, tanıtım ve sonuç kartları; dört ekran boyutunda tarama.
 
 Her aşama ayrı sürüm; telefonda denenip onaylanınca sonraki.

@@ -167,6 +167,9 @@
     $('sesBtn').setAttribute('aria-label', save.mute ? 'Sesi aç' : 'Sesi kapat');
   }
 
+  // v0.90: arayüz ikonları (js/ikon.js); yazı simgeleri yerine çizilmiş SVG
+  function IKS(ad, cls) { return window.KuyuIkon ? window.KuyuIkon.svg(ad, cls) : ''; }
+
   // ---------- titreşim (Android tarayıcıları; iOS Safari desteklemez, sessizce atlanır) ----------
   function buzz(pattern) {
     if (save.haptics === false || !navigator.vibrate) return;
@@ -185,13 +188,15 @@
   var K = 1, DPR = 1, viewW = 0, viewH = 0, brick = null;
 
   function layout() {
+    // v0.90: üst şerit ve alt ipucu oyunun içine taşındı; tuval bütün ekranı doldurur (çok uzun ekranlarda 2,3 oranında kalır, ortalanır)
     var box = $('sahne').getBoundingClientRect();
-    var w = Math.min(box.width, 460), h = box.height;
-    if (h / w > 2.1) h = w * 2.1;
+    var w = Math.min(box.width, 480), h = box.height;
+    if (h / w > 2.3) h = w * 2.3;
     if (h < 360) h = 360;
     viewW = Math.floor(w); viewH = Math.floor(h);
     DPR = Math.min(window.devicePixelRatio || 1, 2);
     canvas.style.width = viewW + 'px'; canvas.style.height = viewH + 'px';
+    canvas.style.top = Math.max(0, Math.round((box.height - viewH) / 2)) + 'px';
     canvas.width = Math.round(viewW * DPR); canvas.height = Math.round(viewH * DPR);
     K = viewW / CFG.W;
     buildBricks();
@@ -430,7 +435,14 @@
   // Meydan okuma bağlantısı tarih taşımaz: açıldığı gün geçerli kurala göre kurulur.
   var KOR_GUNLUK = '2026-11-24', KOR_HAFTALIK = '2026-11-30';
   function korAyar(key, bas) { var y = (key || todayKey()) >= bas; return { kor: y, cark: y, akinti: y }; } // kor halka (v0.69), döner çark (v0.70) ve akıntı sütunu (v0.71) aynı tarihten
-  function newEndlessDef() { return meydan ? (meydan.tur === 'h' ? GEN.createHaftalik(meydan.seed, korAyar(haftaKey(), KOR_HAFTALIK)) : GEN.createEndless(meydan.seed, null, korAyar(todayKey(), KOR_GUNLUK))) : dailyKey ? GEN.createEndless(dailySeed(dailyKey), GEN.gunKurali(dailyKey), korAyar(dailyKey, KOR_GUNLUK)) : weekKey ? GEN.createHaftalik(tohum('kuyu-haftalik-' + weekKey), korAyar(weekKey, KOR_HAFTALIK)) : GEN.createEndless((Date.now() ^ (Math.random() * 1e9)) >>> 0, null, { kor: true, cark: true, akinti: true }); }
+  // Halka ustalığı (v0.90) ustalık payına yeni günden (Günlük) ve yeni haftadan (Haftalık) itibaren katılır: o gün/hafta oynanmış puanlar aynı ölçüyle kalır
+  var HALKA_GUNLUK = '2026-11-26', HALKA_HAFTALIK = '2026-11-30';
+  function newEndlessDef() {
+    var d = newEndlessDef0();
+    d.halkaUstalik = dailyKey ? dailyKey >= HALKA_GUNLUK : weekKey ? weekKey >= HALKA_HAFTALIK : meydan ? (meydan.tur === 'h' ? haftaKey() >= HALKA_HAFTALIK : todayKey() >= HALKA_GUNLUK) : true;
+    return d;
+  }
+  function newEndlessDef0() { return meydan ? (meydan.tur === 'h' ? GEN.createHaftalik(meydan.seed, korAyar(haftaKey(), KOR_HAFTALIK)) : GEN.createEndless(meydan.seed, null, korAyar(todayKey(), KOR_GUNLUK))) : dailyKey ? GEN.createEndless(dailySeed(dailyKey), GEN.gunKurali(dailyKey), korAyar(dailyKey, KOR_GUNLUK)) : weekKey ? GEN.createHaftalik(tohum('kuyu-haftalik-' + weekKey), korAyar(weekKey, KOR_HAFTALIK)) : GEN.createEndless((Date.now() ^ (Math.random() * 1e9)) >>> 0, null, { kor: true, cark: true, akinti: true }); }
   function reset() {
     // Günlük ve Haftalık Kuyu (v0.64): her koşu bir deneme hakkı harcar (Yeniden dene ve Baştan başla dahil). Hak yoksa
     // koşu başlamaz; hak penceresi açılır (video ile yenileme ya da Hikâye'ye devam). Meydan okuma hak harcamaz.
@@ -440,6 +452,7 @@
       persist();
     }
     istatBitir('terk'); // Baştan başla / Yeni koşu
+    $('ipucu').classList.remove('gizli'); // v0.90: ipucu balonu her koşu başında görünür, ilk atışta kaybolur
     if (mode === 'endless') def = newEndlessDef();
     sim = E.createSim(def); hisSifirla(); anlarSifirla();
     notKur();
@@ -729,6 +742,17 @@
         burst(e.x, e.y + 10, 8, 'rgb(' + COL_AKINTI + ')', 120, 0.5, -200);
         floatText(e.x, e.y - 26, 'AKINTI!', 'rgb(' + COL_AKINTI + ')', 15);
       }
+      else if (e.type === 'halkaUsta') {
+        // halka ustalığı: küçük renkli "+ustalık" yazısı ve kıvılcım; ilk seferde oyunu durdurmayan kısa açıklama
+        if (sim.def.halkaUstalik === false) continue;
+        var hRenk = 'rgb(' + (e.tur === 'akinti' ? COL_AKINTI : CEKIM_RENK[e.tur] || '255,224,102') + ')';
+        floatText(e.x, e.y + 24, '+ustalık', hRenk, 12);
+        burst(e.x, e.y, 6, hRenk, 110, 0.35, -20);
+        if (!save.seen.halkaUsta && window.KuyuScreens && window.KuyuScreens.hikaye) {
+          save.seen.halkaUsta = 1; persist();
+          window.KuyuScreens.hikaye('Halka ustalığı!', 'Özel halkayı işine yarayacak biçimde kullandın. Hız halkasından bırakmak, çark, yay, kordan akışla ayrılmak ve akıntı TAM bırakış gibi ödül çarpanını artırır.', 6000);
+        }
+      }
       else if (e.type === 'carkItis') {
         // çark fırlattı: yükselen ıslık, turkuaz kıvılcım
         tone(300, 0.22, 'triangle', 0.05, 900); buzz(14);
@@ -955,6 +979,24 @@
   }
 
   // Hız halkası: mavi halka ve yukarı oklar. Tutun, bırakınca yukarı fırlarsın.
+  // Halka ustalığı (v0.90): menzile giren özel halkanın çevresinde kendi renginde yavaşça nefes alan bir hale.
+  // Yalnız görüntü: nişan kuralı ve hedef seçimi aynı; oyuncunun gözü işine yarayacak halkaya gitsin diye.
+  var CEKIM_RENK = { hiz: '111,211,255', kor: '255,122,47', cark: '143,211,199', yay: '127,229,142', firlat: '255,190,90' };
+  function cekimTur(r) { return r.hiz ? 'hiz' : r.kor ? 'kor' : r.cark ? 'cark' : r.yay != null ? 'yay' : r.firlat ? 'firlat' : null; }
+  function drawCekim(r, t) {
+    var tur = cekimTur(r); if (!tur || !sim || sim.status !== 'play') return;
+    if (sim.rope && sim.rope.ref === r) return;
+    var dx = r.x - sim.p.x, dy = r.y - sim.p.y, d = Math.sqrt(dx * dx + dy * dy);
+    if (d > CFG.HOOK_MAX || d < 26) return;
+    var yak = 1 - Math.max(0, (d - CFG.HOOK_MAX * 0.6) / (CFG.HOOK_MAX * 0.4)); // menzilin ucunda soluk, yaklaştıkça belirgin
+    var a = (reduceMotion ? 0.26 : 0.2 + 0.12 * Math.sin(t / 260 + r.x * 0.05)) * yak;
+    ctx.save();
+    ctx.lineWidth = 6; ctx.strokeStyle = 'rgba(' + CEKIM_RENK[tur] + ',' + a.toFixed(3) + ')';
+    ctx.beginPath(); ctx.arc(r.x, r.y, CFG.RING_R + 9, 0, Math.PI * 2); ctx.stroke();
+    ctx.lineWidth = 2; ctx.strokeStyle = 'rgba(' + CEKIM_RENK[tur] + ',' + (a * 0.7).toFixed(3) + ')';
+    ctx.beginPath(); ctx.arc(r.x, r.y, CFG.RING_R + 15, 0, Math.PI * 2); ctx.stroke();
+    ctx.restore();
+  }
   function drawSpeedRing(r, t) {
     var a = 0.7 + 0.3 * Math.sin(t / 200 + r.y);
     ctx.lineWidth = 2.6; ctx.strokeStyle = 'rgba(111,211,255,' + a + ')';
@@ -1798,7 +1840,7 @@
     sim.buttons.forEach(drawButton);
     drawAkintilar(t, vh);
     drawCarklar(t, vh);
-    sim.rings.forEach(function (r) { if (r.y > cam - 30 - (r.sw ? CFG.SARKAC_L : 0) && r.y < cam + vh + 30) { if (r.kapi) { drawGate(r, t); return; } if (r.gecit || r.cikis) { drawPortal(r, t); return; } if (r.sw) drawSwingChain(r); drawRing(r.x, r.y); if (r.kor) drawKorHalka(r, t); if (r.cark) drawCarkHalka(r); if (r.yay != null) drawSpringRing(r, t); if (r.ff && !r.got) { drawFireflyRing(r, t); if (r === notHalka && notAktif) drawNot(r, t); } if (r.hiz) drawSpeedRing(r, t); if (r.firlat) drawFirlatRing(r, t); if (r.fener) drawFener(r, t); } });
+    sim.rings.forEach(function (r) { if (r.y > cam - 30 - (r.sw ? CFG.SARKAC_L : 0) && r.y < cam + vh + 30) { if (r.kapi) { drawGate(r, t); return; } if (r.gecit || r.cikis) { drawPortal(r, t); return; } if (r.sw) drawSwingChain(r); drawCekim(r, t); drawRing(r.x, r.y); if (r.kor) drawKorHalka(r, t); if (r.cark) drawCarkHalka(r); if (r.yay != null) drawSpringRing(r, t); if (r.ff && !r.got) { drawFireflyRing(r, t); if (r === notHalka && notAktif) drawNot(r, t); } if (r.hiz) drawSpeedRing(r, t); if (r.firlat) drawFirlatRing(r, t); if (r.fener) drawFener(r, t); } });
     sim.fireflies.forEach(function (f) { if (f.y > cam - 20 && f.y < cam + vh + 20) drawFirefly(f, t); });
     sim.boxes.forEach(drawBox);
     drawVurgu(t);
@@ -2080,12 +2122,12 @@
   function yildizIpucu(b, ffT) {
     var n = yildiz(b, ffT);
     if (n >= 3 || n < 1) return '';
-    if (n === 1) return '2★ için bir madalya kazan';
+    if (n === 1) return '2' + IKS('yildiz') + ' için bir madalya kazan';
     var eksik = [];
     if (!(ffT > 0 && (b.ff || 0) >= ffT)) eksik.push('Ateşböceği');
     if (!b.perfect) eksik.push('Kusursuz');
     if (!b.flow) eksik.push('Akış');
-    return '3★ için ' + eksik.join(' ve ') + ' kaldı';
+    return '3' + IKS('yildiz') + ' için ' + eksik.join(' ve ') + ' kaldı';
   }
   // Bölüm sonu madalyası; bu oyunda ilk kez kazanıldıysa "YENİ" etiketi ve küçük bir zıplama.
   function medal(ok, icon, title, sub, isNew, i) {
@@ -2197,7 +2239,7 @@
       '<div class="sonuc-bas"><div class="sonuc-baslik"><h2>Gün ışığı!</h2>' + yildizHtml(yYeni, 'sonuc-yildiz') +
       (yYeni > yEski ? '<em class="yildiz-yeni">YENİ</em>' : '') + '</div><span>' + noYazi(levelNo) + '. ' + def.name + (def.ikinci ? ' · ikinci yolculuk' : def.kisa ? ' · deneme' : '') + (first ? ' · ilk kez geçildi' : deaths ? ' · ' + (deaths + 1) + '. deneme' : '') + '</span></div>' +
       '<div class="odul-satir"><i class="ikon-odul" aria-hidden="true"></i><b id="odulSayi">0</b>' + (recReward ? '<em class="rekor-etiket">REKOR</em>' : '') + '</div>' +
-      '<p class="odul-hesap">' + (mult > 1 ? base + ' × x' + fmt(mult, 2) + ' çarpan' + (E.ustalikPay(sim) > 0 ? ' (hız x' + fmt(E.hizPay(sim), 2) + ' + ustalık ' + fmt(E.ustalikPay(sim), 2) + ')' : '') : 'Bölüm ödülü · hızlanırsan ve TAM bırakırsan çarpan artar') + '</p>' +
+      '<p class="odul-hesap">' + (mult > 1 ? base + ' × x' + fmt(mult, 2) + ' çarpan' + (E.ustalikPay(sim) > 0 ? ' (hız x' + fmt(E.hizPay(sim), 2) + ' + ustalık ' + fmt(E.ustalikPay(sim), 2) + (sim.halkaUsta ? ', ' + sim.halkaUsta + ' halka ustalığı' : '') + ')' : '') : 'Bölüm ödülü · hızlanırsan, TAM bırakırsan ve özel halkaları kullanırsan çarpan artar') + '</p>' +
       '<div class="madalyalar">' +
       medal(ffT > 0 && ff >= ffT, ICON.ff, 'Ateşböceği', ff + '/' + ffT, newFF, 0) +
       medal(perfect, ICON.perfect, 'Kusursuz', sim.donus ? sim.donus + ' kez fenere döndün' : shots + '/' + def.par + ' atış', newPerfect, 1) +
@@ -2236,7 +2278,7 @@
     $('kart').innerHTML =
       '<h2>Devam?</h2><p class="devam-alt">' + E.meters(sim) + ' m · ' + (n + 1) + '. devam (bir koşuda en çok ' + EKO.DEVAM_BEDEL.length + ')</p>' +
       '<div class="devam-sayac" aria-hidden="true"><svg viewBox="0 0 44 44"><circle cx="22" cy="22" r="19"></circle><circle class="dolu" cx="22" cy="22" r="19"></circle></svg><b id="devamSn">5</b></div>' +
-      (n === 0 ? '<button type="button" class="ana buyuk genis" id="devamVideo">▶ Video izle, devam et</button>' : '') +
+      (n === 0 ? '<button type="button" class="ana buyuk genis" id="devamVideo">' + IKS('video') + 'Video izle, devam et</button>' : '') +
       '<button type="button" class="' + (n === 0 ? 'genis' : 'ana buyuk genis') + '" id="devamAtes"' + (yeter ? '' : ' disabled') + '><i class="ikon-ates" aria-hidden="true"></i> ' + bedel + ' ateşböceği ile devam' + (yeter ? '' : ' · ' + (bedel - bakiye) + ' eksik') + '</button>' +
       '<button type="button" class="metin-btn" id="devamGec">Geç</button>';
     $('katman').classList.remove('alt');
@@ -2267,7 +2309,7 @@
   function yenidenYazi() {
     if (meydan || !(dailyKey || weekKey)) return 'Bir daha dene';
     var h = EKO.hakDurum(save, dailyKey ? 'gunluk' : 'haftalik', dailyKey || weekKey);
-    return h.kalan > 0 ? 'Bir daha dene · ' + h.kalan + ' hak' : h.son ? 'Bugünlük bu kadar' : '▶ Deneme yenile';
+    return h.kalan > 0 ? 'Bir daha dene · ' + h.kalan + ' hak' : h.son ? 'Bugünlük bu kadar' : IKS('video') + 'Deneme yenile';
   }
   function showEndlessResult() {
     resultShown = true;
@@ -2297,7 +2339,7 @@
       var yz = EKO.gunYildizKaydet(save, dailyKey, m), hedef = EKO.gunHedef(dailyKey);
       EKO.gecmisYaz(save, 'gunluk', dailyKey, { puan: d.best, metre: d.meters, yildiz: yz.yildiz });
       var yildizHtml = '<div class="gun-yildiz" aria-label="Günün hedefi ' + hedef.metre + ' metre, ' + yz.yildiz + ' yıldız"><span class="yildizlar">' +
-        [0, 1, 2].map(function (i) { return '<i class="' + (i < yz.yildiz ? 'var' : '') + '">★</i>'; }).join('') + '</span><small>Günün hedefi ' + hedef.esik.join(' · ') + ' m' +
+        [0, 1, 2].map(function (i) { return '<i class="' + (i < yz.yildiz ? 'var' : '') + '">' + IKS('yildiz') + '</i>'; }).join('') + '</span><small>Günün hedefi ' + hedef.esik.join(' · ') + ' m' +
         (yz.odul ? ' · +' + yz.odul + ' ateşböceği' : '') + '</small></div>' +
         (seriOdul ? '<p class="seri-odul">' + st.count + ' günlük seri! +' + seriOdul + ' ateşböceği</p>' : '') +
         (donmaKul ? '<p class="seri-odul">Dün kaçırdın ama donma hakkın seriyi korudu.</p>' : '');
@@ -2318,7 +2360,7 @@
       // haftanın hedefi (v0.66): puanla 1–3 yıldız, her yıldız haftada bir kez ödül
       var hy = EKO.haftaYildizKaydet(save, weekKey, sc), hh = EKO.haftaHedef(weekKey);
       var haftaYildizHtml = '<div class="gun-yildiz" aria-label="Haftanın hedefi ' + hh.puan + ' puan, ' + hy.yildiz + ' yıldız"><span class="yildizlar">' +
-        [0, 1, 2].map(function (i) { return '<i class="' + (i < hy.yildiz ? 'var' : '') + '">★</i>'; }).join('') + '</span><small>Haftanın hedefi ' + hh.esik.join(' · ') + ' puan' +
+        [0, 1, 2].map(function (i) { return '<i class="' + (i < hy.yildiz ? 'var' : '') + '">' + IKS('yildiz') + '</i>'; }).join('') + '</span><small>Haftanın hedefi ' + hh.esik.join(' · ') + ' puan' +
         (hy.odul ? ' · +' + hy.odul + ' ateşböceği' : '') + '</small></div>';
       isRecord = hk.rekor; recM = false;
       title = hk.ligAtladi ? hd.ligAd + ' ligi!' : isRecord && hd.tries > 1 ? 'Haftanın rekoru!' : isRecord ? 'Haftanın ilk puanı' : 'Su yetişti';
@@ -2528,20 +2570,37 @@
     var m = E.meters(sim);
     if (mode === 'endless') {
       $('duraklatBilgi').textContent = (dailyKey ? 'Günlük Kuyu' : weekKey ? 'Haftalık Kuyu' : 'Sonsuz Kuyu') + ' · ' + m + ' m · ' + E.score(sim) + ' puan · akış x' + sim.combo;
-      $('bastanBtn').textContent = 'Yeni koşu';
+      $('bastanYazi').textContent = 'Yeni koşu';
       $('dAtlaBtn').hidden = true;
     } else {
       var depth = Math.max(0, Math.round(sim.p.y / 20));
       $('duraklatBilgi').textContent = noYazi(levelNo) + '. ' + def.name + ' · ' + depth + ' m · atış ' + (sim.shots - sim.misses) + '/' + def.par +
         ' · ateşböceği ' + E.fireflyCount(sim) + '/' + sim.fireflies.length;
-      $('bastanBtn').textContent = 'Baştan başla';
+      $('bastanYazi').textContent = 'Baştan başla';
       $('dAtlaBtn').hidden = false;
     }
     syncPauseToggles();
+    durAyarGoster(false);
+    $('duraklat').classList.remove('kapaniyor');
     $('duraklat').hidden = false;
     $('devamBtn').focus({ preventScroll: true });
   }
-  function closePause() { pauseOpen = false; $('duraklat').hidden = true; MZ.kis(false); }
+  // v0.90: pano kapanırken yukarı çekilir (hareket azaltma açıksa hemen gizlenir); oyun beklemeden sürer
+  var durKapaT = 0;
+  function closePause() {
+    pauseOpen = false; MZ.kis(false);
+    var k = $('duraklat'); clearTimeout(durKapaT);
+    if (k.hidden || reduceMotion) { k.hidden = true; return; }
+    k.classList.add('kapaniyor');
+    durKapaT = setTimeout(function () { k.hidden = true; k.classList.remove('kapaniyor'); }, 230);
+  }
+  // Dişli: duraklatma panosunda ses ve titreşim anahtarları (Ayarlar'daki anahtarların aynısı)
+  function durAyarGoster(acik) {
+    $('durAna').hidden = acik; $('durAyar').hidden = !acik;
+    $('dAyarBtn').setAttribute('aria-expanded', acik ? 'true' : 'false');
+    $('duraklatBaslik').textContent = acik ? 'Ayarlar' : 'Duraklatıldı';
+    (acik ? $('dMuzikBtn') : $('devamBtn')).focus({ preventScroll: true });
+  }
   function resumeGame() {
     if (!pauseOpen) return;
     closePause();
@@ -2550,11 +2609,8 @@
   }
   function syncPauseToggles() {
     $('dSesBtn').setAttribute('aria-checked', save.mute ? 'false' : 'true');
-    $('dSesBtn').textContent = save.mute ? 'Efekt kapalı' : 'Efekt açık';
     $('dMuzikBtn').setAttribute('aria-checked', muzikAcik() ? 'true' : 'false');
-    $('dMuzikBtn').textContent = muzikAcik() ? 'Müzik açık' : 'Müzik kapalı';
     $('dTitresimBtn').setAttribute('aria-checked', save.haptics === false ? 'false' : 'true');
-    $('dTitresimBtn').textContent = save.haptics === false ? 'Titreşim kapalı' : 'Titreşim açık';
   }
   // Sonuç kartı açıkken (bölüm bitti / yakalandın) duraklatmanın anlamı yok: menüye döner.
   // Bölüm sonu yürüyüşü ya da bölge finali sürerken menü düğmesi sonuç kartını açar (bölüm kaydedilmeden çıkılmasın).
@@ -2570,6 +2626,8 @@
   $('dSesBtn').onclick = function () { save.mute = !save.mute; persist(); setMuteIcon(); syncPauseToggles(); };
   $('dMuzikBtn').onclick = function () { muzikDegis(); syncPauseToggles(); };
   $('dTitresimBtn').onclick = function () { save.haptics = save.haptics === false; persist(); syncPauseToggles(); };
+  $('dAyarBtn').onclick = function () { durAyarGoster($('durAyar').hidden); };
+  $('dAyarGeri').onclick = function () { durAyarGoster(false); };
   // Telefon arka plana alınınca (bildirim, arama, uygulama değişimi) oyun kendiliğinden durur.
   document.addEventListener('visibilitychange', function () {
     if (audio) { if (document.hidden) audio.suspend(); else if (!save.mute || muzikAcik()) audio.resume(); }
@@ -2588,6 +2646,7 @@
     ac();
     if (finalT !== null) { if (finalT > 1) finalBitir(); return; }
     if (!sim || paused || sim.status !== 'play') return;
+    $('ipucu').classList.add('gizli');
     active = ev.pointerId;
     try { canvas.setPointerCapture(ev.pointerId); } catch (e) {}
     // Tek el: dokunuşun ekrandaki yatay yeri yönü seçer (sol / orta / sağ), nişan yardımı hedefi bulur.
@@ -2627,6 +2686,7 @@
     if (e.target && e.target.tagName === 'INPUT') return;
     if (introOpen) { if (e.key === 'Enter' || e.key === ' ' || e.key === 'Escape') { e.preventDefault(); closeIntro(false); } return; }
     if (pauseOpen) {
+      if (!$('durAyar').hidden) { if (e.key === 'Escape') { e.preventDefault(); durAyarGoster(false); } return; }
       if (e.key === 'Escape' || e.key === 'Enter' || e.key === ' ') { e.preventDefault(); resumeGame(); }
       else if (e.key === 'r' || e.key === 'R') { closePause(); reset(); }
       return;
@@ -2750,7 +2810,7 @@
     geri: function () {
       if ($('oyunEkrani').hidden) return false;
       if (introOpen) { closeIntro(false); return true; }
-      if (pauseOpen) { resumeGame(); return true; }
+      if (pauseOpen) { if (!$('durAyar').hidden) durAyarGoster(false); else resumeGame(); return true; }
       if (sim && sim.status === 'play' && !paused && $('katman').hidden) { pauseGame(); return true; }
       goHome(); return true;
     },

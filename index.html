@@ -16,22 +16,22 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@600;800&family=Figtree:wght@400;600;800&family=Lilita+One&display=swap">
-<link rel="stylesheet" href="css/kuyu.css?v=0.89">
-<link rel="stylesheet" href="css/ekranlar.css?v=0.89">
-<link rel="stylesheet" href="css/arayuz.css?v=0.89">
+<link rel="stylesheet" href="css/kuyu.css?v=0.90">
+<link rel="stylesheet" href="css/ekranlar.css?v=0.90">
+<link rel="stylesheet" href="css/arayuz.css?v=0.90">
 </head>
 <body>
+<!-- v0.90: oyun alanı tam ekran; bölüm adı, göstergeler ve duraklat düğmesi oyunun içinde, saydam çıkartmalar.
+     İpucu altta küçük saydam balon: ilk dokunuşa kadar görünür, dokunuşu engellemez. -->
 <div class="app" id="oyunEkrani" hidden>
-  <div class="serit">
-    <div class="bilgi"><b id="baslik">Hoook</b><div class="cipler" id="cipler" aria-live="off"></div></div>
-    <div class="puan" id="puan" hidden>0<small>puan</small></div>
-    <button type="button" id="menuBtn" aria-label="Duraklat" title="Duraklat">
-      <svg viewBox="0 0 20 20" aria-hidden="true"><rect x="5" y="4" width="3.4" height="12" rx="1.2" fill="currentColor"/><rect x="11.6" y="4" width="3.4" height="12" rx="1.2" fill="currentColor"/></svg>
-    </button>
-  </div>
-
   <div class="sahne" id="sahne">
     <canvas id="oyun" aria-label="Hoook. Bir noktaya bas ve basılı tut: kanca oraya fırlar, ipe sarılırsın. Bırakınca düşersin."></canvas>
+    <div class="serit">
+      <div class="bilgi"><b id="baslik">Hoook</b><div class="cipler" id="cipler" aria-live="off"></div></div>
+      <div class="puan" id="puan" hidden>0<small>puan</small></div>
+      <button type="button" id="menuBtn" aria-label="Duraklat" title="Duraklat" data-ik="duraklat"></button>
+    </div>
+    <p class="ipucu" id="ipucu"></p>
     <div class="katman" id="katman" hidden><div class="kart" id="kart"></div></div>
     <!-- Tanıtım kartı: yeni bir şey ilk kez görülünce oyun kısa süre durur -->
     <div class="katman alt tanitim-katman" id="yeniKatman" hidden role="dialog" aria-modal="true" aria-labelledby="yeniBaslik">
@@ -43,29 +43,28 @@
         <button type="button" class="ana buyuk genis" id="yeniTamam">Anladım</button>
       </div>
     </div>
-    <!-- Duraklatma paneli: oyun ve su durur, tutunduğun ip bırakılmaz -->
-    <div class="katman duraklat" id="duraklat" hidden role="dialog" aria-modal="true" aria-labelledby="duraklatBaslik">
+    <!-- Duraklatma (v0.90): iki iple inen pano. Üç ana düğme: Devam et, Baştan başla, Ana menü; altında küçük "Bölümü atla".
+         Ses ve titreşim dişliyle açılan Ayarlar panosunda (oyundan çıkmadan). Oyun ve su durur, tutunduğun ip bırakılmaz -->
+    <div class="katman duraklat pano" id="duraklat" hidden role="dialog" aria-modal="true" aria-labelledby="duraklatBaslik">
       <div class="kart">
-        <h2 id="duraklatBaslik">Duraklatıldı</h2>
-        <p id="duraklatBilgi"></p>
-        <button type="button" class="ana buyuk genis" id="devamBtn">Devam et</button>
-        <div class="dur-iki">
-          <button type="button" id="bastanBtn">Baştan başla</button>
-          <button type="button" id="dAtlaBtn">Bölümü atla</button>
+        <h2 class="pano-tabela" id="duraklatBaslik">Duraklatıldı</h2>
+        <button type="button" class="pano-disli" id="dAyarBtn" aria-label="Ayarlar: ses ve titreşim" aria-expanded="false" data-ik="disli"></button>
+        <div class="dur-ana" id="durAna">
+          <p class="pano-bilgi" id="duraklatBilgi"></p>
+          <button type="button" class="ana buyuk genis" id="devamBtn" data-ik="oynat">Devam et</button>
+          <button type="button" class="genis pano-dugme krem" id="bastanBtn" data-ik="bastan"><span id="bastanYazi">Baştan başla</span></button>
+          <button type="button" class="genis pano-dugme mavi" id="anaMenuBtn" data-ik="ev">Ana menü</button>
+          <button type="button" class="metin-btn" id="dAtlaBtn">Bölümü atla ›</button>
         </div>
-        <div class="dur-iki">
-          <button type="button" class="anahtar-dugme" id="dMuzikBtn" role="switch" aria-checked="true">Müzik</button>
-          <button type="button" class="anahtar-dugme" id="dSesBtn" role="switch" aria-checked="true">Efekt</button>
+        <div class="dur-ayar" id="durAyar" hidden>
+          <div class="ayar-satir"><div><b>Müzik</b><span>Ortam müziği</span></div><button type="button" class="anahtar" id="dMuzikBtn" role="switch" aria-checked="true" aria-label="Müzik"><i></i></button></div>
+          <div class="ayar-satir"><div><b>Ses efektleri</b><span>Kanca, akış, ateşböceği</span></div><button type="button" class="anahtar" id="dSesBtn" role="switch" aria-checked="true" aria-label="Ses efektleri"><i></i></button></div>
+          <div class="ayar-satir"><div><b>Titreşim</b><span>Tutunurken kısa titreşim</span></div><button type="button" class="anahtar" id="dTitresimBtn" role="switch" aria-checked="true" aria-label="Titreşim"><i></i></button></div>
+          <button type="button" class="genis pano-dugme krem" id="dAyarGeri" data-ik="geri">Geri</button>
         </div>
-        <div class="dur-iki">
-          <button type="button" class="anahtar-dugme" id="dTitresimBtn" role="switch" aria-checked="true">Titreşim</button>
-        </div>
-        <button type="button" class="genis" id="anaMenuBtn">Ana menü</button>
       </div>
     </div>
   </div>
-
-  <p class="ipucu" id="ipucu"></p>
 </div>
 
 <!-- Açılış: Funday Morning logosu ve yükleme -->
@@ -73,7 +72,7 @@
   <img id="acilisLogo" class="marka-logo" src="assets/funday-morning-logo.webp" alt="Funday Morning Games">
   <div class="yukleme" aria-hidden="true"><div id="yuklemeDolgu"></div></div>
   <div class="yukleme-not" id="yuklemeNot">Yükleniyor…</div>
-  <div class="ek-surum">Hoook v0.89</div>
+  <div class="ek-surum">Hoook v0.90</div>
 </section>
 
 <!-- Giriş: yalnızca ilk açılışta -->
@@ -157,11 +156,11 @@
 </section>
 
 <!-- Bölümler -->
-<section class="ekran sayfa-ekran sekmeli" id="ekBolumler" hidden>
+<section class="ekran sayfa-ekran sekmeli askida bolumler" id="ekBolumler" hidden>
   <div class="sayfa-ust"><h2>Hikâye</h2></div>
   <div class="sayfa-ic">
     <div class="bolum-ozet" id="bolumOzet">
-      <div class="ozet-satir"><b id="ozetGecilen">0</b><span>bölüm geçildi</span><b id="ozetHedef">0/0</b><span>hedef</span><b id="ozetYildiz">0/0</b><span>★</span></div>
+      <div class="ozet-satir"><b id="ozetGecilen">0</b><span>bölüm geçildi</span><b id="ozetHedef">0/0</b><span>hedef</span><b id="ozetYildiz">0/0</b><span data-ik="yildiz" aria-label="yıldız"></span></div>
       <div class="cubuk" aria-hidden="true"><i id="ozetCubuk"></i></div>
     </div>
     <div class="filtre" role="tablist" aria-label="Bölüm filtresi">
@@ -178,8 +177,8 @@
   </div>
 </section>
 
-<!-- Profil kartı -->
-<section class="ekran sayfa-ekran sekmeli" id="ekGorevler" hidden>
+<!-- Görevler (v0.90): günlük giriş şeridi, çıkartma görev kartları, başarım rozetleri -->
+<section class="ekran sayfa-ekran sekmeli askida gorevler" id="ekGorevler" hidden>
   <div class="sayfa-ust"><h2>Görevler</h2></div>
   <div class="sayfa-ic">
     <div class="giris-satir" id="girisSatir"></div>
@@ -223,7 +222,7 @@
   </div>
 </section>
 
-<section class="ekran sayfa-ekran sekmeli" id="ekIstat" hidden>
+<section class="ekran sayfa-ekran sekmeli askida istat" id="ekIstat" hidden>
   <div class="sayfa-ust"><h2>İstatistikler</h2></div>
   <div class="sayfa-ic">
     <p class="not" id="istatBas">Bu cihazda oynadıkların. Hiçbir yere gönderilmez.</p>
@@ -302,35 +301,47 @@
 </section>
 
 <!-- Ayarlar -->
-<section class="ekran sayfa-ekran sekmeli" id="ekAyarlar" hidden>
+<!-- Ayarlar (v0.90, İstişare 5 Aşama 3): çıkartma panolar halinde gruplar; ses ve titreşim en üstte (oyundaki dişli de aynı anahtarları açar) -->
+<section class="ekran sayfa-ekran sekmeli askida ayarlar" id="ekAyarlar" hidden>
   <div class="sayfa-ust"><h2>Ayarlar</h2></div>
   <div class="sayfa-ic">
+    <div class="ay-grup g-ses"><h3 class="ay-bas">Ses ve titreşim</h3>
     <div class="ayar-satir"><div><b>Müzik</b><span>Bölgeye göre değişen ortam müziği; akış sürerken canlanır</span></div><button type="button" class="anahtar" id="muzikAnahtar" role="switch" aria-checked="true" aria-label="Müzik"><i></i></button></div>
     <div class="ayar-satir"><div><b>Ses efektleri</b><span>Kanca, akış ve ateşböceği sesleri</span></div><button type="button" class="anahtar" id="sesAnahtar" role="switch" aria-checked="true" aria-label="Ses efektleri"><i></i></button></div>
+    <div class="ayar-satir"><div><b>Titreşim</b><span>Tutunurken ve ateşböceği alınca kısa titreşim (Android)</span></div><button type="button" class="anahtar" id="titresimAnahtar" role="switch" aria-checked="true" aria-label="Titreşim"><i></i></button></div>
+    </div>
+    <div class="ay-grup g-oyun"><h3 class="ay-bas">Oyun</h3>
     <div class="ayar-satir"><div><b>Büyük yazı</b><span>Menülerdeki küçük yazılar, açıklamalar ve ipuçları büyür</span></div><button type="button" class="anahtar" id="yaziAnahtar" role="switch" aria-checked="false" aria-label="Büyük yazı"><i></i></button></div>
     <div class="ayar-satir"><div><b>Hayalet ve rekor</b><span>En iyi koşun başta kısa görünür, sonra yalnız yakınındayken belirir; Günlük ve Haftalık Kuyu'da en iyine yaklaşınca ince bir rekor çizgisi</span></div><button type="button" class="anahtar" id="hayaletAnahtar" role="switch" aria-checked="true" aria-label="Hayalet"><i></i></button></div>
-    <div class="ayar-satir"><div><b>Titreşim</b><span>Tutunurken ve ateşböceği alınca kısa titreşim (Android)</span></div><button type="button" class="anahtar" id="titresimAnahtar" role="switch" aria-checked="true" aria-label="Titreşim"><i></i></button></div>
+    <div class="ayar-satir" id="tamEkranSatir"><div><b>Tam ekran</b><span id="tamEkranYazi">Tarayıcı çubukları gizlenir. Ana ekrana eklersen oyun kendiliğinden tam ekran açılır.</span></div><button type="button" id="tamEkranBtn">Aç</button></div>
+    </div>
+    <div class="ay-grup g-oyuncu"><h3 class="ay-bas">Oyuncu</h3>
     <form class="ayar-satir ad-satir" id="adForm">
       <label for="adDegis"><b>Oyuncu adı</b></label>
       <div class="git"><input id="adDegis" maxlength="16" autocomplete="nickname"><button type="submit">Kaydet</button></div>
     </form>
     <div class="ayar-satir"><div><b>Hesap</b><span id="hesapYazi">Misafir · ilerleme bu cihazda</span></div></div>
-    <h3>Nasıl oynanır</h3>
+    <div class="ayar-satir"><div><b>Yedek</b><span>İlerleme bu cihazda durur. Kodu sakla; telefon değiştirince ya da tarayıcı verisi silinince geri yükle.</span></div></div>
+    <div class="dur-iki"><button type="button" id="yedekAlBtn">Yedek kodu al</button><button type="button" id="yedekYukleBtn">Yedekten yükle</button></div>
+    </div>
+    <details class="pr-defter ay-nasil">
+    <summary><span><b>Nasıl oynanır</b><small>Tek el, akış, karar noktaları</small></span></summary>
     <ol class="nasil">
       <li><b>Tek elle oyna:</b> ekranın sol yarısına dokun, kanca turkuaz işaretli hedefe; sağ yarısına dokun, sarı işaretli hedefe atılır. O tarafta hedef yoksa (soluk ×) kanca boşa gider, ipin bırakılmaz.</li>
       <li><b>Karar noktaları:</b> sarı parlayan halkada ateşböceği, mavi oklu halkada hız var. Hız halkasından bırakınca yukarı fırlarsın.</li>
+      <li><b>Halka ustalığı:</b> özel halkaları işine yarayacak biçimde kullan (hız halkasından bırak, çarkla fırla, yayla uç, kordan akışla ayrıl, akıntıda süzül). Her biri TAM bırakış gibi ödül çarpanını artırır; menzile girince çevrelerinde renkli bir hale belirir.</li>
       <li><b>Basılı tut:</b> ipe sarılırsın. <b>Bırak:</b> ipten kopar, savrulursun.</li>
       <li><b>Akış:</b> ip tam sarılmadan bırak, havadayken sıradakine tutun. Zincir uzadıkça puan artar.</li>
       <li>Asılı kalmak bedava değil: elin yorulur ve kayarsın.</li>
       <li>Kanca ahşaba ve halkaya saplanır, taştan seker. Alttan yükselen suya dikkat.</li>
     </ol>
-    <div class="ayar-satir" id="tamEkranSatir"><div><b>Tam ekran</b><span id="tamEkranYazi">Tarayıcı çubukları gizlenir. Ana ekrana eklersen oyun kendiliğinden tam ekran açılır.</span></div><button type="button" id="tamEkranBtn">Aç</button></div>
-    <div class="ayar-satir"><div><b>Yedek</b><span>İlerleme bu cihazda durur. Kodu sakla; telefon değiştirince ya da tarayıcı verisi silinince geri yükle.</span></div></div>
-    <div class="dur-iki"><button type="button" id="yedekAlBtn">Yedek kodu al</button><button type="button" id="yedekYukleBtn">Yedekten yükle</button></div>
-    <button type="button" id="istatBtn">Oyun istatistikleri</button>
-    <button type="button" id="tanitimBtn">Tanıtımı yeniden izle</button>
-    <button type="button" id="ipucuSifirBtn">Tanıtım kartlarını yeniden göster</button>
-    <p class="surum">Hoook v0.89 · prototip · Funday Morning Games</p>
+    </details>
+    <div class="ay-grup ay-diger"><h3 class="ay-bas">Diğer</h3>
+    <button type="button" class="ay-git" id="istatBtn">Oyun istatistikleri</button>
+    <button type="button" class="ay-git" id="tanitimBtn">Tanıtımı yeniden izle</button>
+    <button type="button" class="ay-git" id="ipucuSifirBtn">Tanıtım kartlarını yeniden göster</button>
+    </div>
+    <p class="surum">Hoook v0.90 · prototip · Funday Morning Games</p>
   </div>
 </section>
 
@@ -343,13 +354,15 @@
   <button type="button" data-sekme="ekProfil"><span class="am-ik"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="9" r="4" fill="#35d0e8" stroke="#1a0f2e" stroke-width="2"/><path d="M4 21c1-5 4-7 8-7s7 2 8 7z" fill="#35d0e8" stroke="#1a0f2e" stroke-width="2" stroke-linejoin="round"/></svg></span><span>Profil</span></button>
 </nav>
 
-<div class="katman-ust" id="girisKatman" hidden role="dialog" aria-modal="true" aria-labelledby="girisBaslik">
+<!-- Pencereler (v0.90, İstişare 5 Aşama 3): yukarıdan iki iple inen pano; kapanınca yukarı çekilir -->
+<!-- Günlük giriş: 7 günlük şerit, her gün ipe asılı bir etiket; bugünkü parlar, 7. gün hediye -->
+<div class="katman-ust pano" id="girisKatman" hidden role="dialog" aria-modal="true" aria-labelledby="girisBaslik">
   <div class="kart giris-kart">
-    <h2 id="girisBaslik">Günlük giriş</h2>
-    <p id="girisAlt">Her gün gel, ateşböceği al. Bir gün kaçırırsan sıfırlanmaz, kaldığın yerden devam eder.</p>
+    <h2 class="pano-tabela" id="girisBaslik">Günlük giriş</h2>
+    <p class="pano-bilgi" id="girisAlt">Her gün gel, ateşböceği al. Bir gün kaçırırsan sıfırlanmaz, kaldığın yerden devam eder.</p>
     <div class="takvim" id="girisTakvim"></div>
     <button type="button" class="ana buyuk genis" id="girisAlBtn">Al</button>
-    <button type="button" class="genis video-btn" id="girisVideoBtn">Video izle, ikiye katla</button>
+    <button type="button" class="genis pano-dugme mavi" id="girisVideoBtn">Video izle, ikiye katla</button>
     <button type="button" class="metin-btn" id="girisKapat">Sonra</button>
   </div>
 </div>
@@ -367,47 +380,50 @@
     <h2 id="urunAd"></h2>
     <p id="urunNot"></p>
     <button type="button" class="ana buyuk genis" id="urunAl">Al</button>
-    <button type="button" class="genis video-btn" id="urunVideo" hidden>▶ Video izle, %50 indirim</button>
+    <button type="button" class="genis video-btn" id="urunVideo" hidden data-ik="video">Video izle, %50 indirim</button>
     <button type="button" class="metin-btn" id="urunKapat">Vazgeç</button>
   </div>
 </div>
 
 <!-- Deneme hakkı (v0.64): Günlük ve Haftalık Kuyu; video ile artan yenileme, sonra Hikâye -->
-<div class="katman-ust" id="hakKatman" hidden role="dialog" aria-modal="true" aria-labelledby="hakBaslik">
+<div class="katman-ust pano" id="hakKatman" hidden role="dialog" aria-modal="true" aria-labelledby="hakBaslik">
   <div class="kart hak-kart">
-    <h2 id="hakBaslik">Denemeler bitti</h2>
-    <p id="hakMetin"></p>
+    <h2 class="pano-tabela" id="hakBaslik">Denemeler bitti</h2>
+    <p class="pano-bilgi" id="hakMetin"></p>
     <div class="hak-video" id="hakVideoSay" aria-hidden="true"></div>
-    <button type="button" class="ana buyuk genis" id="hakVideoBtn">▶ Video izle</button>
-    <button type="button" class="genis" id="hakHikayeBtn">Hikâye</button>
+    <button type="button" class="ana buyuk genis" id="hakVideoBtn">Video izle</button>
+    <button type="button" class="genis pano-dugme krem" id="hakHikayeBtn">Hikâye</button>
     <button type="button" class="metin-btn" id="hakKapat">Kapat</button>
   </div>
 </div>
 
-<div class="katman-ust" id="videoKatman" hidden role="dialog" aria-modal="true" aria-labelledby="videoBaslik">
+<!-- Ödüllü video (yer tutucu): ipte dönen kanca ve geri sayım -->
+<div class="katman-ust pano" id="videoKatman" hidden role="dialog" aria-modal="true" aria-labelledby="videoBaslik">
   <div class="kart video-kart">
-    <h2 id="videoBaslik">Ödüllü video</h2>
-    <p>Deneme sürümünde reklam yok; burada ödüllü video oynayacak. Ödülün birazdan geliyor.</p>
+    <h2 class="pano-tabela" id="videoBaslik">Ödüllü video</h2>
+    <div class="video-kanca" aria-hidden="true"><i class="vk-ip"></i><i class="vk-kanca"></i></div>
     <b class="video-sayac" id="videoSayac">3</b>
+    <p class="pano-bilgi">Deneme sürümünde reklam yok; burada ödüllü video oynayacak. Ödülün birazdan geliyor.</p>
   </div>
 </div>
 
 <div class="hikaye-kart" id="hikayeKart" role="status" hidden><b id="hkBaslik"></b><span id="hkMetin"></span></div>
 <div class="bildirim" id="bildirim" role="status" hidden></div>
 
-<script src="js/engine.js?v=0.89"></script>
-<script src="js/levels.js?v=0.89"></script>
-<script src="js/bolumler.js?v=0.89"></script>
-<script src="js/gen.js?v=0.89"></script>
-<script src="js/gorevler.js?v=0.89"></script>
-<script src="js/ekonomi.js?v=0.89"></script>
-<script src="js/istatistik.js?v=0.89"></script>
-<script src="js/muzik.js?v=0.89"></script>
-<script src="js/notlar.js?v=0.89"></script>
-<script src="js/hayalet.js?v=0.89"></script>
-<script src="js/online.js?v=0.89"></script>
-<script src="js/karakter.js?v=0.89"></script>
-<script src="js/game.js?v=0.89"></script>
-<script src="js/screens.js?v=0.89"></script>
+<script src="js/engine.js?v=0.90"></script>
+<script src="js/levels.js?v=0.90"></script>
+<script src="js/bolumler.js?v=0.90"></script>
+<script src="js/gen.js?v=0.90"></script>
+<script src="js/gorevler.js?v=0.90"></script>
+<script src="js/ekonomi.js?v=0.90"></script>
+<script src="js/istatistik.js?v=0.90"></script>
+<script src="js/muzik.js?v=0.90"></script>
+<script src="js/notlar.js?v=0.90"></script>
+<script src="js/hayalet.js?v=0.90"></script>
+<script src="js/online.js?v=0.90"></script>
+<script src="js/karakter.js?v=0.90"></script>
+<script src="js/ikon.js?v=0.90"></script>
+<script src="js/game.js?v=0.90"></script>
+<script src="js/screens.js?v=0.90"></script>
 </body>
 </html>

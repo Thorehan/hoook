@@ -235,6 +235,16 @@ Hikâye ekranındaki "Yeni Maden", "Yeni Kristal Mağara" ve "Yeni Eski Kule · 
 - [ ] **Profil:** canlı Çıra, ad (kalem Ayarlar'daki ad kutusunu açıyor), rozetler, büyük sayılar. "Çıra'nın yolu" ve "Eski rekorlar" açılıp kapanıyor mu?
 - [ ] Bütün panellerde (Market, Koleksiyon, Sıralama, Profil, Görevler, Ayarlar, Hikâye listesi) duvar aynı ve simetrik mi?
 
+## 33. Pencereler, tam ekran oyun ve halka ustalığı (v0.90, 8 dk)
+- [ ] **Günlük giriş** penceresi yukarıdan iple iniyor mu, kapatınca yukarı çekiliyor mu? 7 gün etiketleri okunuyor mu, bugünkü belli mi?
+- [ ] Denemeler bitti ve Ödüllü video pencereleri aynı dilde mi?
+- [ ] **Duraklat:** üç ana düğme (Devam et, Baştan başla, Ana menü) net mi? Dişli ses ve titreşim anahtarlarını açıyor mu, "Geri" ve Android geri tuşu duraklatmaya dönüyor mu? "Bölümü atla" bulunuyor mu?
+- [ ] **Oyun alanı tam ekran:** bölüm adı, göstergeler ve duraklat düğmesi oyunu kapatmıyor mu? Sağ üst köşedeki düğme yanlışlıkla basılıyor mu?
+- [ ] Alttaki ipucu balonu Çıra'yı ve oyunu engellemiyor mu, ilk atışta kayboluyor mu?
+- [ ] Görevler, İstatistikler, Ayarlar ve Bölüm listesi yeni dilde rahat okunuyor mu? İkonlar (yıldız, tik, video, saat, kilit) net mi?
+- [ ] **Harita:** duvar baştan sona aynı mı, renk yukarı doğru yumuşak değişiyor mu? Sıradaki bölümün üstü kararıyor mu, bu hoş mu?
+- [ ] **Halka ustalığı:** menzile giren hız, çark, yay, kor halkasının çevresinde renkli hale görünüyor mu? Kullanınca "+ustalık" yazısı ve ilk seferde kısa açıklama çıkıyor mu? Özel halkayı kullanmak "zaten böyle yapmak istiyordum" hissi veriyor mu, oyun akıcı kalıyor mu?
+
 ## 5. Genel izlenim (serbest)
 - En sevdiğim an:
 - En çok zorlandığım yer:

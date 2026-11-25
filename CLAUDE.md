@@ -25,12 +25,13 @@ Devir elindeyken iş bitirme ve devretme adımları `docs/DEVIR-MUHAMMED.md` §8
 | `docs/hikaye.md` | Hikâye "Çıra": tek kaynak, metin kuralları |
 | `docs/telefon-testi.md` | Telefonda deneme listesi |
 
-Kod: `js/engine.js` (deterministik fizik ve kurallar, DT 1/120), `js/gen.js` (bölüm, Sonsuz ve Günlük üreticisi), `js/game.js` (çizim, ses, oyun döngüsü, sonuç kartları), `js/screens.js` (menüler), `js/ekonomi.js`, `js/gorev.js`, `js/hayalet.js`, `js/notlar.js`, `js/muzik.js`, `js/online.js` (meydan okuma bağlantısı, skor tablosu istemcisi), `js/karakter.js` (karakter ve takı çizimi, v0.76); stil `css/` (`css/arayuz.css`: İstişare 4 tasarım dili).
+Kod: `js/engine.js` (deterministik fizik ve kurallar, DT 1/120), `js/gen.js` (bölüm, Sonsuz ve Günlük üreticisi), `js/game.js` (çizim, ses, oyun döngüsü, sonuç kartları), `js/screens.js` (menüler), `js/ekonomi.js`, `js/gorev.js`, `js/hayalet.js`, `js/notlar.js`, `js/muzik.js`, `js/online.js` (meydan okuma bağlantısı, skor tablosu istemcisi), `js/karakter.js` (karakter ve takı çizimi, v0.76), `js/ikon.js` (arayüz SVG ikonları, v0.90); stil `css/` (`css/arayuz.css`: İstişare 4 tasarım dili).
 
 ## 3 · Kalıcı tasarım kararları (Törehan'ın kararları; değiştirmeden önce sor)
 
 - **Mobil, tek elle oynanır.** Ekranın sol yarısı sol hedefe, sağ yarısı sağ hedefe kanca atar. Her özellik 375 px genişlikte denenir.
 - **Nişan kuralı:** Yukarısı belirli şartlarda önceliklidir, şartlar sağlanmazsa aşağıdaki seçilir. Sıra: bu taraftaki dik yukarı hedef → yandaki sığ hedef → aşağıdaki. Hattı başka bir dik yukarı halka kesiyorsa o halka alınır. Çıra'nın değdiği halka engel sayılmaz. Yükselirken yukarı hedef 0,35 sn içinde menzile girecekse kanca bekler. Her mekanik değişiklikten sonra `node tools/nisan.js` çalıştırılır, "kurala aykırı" 0 olmalı.
+- **Halka ustalığı (v0.90, Törehan onayı 25/11):** özel halkayı işine yarayacak biçimde kullanmak (hız halkasından bırakış, çark itişi, yay, kordan akışla ayrılma, akıntı) TAM bırakış gibi ustalık payına katılır (ortak tavan); menzildeki özel halkada hale yalnız çizimdir, nişan kuralı aynı. Yarışma modlarında yeni günden/haftadan itibaren (`game.js` → `HALKA_GUNLUK`, `HALKA_HAFTALIK`).
 - **Karar önemli olmalı:** Düşünmeden sol-sağ spam ilerletmemeli (`node tools/spam.js`). Tek tarafa basan oyuncu bölüm geçememeli (`node tools/oyuncu.js`: sadeceSag/Sol 0/74).
 - **Uçuş ve ip çekme hızı sabit** (`CFG.REEL` 760). İtişler serbest, ama yalnız ustalıkla gelir: TAM bırakış, alevlenme, hız halkası, kanat.
 - **Ana oyun Hikâye (v0.64, Törehan 19/11):** dokun ve başla Hikâye'de sıradaki bölümü açar. Serbest Sonsuz Kuyu kalktı; yarışma modları Günlük ve Haftalık Kuyu, ikisi de sınırlı denemeli (günde 3, haftada 5; hak bitince video ile +1, yenileme bedeli 1→5 video, 5 yenilemeden sonra reklam ve deneme yok, Hikâye'ye yönlendirilir). Günün hedefi (yıldız), seri ödülü (donma hakkı), büyüyen lig ödülü ve lig görünümleri, Profil'de rekor duvarı. Devam hakkı kalktı.

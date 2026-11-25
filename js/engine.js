@@ -148,7 +148,7 @@
       grounded: false,
       // akış ve skor
       hang: 0, air: 0, chain: false, combo: 0, maxCombo: 0, hooks: 0, shots: 0, slips: 0,
-      startY: sy, topY: sy, bonus: 0, fireflyPts: 0, maxSpeed: 0, rescues: 0, misses: 0, boosts: 0, gates: 0, springs: 0, float: 0, portals: 0, swings: 0, ffGot: 0, tam: 0, tamSeri: 0, alev: 0, alevPuan: 0, itisler: 0,
+      startY: sy, topY: sy, bonus: 0, fireflyPts: 0, maxSpeed: 0, rescues: 0, misses: 0, boosts: 0, gates: 0, springs: 0, float: 0, portals: 0, swings: 0, ffGot: 0, tam: 0, tamSeri: 0, halkaUsta: 0, alev: 0, alevPuan: 0, itisler: 0,
       akintilar: (def.akintilar || []).map(function (a) { return { x: a[0], y: a[1], w: a[2], h: a[3] }; }), // akıntı sütunları (v0.71): sol, üst, genişlik, boy
       gucler: (def.gucler || []).map(function (g) { return { x: g[0], y: g[1], tur: g[2], got: false }; }), guc: { fener: 0, kanat: 0, kalkan: false }, gucSay: 0
     };
@@ -288,6 +288,14 @@
     if (a !== s.alev) { s.events.push({ type: 'alev', seviye: a, onceki: s.alev }); s.alev = a; }
   }
 
+  // Halka ustalığı (v0.90; Muhammed'in isteği, Törehan onayı 25/11): özel halkayı işine yarayacak biçimde kullanmak (hız halkasından bırakış, çark itişi,
+  // yay fırlatması, akışla kordan ayrılma, akıntıda süzülme) ustalık payına TAM bırakış gibi katılır (ortak tavan USTALIK_MAX).
+  // Fizik, nişan ve hızlar aynı; yalnız ödül çarpanı ve geri bildirim. def.halkaUstalik === false olan kuyularda sayılmaz
+  // (yeni günden/haftadan önceki Günlük ve Haftalık tohumları eski puanla kalır).
+  function halkaUstalik(s, tur, x, y) {
+    s.halkaUsta = (s.halkaUsta || 0) + 1;
+    s.events.push({ type: 'halkaUsta', tur: tur, x: x, y: y, n: s.halkaUsta });
+  }
   // İpi bırak (parmak kalktı, yeni atış ya da el kaydı).
   function detach(s, why) {
     var rp = s.rope;
@@ -312,10 +320,12 @@
       }
       // Alevliyken erken bırakış (fırlama) ek yukarı itiş verir; asılı kalıp bırakan almaz
       if (s.chain && s.alev > 0) itis += CFG.ALEV_ITIS[s.alev - 1];
+      // kor halka: sönmeden, akışla ayrılmak ustalıktır
+      if (rp.korBas != null && s.chain && (why === 'release' || why === 'repress')) halkaUstalik(s, 'kor', rp.x, rp.y);
       // Döner çark (v0.70): halka yükselirken bırakırsan çarkın hızı seni fırlatır (doğru an: halka en hızlı yükselirken)
       if (rp.ref && rp.ref.cark && (why === 'release' || why === 'repress')) {
         var cpay = -carkVy(rp.ref, s.t) / (CFG.CARK_R * Math.abs(rp.ref.cark.w));
-        if (cpay > 0.15) { var ci = Math.round(CFG.CARK_ITIS * cpay); itis += ci; s.carkItis = (s.carkItis || 0) + 1; s.events.push({ type: 'carkItis', x: s.p.x, y: s.p.y, guc: ci }); }
+        if (cpay > 0.15) { var ci = Math.round(CFG.CARK_ITIS * cpay); itis += ci; s.carkItis = (s.carkItis || 0) + 1; s.events.push({ type: 'carkItis', x: s.p.x, y: s.p.y, guc: ci }); halkaUstalik(s, 'cark', s.p.x, s.p.y); }
       }
       if (itis > 0) {
         s.p.py += itis * CFG.DT; s.itisler++;
@@ -327,6 +337,7 @@
         s.p.py += CFG.BOOST * CFG.DT;
         s.boosts++;
         s.events.push({ type: 'boost', x: s.p.x, y: s.p.y });
+        halkaUstalik(s, 'hiz', s.p.x, s.p.y);
       }
     }
     s.events.push({ type: why === 'slip' ? 'slip' : 'release', box: rp.kind === 'box', chain: s.chain });
@@ -682,7 +693,7 @@
         var akVx = (p.x - p.px) * (1 - 6 * dt) + ((ak.x + ak.w / 2) - p.x) * 8 * dt * dt;
         p.px = p.x - akVx;
         s.air = 0;
-        if (s.akintiSon !== akIc) { s.akintiSon = akIc; s.akintiSay = (s.akintiSay || 0) + 1; s.events.push({ type: 'akinti', x: p.x, y: p.y }); }
+        if (s.akintiSon !== akIc) { s.akintiSon = akIc; s.akintiSay = (s.akintiSay || 0) + 1; s.events.push({ type: 'akinti', x: p.x, y: p.y }); halkaUstalik(s, 'akinti', p.x, p.y); }
       } else if (!akIc) s.akintiSon = null;
     }
     var rp = s.rope;
@@ -865,6 +876,7 @@
     s.springs++;
     s.float = CFG.YAY_FLOAT;
     s.events.push({ type: 'yay', x: rg.x, y: rg.y });
+    halkaUstalik(s, 'yay', rg.x, rg.y);
   }
 
   function passGate(s, gt) {
@@ -898,13 +910,14 @@
       if (f.ring === rg && !f.got) { f.got = true; rg.got = true; s.fireflyPts += 25; s.ffGot++; s.events.push({ type: 'firefly', x: f.x, y: f.y }); }
     }
   }
-  // Çarpan = hız payı (1,00 – 1,50, 0,05 adımlarla) + ustalık payı (her TAM bırakış +0,05, en çok +0,50).
+  // Çarpan = hız payı (1,00 – 1,50, 0,05 adımlarla) + ustalık payı (her TAM bırakış ve her halka ustalığı +0,05, en çok +0,50).
   // Hızın tavanına akışla kolay varılıyor; ustalık payı zamanlamayı da ayrıştırır (en çok x2,00).
   function hizPay(s) {
     var k = Math.max(0, Math.min(1, (s.maxSpeed - CFG.SPEED_BASE) / (CFG.SPEED_TOP - CFG.SPEED_BASE)));
     return 1 + Math.round(k * 10) / 20;
   }
-  function ustalikPay(s) { return Math.min(CFG.USTALIK_MAX, Math.round((s.tam || 0) * CFG.USTALIK_TAM * 100) / 100); }
+  function ustalikSay(s) { return (s.tam || 0) + (s.def && s.def.halkaUstalik === false ? 0 : (s.halkaUsta || 0)); }
+  function ustalikPay(s) { return Math.min(CFG.USTALIK_MAX, Math.round(ustalikSay(s) * CFG.USTALIK_TAM * 100) / 100); }
   function speedMult(s) { return Math.round((hizPay(s) + ustalikPay(s)) * 100) / 100; }
   function speedMs(v) { return v / 20; } // birim/sn → m/sn (20 birim = 1 m)
   // Güçlendirme al: fener (süre), kanat (süre; ip bırakılır), kalkan (bir düşüşü affeder, bir tane tutulur)
