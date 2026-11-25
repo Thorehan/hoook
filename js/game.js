@@ -2063,6 +2063,30 @@
     perfect: '<svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9" fill="none" stroke="#bfe6ee" stroke-width="2.5"/><circle cx="12" cy="12" r="3.5" fill="#bfe6ee"/></svg>',
     flow: '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 16c4 0 4-8 9-8s5 8 9 8" fill="none" stroke="#f26a3a" stroke-width="2.8" stroke-linecap="round"/></svg>'
   };
+  // Yıldızlar (v0.86, İstişare 6 A3, docs/kisa-bolumler-plan.md §3): kayıttaki en iyi madalyalardan; ödülsüz, düşmez.
+  // 1★ geçiş · 2★ en az bir madalya · 3★ üç madalya. ffT: bölümdeki ateşböceği sayısı.
+  function yildiz(b, ffT) {
+    if (!b || !b.done) return 0;
+    var m = (ffT > 0 && (b.ff || 0) >= ffT ? 1 : 0) + (b.perfect ? 1 : 0) + (b.flow ? 1 : 0);
+    return m >= 3 ? 3 : m >= 1 ? 2 : 1;
+  }
+  var YILDIZ_YOL = 'M12 2.6l2.8 5.9 6.4.8-4.7 4.4 1.2 6.4L12 17l-5.7 3.1 1.2-6.4-4.7-4.4 6.4-.8z';
+  function yildizHtml(n, cls) {
+    var h = '<span class="yildizlar' + (cls ? ' ' + cls : '') + '" role="img" aria-label="' + n + ' yıldız">';
+    for (var i = 0; i < 3; i++) h += '<svg viewBox="0 0 24 24" class="' + (i < n ? 'dolu' : '') + '" style="--i:' + i + '" aria-hidden="true"><path d="' + YILDIZ_YOL + '"/></svg>';
+    return h + '</span>';
+  }
+  // Bir sonraki yıldız için ipucu (3★ ise boş).
+  function yildizIpucu(b, ffT) {
+    var n = yildiz(b, ffT);
+    if (n >= 3 || n < 1) return '';
+    if (n === 1) return '2★ için bir madalya kazan';
+    var eksik = [];
+    if (!(ffT > 0 && (b.ff || 0) >= ffT)) eksik.push('Ateşböceği');
+    if (!b.perfect) eksik.push('Kusursuz');
+    if (!b.flow) eksik.push('Akış');
+    return '3★ için ' + eksik.join(' ve ') + ' kaldı';
+  }
   // Bölüm sonu madalyası; bu oyunda ilk kez kazanıldıysa "YENİ" etiketi ve küçük bir zıplama.
   function medal(ok, icon, title, sub, isNew, i) {
     return '<div class="madalya' + (ok ? ' var' : '') + (isNew ? ' yeni' : '') + '" style="--i:' + (i || 0) + '">' +
@@ -2156,11 +2180,13 @@
     var newFF = ff > (b.ff || 0) && ff >= ffT && ffT > 0, newPerfect = perfect && !b.perfect, newFlow = flow && !b.flow;
     var recTime = !first && time < (b.time || Infinity), recReward = !first && reward > (b.reward || 0), recSpeed = !first && speed > (b.speed || 0) + 0.05;
     if (HY && (first || recTime || !b.time)) HY.sakla(hayaletYeri(), hayaletKayit, time); // en kısa süreli koşu hayalet olur
-    bestKayit()[levelNo] = {
+    var yEski = yildiz(b, ffT);
+    var yeniKayit = bestKayit()[levelNo] = {
       ff: Math.max(b.ff || 0, ff), time: b.time ? Math.min(b.time, time) : time,
       perfect: !!(b.perfect || perfect), flow: !!(b.flow || flow), done: true,
       reward: Math.max(b.reward || 0, reward), speed: Math.max(b.speed || 0, speed)
     };
+    var yYeni = yildiz(yeniKayit, ffT), yIpucu = yildizIpucu(yeniKayit, ffT);
     noteStats(speed, reward);
     if (!def.kisa && levelNo + 1 > save.maxLevel) save.maxLevel = Math.min(BOLUM_SAYI, levelNo + 1);
     persist();
@@ -2168,7 +2194,8 @@
     var kaz = recordRun({ mode: 'level', won: true, ff: ff, boosts: sim.boosts, gates: sim.gates, maxCombo: sim.maxCombo, speed: speed, perfect: perfect });
     $('kart').className = 'kart sonuc';
     $('kart').innerHTML =
-      '<div class="sonuc-bas"><h2>Gün ışığı!</h2><span>' + noYazi(levelNo) + '. ' + def.name + (def.ikinci ? ' · ikinci yolculuk' : def.kisa ? ' · deneme' : '') + (first ? ' · ilk kez geçildi' : deaths ? ' · ' + (deaths + 1) + '. deneme' : '') + '</span></div>' +
+      '<div class="sonuc-bas"><div class="sonuc-baslik"><h2>Gün ışığı!</h2>' + yildizHtml(yYeni, 'sonuc-yildiz') +
+      (yYeni > yEski ? '<em class="yildiz-yeni">YENİ</em>' : '') + '</div><span>' + noYazi(levelNo) + '. ' + def.name + (def.ikinci ? ' · ikinci yolculuk' : def.kisa ? ' · deneme' : '') + (first ? ' · ilk kez geçildi' : deaths ? ' · ' + (deaths + 1) + '. deneme' : '') + '</span></div>' +
       '<div class="odul-satir"><i class="ikon-odul" aria-hidden="true"></i><b id="odulSayi">0</b>' + (recReward ? '<em class="rekor-etiket">REKOR</em>' : '') + '</div>' +
       '<p class="odul-hesap">' + (mult > 1 ? base + ' × x' + fmt(mult, 2) + ' çarpan' + (E.ustalikPay(sim) > 0 ? ' (hız x' + fmt(E.hizPay(sim), 2) + ' + ustalık ' + fmt(E.ustalikPay(sim), 2) + ')' : '') : 'Bölüm ödülü · hızlanırsan ve TAM bırakırsan çarpan artar') + '</p>' +
       '<div class="madalyalar">' +
@@ -2176,6 +2203,7 @@
       medal(perfect, ICON.perfect, 'Kusursuz', sim.donus ? sim.donus + ' kez fenere döndün' : shots + '/' + def.par + ' atış', newPerfect, 1) +
       medal(flow, ICON.flow, 'Akış', 'x' + sim.maxCombo + ' · hedef x' + def.flow, newFlow, 2) +
       '</div>' +
+      (yIpucu ? '<p class="yildiz-ipucu">' + yIpucu + '</p>' : '') +
       '<div class="istatistik">' +
       stat(SURE_IK, fmt(time, 1) + ' sn', 'süre ' + fmt(time, 1) + ' saniye', recTime) +
       stat(IK.hiz, fmt(speed, 0) + ' m/sn', 'en yüksek hız ' + fmt(speed, 1) + ' metre/saniye', recSpeed) +
@@ -2676,6 +2704,7 @@
     persist: persist,
     levelDef: levelDef,
     bolumSayi: BOLUM_SAYI, kisaBas: KISA_BAS, kisaSayi: KISA_SAYI,
+    yildiz: yildiz, yildizHtml: yildizHtml,
     toggleMuzik: function () { return muzikDegis(); },
     muzikAcik: muzikAcik,
     muzikSahne: function (s) { MZ.sahne(s); MZ.kis(false); },

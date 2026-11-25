@@ -12,6 +12,7 @@
 
 ## Son durum (v0.83)
 
+- **v0.86** (25/11/2026, Muhammed): İstişare 6 Yol A3: yıldızlar. 1★ geçiş, 2★ en az bir madalya, 3★ üç madalya; kayıttaki en iyi madalyalardan, ödülsüz, düşmez, yeni kayıt alanı yok. Sonuç kartında başlığın yanında (yeni yıldıza "YENİ", altında bir sonraki yıldız için ipucu), bölüm kartlarında ✓/★ yerine, grup başlıklarında ve özette toplam. Yalnız görünüş; oynanış ve ekonomi aynı. Telefonda denenecek: `docs/telefon-testi.md` §29. Sırada A4 (harita) ya da İstişare 5 Aşama 3.
 - **v0.85** (24/11/2026, Muhammed): İstişare 6 Yol A2: kısa bölümler denemesi. Hikâye ekranının başında "Yeni Taş Kuyu · deneme": 6 uzun bölüm → 18 kısa bölüm (fener yok, her bölümde ateşböceği, notlar ve final yerinde), ayrı kayıt; bugünkü bölümler, Günlük ve Haftalık birebir aynı. Bütün testler çalıştı (`docs/kisa-bolumler-plan.md` §6). Telefonda denenecek: `docs/telefon-testi.md` §28. Sırada A3 (yıldızlar) ya da İstişare 5 Aşama 3.
 - **v0.84** (24/11/2026, Muhammed): İstişare 5 Aşama 2: Market, Koleksiyon ve ürün sayfası Askıda Menü dilinde (kuyu duvarı, kirişe asılı tabela, çiviye asılı eğik çıkartma kartlar, alttan açılan ürün sayfası, satın alma kutlaması). Yalnız görünüş; fiyat, ürün, kural aynı. Telefonda denenecek: `docs/telefon-testi.md` §27. Sırada Aşama 3 (Yarışma, Profil, pencereler, durumlar).
 - **v0.83** (24/11/2026, Törehan): Hikâye bölümlerinde Çıra geçici bir çengelde asılı başlar, sonsuz modlar dipten (zeminden). Ana ekranda OYNA ortadaki duvar halkasından sarkar, Çıra yukarıda, "Başlamak için dokun" geri geldi (boş yere dokunmak başlatır). Bütün mekanik ölçümleri öncekiyle aynı. Telefonda denenecek: `docs/telefon-testi.md` §26.
@@ -67,7 +68,7 @@
 - Puan doğrulama için Workers Paid (ayda 5 $) alınsın mı?
 - Ölçüm (analitik) eklensin mi, hangi hizmet?
 - Bekçinin adı. İki para birimi mi, tek mi. Müzik parçaları (Mustafa'dan).
-- ✅ **İstişare 6 (24/11) yanıtlandı:** kararlar `docs/istisare-6-bolum-hesap.md`. Kısa bölümler (önce Taş Kuyu), yıldız madalyalardan ve ödülsüz, harita ayrı ekran, tablo herkese açık (misafir de gönderir), ortak Funday Firebase projesi, giriş misafir + Google + e-posta, Workers Paid hesaplarla birlikte. Bekleyen: Törehan ortak Firebase projesini açacak ve Workers Paid'i alacak. ✅ A1 kısa bölüm kuralları: `docs/kisa-bolumler-plan.md`. ✅ A2 (v0.85): Taş Kuyu 18 kısa bölüm deneme olarak. Sırada A3 yıldızlar.
+- ✅ **İstişare 6 (24/11) yanıtlandı:** kararlar `docs/istisare-6-bolum-hesap.md`. Kısa bölümler (önce Taş Kuyu), yıldız madalyalardan ve ödülsüz, harita ayrı ekran, tablo herkese açık (misafir de gönderir), ortak Funday Firebase projesi, giriş misafir + Google + e-posta, Workers Paid hesaplarla birlikte. Bekleyen: Törehan ortak Firebase projesini açacak ve Workers Paid'i alacak. ✅ A1 kısa bölüm kuralları: `docs/kisa-bolumler-plan.md`. ✅ A2 (v0.85): Taş Kuyu 18 kısa bölüm deneme olarak. ✅ A3 (v0.86): yıldızlar. Sırada A4 kuyu duvarı haritası (önce yaklaşım).
 
 ## Devir geçmişi
 

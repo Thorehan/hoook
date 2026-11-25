@@ -162,6 +162,14 @@ button.anahtar-dugme[aria-checked="false"] { color: var(--soluk); }
 .kart.sonuc { max-width: 380px; gap: 10px; padding: 18px 16px 14px; border-radius: 20px; animation: sayfaGir .32s cubic-bezier(.2, .9, .3, 1) both; }
 .sonuc-bas { display: flex; flex-direction: column; align-items: center; gap: 2px; }
 .sonuc-bas span { color: var(--soluk); font-size: 13px; }
+/* v0.86 yıldızlar: başlığın sağında, madalyalarla birlikte sırayla yanar (salınım, büyüme yok) */
+.sonuc-baslik { display: flex; align-items: center; justify-content: center; gap: 10px; flex-wrap: wrap; }
+.sonuc-bas .yildizlar.sonuc-yildiz svg { width: 24px; height: 24px; }
+.yildiz-yeni { font-style: normal; background: var(--atesbocegi); color: #23260a; font-size: 9px; font-weight: 800; letter-spacing: .06em; padding: 2px 6px; border-radius: 6px; }
+.kart.sonuc .sonuc-yildiz svg.dolu { transform-origin: 50% 60%; animation: yildizSalin .6s ease-out both, madalyaYan .5s ease-out both; animation-delay: calc(.25s + var(--i) * .28s); }
+@keyframes yildizSalin { 0% { transform: rotate(-18deg) translateY(-4px); opacity: .3; } 45% { transform: rotate(10deg); opacity: 1; } 75% { transform: rotate(-4deg); } 100% { transform: none; } }
+.yildiz-ipucu { font-size: 13px; text-align: center; color: var(--soluk); margin: -2px 0 0; }
+@media (prefers-reduced-motion: reduce) { .kart.sonuc .sonuc-yildiz svg.dolu { animation: none; } }
 .odul-satir { display: flex; align-items: center; justify-content: center; gap: 8px; }
 .odul-satir .ikon-odul { width: 30px; height: 30px; }
 .odul-satir b { font-family: var(--font-oyun); font-weight: 800; font-size: 50px; line-height: 1; color: var(--yazi); font-variant-numeric: tabular-nums; }

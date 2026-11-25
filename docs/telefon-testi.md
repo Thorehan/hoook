@@ -200,6 +200,13 @@ Hikâye ekranının başındaki "Yeni Taş Kuyu · deneme" grubundan oyna (bugü
 - [ ] Madalyalar (ateşböceği, kusursuz, akış) her bölümde ulaşılabilir mi? Tekrar oynayıp tamamlamak istiyor musun?
 - [ ] 18 kısa bölüm mü, 6 uzun bölüm mü daha iyi? Neden?
 
+## 29. Yıldızlar (v0.86, 4 dk)
+Kısa ya da uzun bir bölümü birkaç kez oyna; bir kez madalyasız, bir kez madalya toplayarak.
+- [ ] Sonuç kartında yıldızlar başlığın yanında rahat okunuyor mu? Sırayla yanmaları hoş mu?
+- [ ] Yeni yıldız gelince "YENİ" etiketi ve alttaki ipucu ("3★ için … kaldı") anlaşılır mı?
+- [ ] Bölüm listesinde kartlardaki üç küçük yıldız ve grup başlığındaki toplam (ör. 7/18★) okunuyor mu?
+- [ ] Yıldızlar bölümleri tekrar oynama isteği veriyor mu?
+
 ## 5. Genel izlenim (serbest)
 - En sevdiğim an:
 - En çok zorlandığım yer:

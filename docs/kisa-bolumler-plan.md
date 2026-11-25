@@ -2,7 +2,7 @@
 
 > İstişare 6, Yol A. Kararlar Törehan'ın (24/11, `docs/istisare-6-bolum-hesap.md`): uzun bölümler kısa bölümlere bölünür, yıldızlar madalyalardan gelir ve ödülsüzdür, harita ayrı ekrandır. Bu belge kuralları ve Taş Kuyu denemesini tanımlar.
 >
-> **Durum:** ✅ A1 kurallar. ✅ A2 (v0.85, telefonda deneme bekliyor): Taş Kuyu'nun 18 kısa bölümü Hikâye ekranının başında deneme olarak; ölçümler §6'da.
+> **Durum:** ✅ A1 kurallar. ✅ A2 (v0.85, telefonda deneme bekliyor): Taş Kuyu'nun 18 kısa bölümü Hikâye ekranının başında deneme olarak; ölçümler §6'da. ✅ A3 (v0.86): yıldızlar sonuç kartında, bölüm kartlarında, grup başlıklarında ve özette (§3).
 
 ## 1 · Bölüm kuralları
 
@@ -37,6 +37,7 @@ Kor halka, döner çark ve akıntı sütunu Maden, Kristal ve Kule'de bu kurala 
 - Yıldız ateşböceği ya da eşya vermez. Ateşböceği ödemesi bugünkü gibi yalnız ilk kez toplanan ateşböcekleri için (`EKO.bolumOde`).
 - Bölüm tekrar oynanabilir; en iyi madalyalar kalır, yıldız düşmez.
 - Haritada her halkanın altında 0–3 yıldız; bölgenin üstünde toplam (ör. 31/54★).
+- **v0.86 (A3):** sonuç kartında başlığın yanında üç yıldız (en iyi kayıttan; bu koşuda yeni yıldız gelirse "YENİ"), altında bir sonraki yıldız için ipucu. Bölüm kartlarında geçilmiş bölümün sağ üstünde ✓/★ yerine üç küçük yıldız; grup başlığında ve Hikâye özetinde toplam. Hesap `game.js` → `yildiz(b, ateşböceği sayısı)`, kayıtta yeni alan yok.
 
 ## 4 · Taş Kuyu: 6 uzun → 18 kısa (A2 taslağı)
 
