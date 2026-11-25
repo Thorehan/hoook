@@ -260,6 +260,12 @@ Hikâye ekranındaki "Yeni Maden", "Yeni Kristal Mağara" ve "Yeni Eski Kule · 
 - [ ] Bölge sonu (18, 36, 60, 83) final sahnesi ve bekçinin notları (6, 12, …) çıkıyor mu?
 - [ ] Görevler → Başarımlar: Kâşif yeni eşiklerle (18 / 60 / 107) mantıklı mı?
 
+## 36. İkinci yolculuk kısa bölümler (v0.93, 5 dk)
+- [ ] Haritada ve listede ikinci yolculuk 84–166 (dört bölge, "· II" tabelaları) düzgün mü?
+- [ ] İkinci yolculuktan birkaç bölüm oyna (ör. 84, 120, 150): su baştan izliyor mu, zorluk ilk yolculuktan biraz fazla mı, hâlâ adil mi?
+- [ ] v0.92'de ikinci yolculukta ilerlemen vardıysa: kısa bölümlere doğru taşındı mı (geçilmiş, 1 yıldız)?
+- [ ] Kâşif (18 / 83 / 166) mantıklı mı?
+
 ## 5. Genel izlenim (serbest)
 - En sevdiğim an:
 - En çok zorlandığım yer:

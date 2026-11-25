@@ -54,6 +54,16 @@
       ffKisa: function (c) { return ffSay(GEN.createKisa(c)); }, ffUzun: function (k) { return ffSay(GEN.createBolum(k)); } }, hk);
     try { if (hk) localStorage.setItem('kuyu.hayalet', JSON.stringify(hk)); localStorage.setItem(KEY, JSON.stringify(save)); } catch (e) {}
   })();
+  // İkinci yolculuk kısa bölümler (v0.93, A5.3): uzun ikinci yolculuk kayıtları (84–107) kısa bölümlere (84–166) taşınır (save.hikayeV 4)
+  (function ikinciGecisi() {
+    var GC = window.KuyuGecis, T = window.KuyuBolumler;
+    if (!GC || !GC.ikinciGecis || !T || !T.kisaSayi || (save.hikayeV || 0) !== GC.SURUM) return;
+    function ffSay(d) { return (d.rings || []).filter(function (r) { return r[2] === 'ff'; }).length; }
+    var hk = null; try { hk = JSON.parse(localStorage.getItem('kuyu.hayalet') || 'null'); } catch (e) {}
+    GC.ikinciGecis(save, { kisaSayi: T.kisaSayi, kaynak: function (c) { var t = T.kisaBul(c); return t && t.kaynak ? t.kaynak[0] : 0; },
+      ffKisaIkinci: function (c) { return ffSay(GEN.createKisaIkinci(c)); }, ffUzunIkinci: function (u) { return ffSay(GEN.createBolum(u)); } }, hk);
+    try { if (hk) localStorage.setItem('kuyu.hayalet', JSON.stringify(hk)); localStorage.setItem(KEY, JSON.stringify(save)); } catch (e) {}
+  })();
   GOREV.ensure(save);
   EKO.ensure(save);
   IST.ensure(save);
@@ -96,24 +106,24 @@
 
   // ---------- bölümler ----------
   var genCache = {};
-  // Hikâye (v0.92, İstişare 6 A5.2): 83 kısa bölüm (1–83, gen.createKisa; her biri tek fikir, fener yok) + ikinci yolculuk
-  // 84–107 (eski uzun 25–48, gen.createBolum(n − 59); A5.3'te kısa bölümlere döner). Eski 24 uzun bölüm oyundan kalktı (save.uzunBest).
-  var KISA_SAYI = (window.KuyuBolumler && window.KuyuBolumler.kisaSayi) || 0, IKINCI_FARK = 59, BOLUM_SAYI = KISA_SAYI + 24;
+  // Hikâye (v0.92, İstişare 6 A5.2): 83 kısa bölüm (1–83, gen.createKisa; her biri tek fikir, fener yok). Eski 24 uzun bölüm oyundan
+  // kalktı (save.uzunBest). v0.93 (A5.3): ikinci yolculuk da kısa bölümler, 84–166 (gen.createKisaIkinci(n − 83)); eski uzun ikinci yolculuk save.uzunIkinci.
+  var KISA_SAYI = (window.KuyuBolumler && window.KuyuBolumler.kisaSayi) || 0, BOLUM_SAYI = KISA_SAYI * 2;
   function kisaMi(n) { return n >= 1 && n <= KISA_SAYI; }
   function noYazi(n) { return n; } // ekranda görünen numara (v0.92'den beri bölüm numarasıyla aynı)
   function levelDef(n) {
     n = Math.max(1, Math.min(BOLUM_SAYI, Math.floor(n) || 1));
-    if (!genCache[n]) genCache[n] = kisaMi(n) ? GEN.createKisa(n) : GEN.createBolum(n - IKINCI_FARK);
+    if (!genCache[n]) genCache[n] = kisaMi(n) ? GEN.createKisa(n) : GEN.createKisaIkinci(n - KISA_SAYI);
     return genCache[n];
   }
-  // Bölgeler: kısa bölümlerin tarifindeki bölgeden (Taş 1–18, Maden 19–36, Kristal 37–60, Kule 61–83), ikinci yolculukta 6'şar
+  // Bölgeler: kısa bölümlerin tarifindeki bölgeden (Taş 1–18, Maden 19–36, Kristal 37–60, Kule 61–83); ikinci yolculukta aynı aralıklar + 83
   var BOLGE_ARALIK = (function () {
     var T = window.KuyuBolumler, out = [], son = null;
     for (var n = 1; n <= KISA_SAYI; n++) {
       var bi = (T.kisaBul(n) || {}).bolge || 0;
       if (!son || son.bi !== bi) { son = { bi: bi, a: n, b: n, ikinci: false }; out.push(son); } else son.b = n;
     }
-    for (var g = 0; g < 4; g++) out.push({ bi: g, a: KISA_SAYI + 1 + g * 6, b: KISA_SAYI + 6 + g * 6, ikinci: true });
+    out.slice().forEach(function (r) { out.push({ bi: r.bi, a: r.a + KISA_SAYI, b: r.b + KISA_SAYI, ikinci: true }); });
     return out;
   })();
   function bolgeAraligi(n) { for (var i = 0; i < BOLGE_ARALIK.length; i++) if (n >= BOLGE_ARALIK[i].a && n <= BOLGE_ARALIK[i].b) return BOLGE_ARALIK[i]; return BOLGE_ARALIK[0]; }

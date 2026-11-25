@@ -12,6 +12,7 @@ const dep = {
   kaynak: c => { const t = T.kisaBul(c); return t && t.kaynak ? t.kaynak[0] : 0; },
   ffKisa: c => ffSay(G.createKisa(c)), ffUzun: k => ffSay(G.createBolum(k))
 };
+const dep2 = { kisaSayi: T.kisaSayi, kaynak: dep.kaynak, ffKisaIkinci: c => ffSay(G.createKisaIkinci(c)), ffUzunIkinci: u => ffSay(G.createBolum(u)) };
 const cocuk = k => { const o = []; for (let c = 1; c <= T.kisaSayi; c++) if (dep.kaynak(c) === k) o.push(c); return o; };
 
 assert.strictEqual(T.kisaSayi, 83, '83 kısa bölüm');
@@ -59,24 +60,44 @@ const kopya = JSON.stringify(save);
 assert.strictEqual(GC.kisaGecis(save, dep, hk), false);
 assert.strictEqual(JSON.stringify(save), kopya);
 
+// 1b) v0.93 (A5.3): uzun ikinci yolculuk (84 = eski 25, tarif 1) kısa ikinci yolculuğa (84–166)
+assert.strictEqual(GC.ikinciGecis(save, dep2, hk), true);
+const B2 = save.best;
+cocuk(1).forEach(c => { const r = B2[83 + c]; assert(r && r.done && r.tasindi && r.ff === 0, 'ikinci ' + c); assert.strictEqual(r.odenen, Math.min(dep2.ffKisaIkinci(c), Math.round(dep2.ffKisaIkinci(c) * 2 / dep2.ffUzunIkinci(25)))); });
+assert(!B2[83 + Math.max(...cocuk(1)) + 1], 'tarif 2 ikinci geçilmedi');
+assert.deepStrictEqual(save.uzunIkinci[84], save.uzunBest[25]);
+assert.strictEqual(save.last, sira); // ilk yolculukta eksik bölüm var: sıradaki aynı
+assert.deepStrictEqual(Object.keys(save.istat.bolum), ['4']);
+assert.deepStrictEqual(Object.keys(hk.bolum), ['4']);
+assert.strictEqual(save.hikayeV, 4);
+assert.strictEqual(GC.ikinciGecis(save, dep2, hk), false);
+
 // 2) Bütün Hikâye (24 uzun) geçilmiş eski oyuncu: 83 kısa geçildi, sıradaki 84 (ikinci yolculuk)
 const hepsi = { best: {} };
 for (let k = 1; k <= 24; k++) hepsi.best[k] = { done: true, ff: dep.ffUzun(k) };
 GC.kisaGecis(hepsi, dep, null);
 for (let c = 1; c <= 83; c++) assert(hepsi.best[c].done, 'hepsi ' + c);
 assert.strictEqual(hepsi.last, 84);
+// ikinci yolculuğun ilk 6 uzun bölümü de geçilmiş (v0.92'de 84–89): kısa ikinci yolculukta Taş Kuyu'nun hepsi (84–101) geçildi
+for (let u = 25; u <= 30; u++) hepsi.best[u + 59] = { done: true, ff: dep2.ffUzunIkinci(u) };
+GC.ikinciGecis(hepsi, dep2, null);
+for (let c = 1; c <= 18; c++) assert(hepsi.best[83 + c] && hepsi.best[83 + c].done && hepsi.best[83 + c].odenen === dep2.ffKisaIkinci(c), 'ikinci taş ' + c);
+assert(!hepsi.best[83 + 19], 'ikinci maden geçilmedi');
+assert.strictEqual(hepsi.last, 83 + 19);
 // ateşböceği: bütün kısa bölümler ödenmiş sayılır (tekrar ödeme yok)
 let od = 0, top = 0; for (let c = 1; c <= 83; c++) { od += hepsi.best[c].odenen; top += dep.ffKisa(c); }
 assert.strictEqual(od, top);
 // Kâşif: 83 geçilen → Gümüş (60), Altın değil (107)
 GOREV.ensure(hepsi);
 const kasif = GOREV.achList(hepsi).find(a => a.id === 'kasif');
-assert.strictEqual(kasif.val, 83); assert.strictEqual(kasif.tier, 2);
+assert.strictEqual(kasif.val, 83 + 18); assert.strictEqual(kasif.tier, 2); // 18 / 83 / 166
 
 // 3) Yeni oyuncu: boş kayıt
 const yeni = { best: {} };
-GC.kisaGecis(yeni, dep, null);
-assert.deepStrictEqual(yeni.best, {}); assert.strictEqual(yeni.last, 1); assert.strictEqual(yeni.hikayeV, 3);
-assert(!('uzunBest' in yeni) && !('kisaDeneme' in yeni));
+GC.kisaGecis(yeni, dep, null); GC.ikinciGecis(yeni, dep2, null);
+assert.deepStrictEqual(yeni.best, {}); assert.strictEqual(yeni.last, 1); assert.strictEqual(yeni.hikayeV, 4);
+assert(!('uzunBest' in yeni) && !('kisaDeneme' in yeni) && !('uzunIkinci' in yeni));
+// v3 olmadan v4 çalışmaz
+assert.strictEqual(GC.ikinciGecis({ best: {}, hikayeV: 2 }, dep2, null), false);
 
-console.log('Tamam: kısa bölümlere geçiş (eşleme, taşınan bölümler, ödenmiş ateşböcekleri, ikinci yolculuk, hayalet ve istatistik, Kâşif)');
+console.log('Tamam: kısa bölümlere geçiş (eşleme, taşınan bölümler, ödenmiş ateşböcekleri, ikinci yolculuk uzun → kısa, hayalet ve istatistik, Kâşif)');

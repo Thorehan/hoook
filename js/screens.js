@@ -827,7 +827,7 @@
   // ---------- bölümler ----------
   // Gruplar: 1–6 Öğrenme (el yapımı), sonra 10'arlı. Sıradaki bölüm = geçilmemiş ilk bölüm.
   var listUpto = 0, filtre = 'tumu';
-  // v0.92: Hikâye 83 kısa bölüm (dört bölge) + ikinci yolculuk (84–107, bölge başına 6); her bölge bir grup
+  // v0.92–v0.93: Hikâye 83 kısa bölüm (dört bölge) + ikinci yolculuk (84–166, aynı dört bölge); her bölge bir grup
   function groupOf(n) { var r = G.bolgeAraligi(n); return { a: r.a, b: r.b, ad: G.bolgeAdi(r.a) }; }
   function goalsOf(n) {
     var d = G.levelDef(n), ff = (d.rings || []).filter(function (r) { return r[2] === 'ff'; }).length;
@@ -887,7 +887,7 @@
     }
     if (!shown) h = '<p class="bos">Eksik hedefi olan geçilmiş bölüm yok. Tümü sekmesinden yeni bölümlere geçebilirsin.</p>';
     $('liste').innerHTML = h;
-    $('dahaBtn').hidden = true; // v0.62: liste sınırlı, hepsi görünür (v0.92: 107 bölüm)
+    $('dahaBtn').hidden = true; // v0.62: liste sınırlı, hepsi görünür (v0.93: 166 bölüm)
   }
   $('liste').addEventListener('click', function (e) {
     var b = e.target.closest('button[data-n]'); if (!b) return;

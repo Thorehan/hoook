@@ -2,7 +2,7 @@
 
 > İstişare 6, Yol A. Kararlar Törehan'ın (24/11, `docs/istisare-6-bolum-hesap.md`): uzun bölümler kısa bölümlere bölünür, yıldızlar madalyalardan gelir ve ödülsüzdür, harita ayrı ekrandır. Bu belge kuralları ve Taş Kuyu denemesini tanımlar.
 >
-> **Durum:** ✅ A1 kurallar. ✅ A2 (v0.85, telefonda deneme bekliyor): Taş Kuyu'nun 18 kısa bölümü Hikâye ekranının başında deneme olarak; ölçümler §6'da. ✅ A3 (v0.86): yıldızlar sonuç kartında, bölüm kartlarında, grup başlıklarında ve özette (§3). ✅ A4 (v0.87): kuyu duvarı haritası, bugünkü 48 bölümle; A5'te kısa bölümlere geçince aynı harita kullanılır. ✅ A5.1 (v0.88, telefonda deneme bekliyor): Maden, Kristal ve Kule'nin 65 kısa bölümü deneme olarak; tablo ve ölçümler §9'da. ✅ A5.2 (v0.92): geçiş; kısa bölümler 1–83 asıl Hikâye, ikinci yolculuk 84–107 (uzun, A5.3'e kadar), kayıt taşındı (§10).
+> **Durum:** ✅ A1 kurallar. ✅ A2 (v0.85, telefonda deneme bekliyor): Taş Kuyu'nun 18 kısa bölümü Hikâye ekranının başında deneme olarak; ölçümler §6'da. ✅ A3 (v0.86): yıldızlar sonuç kartında, bölüm kartlarında, grup başlıklarında ve özette (§3). ✅ A4 (v0.87): kuyu duvarı haritası, bugünkü 48 bölümle; A5'te kısa bölümlere geçince aynı harita kullanılır. ✅ A5.1 (v0.88, telefonda deneme bekliyor): Maden, Kristal ve Kule'nin 65 kısa bölümü deneme olarak; tablo ve ölçümler §9'da. ✅ A5.2 (v0.92): geçiş; kısa bölümler 1–83 asıl Hikâye, ikinci yolculuk 84–107 (uzun, A5.3'e kadar), kayıt taşındı (§10). ✅ A5.3 (v0.93): ikinci yolculuk kısa bölümler 84–166 (§11).
 
 ## 1 · Bölüm kuralları
 
@@ -235,6 +235,15 @@ Adlar taslak (tablodaki "Ad: öğrettiği" sütununun başı bölüm adıdır); 
 - **Kâşif:** 18 / 60 / 107 (kazanılmış kademe geri alınmaz).
 - **Ölçüm:** `ekonomi-olcum.js` kısa bölümler 19–60 ile (`UZUN=1` eski uzun 7–18): ortalama gün ~147 ateşböceği (uzunla ~157). Bot notların 12/12'sini kısa bölümlerde ateşböceği rotasıyla alıyor.
 - **Geri dönüş:** `geri-donus-v0.91` etiketi.
+
+## 11 · A5.3: ikinci yolculuk kısa bölümler (v0.93, 25/11)
+
+- **Üretim:** `gen.createKisaIkinci(no)`: ilk yolculuğun kısa tarifi (`KISA[no]`), uzun ikinci yolculuğun bölme dönüşümüyle (`ikinciBolme`: yazı ve kutu yok, düzen yok, `dy` +10/+8, öğret → sına ve en az 1 ateşböceği); su yok, izleyen su `min(takip, IKINCI_TAKIP[bölge])` (22 / 18 / 16 / 15 m), not yok. Öğretten dönen bölme (panel öğreten hariç) ve zikzaklı bölme zikzak kalır: tek taraf 0. Tohum `1900003 + no × 7927`; öteki üreticiler aynı.
+- **Numaralar:** oyunda 83 + no (84–166); bölge aralıkları ilk yolculuğunkiler + 83. Finaller yalnız ilk yolculukta (18, 36, 60, 83).
+- **Kayıt** (`ikinciGecis`, `save.hikayeV` 4, `kisaGecis`ten sonra): v0.92 uzun ikinci yolculuk kaydı 84–107 (eski 25–48, tarif 1–24) `save.uzunIkinci`'ye; geçilen uzun bölümün kısa çocukları (83 + kaynak eşleşmesi) "geçildi, madalyasız", `odenen` oranla. Uzun ikinci yolculuğun hayaletleri ve istatistikleri bırakılır.
+- **Kâşif:** 18 / 83 / 166.
+- **Ölçüm:** `IKINCI=1 node tools/hikaye-olcum.js` (temkinli %5 modelde 14–30 sn), `IKINCI=1 node tools/hikaye-denge.js 4 1 83` (tek taraf 0, temkinli %5'in bitiremediği 0, spam 83/83: ilk yolculuktaki gibi). Bot 166 kısa bölümü dener.
+- **Geri dönüş:** `geri-donus-v0.92`.
 
 **A5.1'de (v0.88) yapılanlar:**
 - 65 tarif `KISA` listesine eklenir.

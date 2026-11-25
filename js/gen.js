@@ -797,15 +797,15 @@
   // birer ateşböceği; bölüm ilk yolculuk kadar uzun), su baştan ve daha yakından izler (Taş 22, Maden 18, Kristal 16, Kule 15 m),
   // halkalar biraz seyrek; yerleşim kendi tohumundan (aynı bölümün farklı kuyusu). Not yok.
   var IKINCI_TAKIP = [22, 18, 16, 15];
+  function ikinciBolme(b) {
+    var o = Object.assign({}, b, { yazilar: [], kutu: false, duzen: null, dy: [(b.dy ? b.dy[0] : 165) + 10, (b.dy ? b.dy[1] : 210) + 8] });
+    if (b.tur === 'ogret') { o.tur = 'sina'; o.ff = Math.max(1, b.ff || 0); }
+    return o;
+  }
   function ikinciTarif(T, no) {
     var t = T.bul(no - T.sayi);
     if (!t) return null;
-    var bl = t.bolmeler.map(function (b) {
-      var o = Object.assign({}, b, { yazilar: [], kutu: false, duzen: null, dy: [(b.dy ? b.dy[0] : 165) + 10, (b.dy ? b.dy[1] : 210) + 8] });
-      if (b.tur === 'ogret') { o.tur = 'sina'; o.ff = Math.max(1, b.ff || 0); }
-      return o;
-    });
-    return Object.assign({}, t, { no: no, bolmeler: bl, takip: Math.min(t.takip || 99, IKINCI_TAKIP[t.bolge]), su: 0, suFener: null, not: 0, ikinci: true,
+    return Object.assign({}, t, { no: no, bolmeler: t.bolmeler.map(ikinciBolme), takip: Math.min(t.takip || 99, IKINCI_TAKIP[t.bolge]), su: 0, suFener: null, not: 0, ikinci: true,
       ipucu: 'İkinci yolculuk: su baştan ve daha yakından izliyor, öğretici yazı yok. ' + t.ipucu });
   }
   function createBolum(no) {
@@ -820,6 +820,20 @@
     if (!tarif) return null;
     var d = bolumKur(tarif, 100 + no, 900001 + no * 7919);
     d.kisa = no; d.fenerli = false;
+    return d;
+  }
+  // İkinci yolculuğun kısa bölümleri (v0.93, A5.3): ilk yolculuğun kısa tarifinden, uzun ikinci yolculuğun kurallarıyla (ikinciTarif):
+  // yazı ve kutu yok, öğret → sına (en az 1 ateşböceği), su baştan ve daha yakından izler, halkalar biraz seyrek, not yok.
+  // Kendi tohum alanı (ilk yolculuğun aynı bölümünün farklı kuyusu); öteki üreticilerin rastgele sayı sırası değişmez.
+  function createKisaIkinci(no) {
+    var T = tarifler(), t = T && T.kisaBul && T.kisaBul(no);
+    if (!t) return null;
+    // öğretten sınaya dönen bölme ve zikzaklı bölme zikzak kalır: tek tarafa basan oyuncu ilerleyemesin (hikaye-denge: tek taraf 0)
+    var bl = t.bolmeler.map(function (b) { var o = ikinciBolme(b); if ((b.tur === 'ogret' && !b.panel) || b.duzen === 'zikzak') o.duzen = 'zikzak'; return o; }); // panel öğreten bölmede panel zaten yön seçtirir
+    var tarif = Object.assign({}, t, { bolmeler: bl, takip: Math.min(t.takip || 99, IKINCI_TAKIP[t.bolge]), su: 0, suFener: null, not: 0, ikinci: true,
+      ipucu: 'İkinci yolculuk: su baştan ve daha yakından izliyor. ' + t.ipucu });
+    var d = bolumKur(tarif, 200 + no, 1900003 + no * 7927);
+    d.kisa = no; d.kisaIkinci = no; d.fenerli = false;
     return d;
   }
   function bolumKur(tarif, no, tohum) {
@@ -1062,7 +1076,7 @@
     }, ek);
   }
 
-  var api = { createBolum: createBolum, createKisa: createKisa, HAFTALIK_SU: HAFTALIK_SU, createHaftalik: createHaftalik, ENDLESS_WATER: { base: 38, perM: 0.3, perS: 0, cap: 300 }, createLevel: createLevel, bolumSuyu: bolumSuyu, createEndless: createEndless, KURALLAR: KURALLAR, gunKurali: gunKurali, target: target, hangOf: hangOf, ffAlternative: ffAlternative, rng: rng };
+  var api = { createBolum: createBolum, createKisa: createKisa, createKisaIkinci: createKisaIkinci, HAFTALIK_SU: HAFTALIK_SU, createHaftalik: createHaftalik, ENDLESS_WATER: { base: 38, perM: 0.3, perS: 0, cap: 300 }, createLevel: createLevel, bolumSuyu: bolumSuyu, createEndless: createEndless, KURALLAR: KURALLAR, gunKurali: gunKurali, target: target, hangOf: hangOf, ffAlternative: ffAlternative, rng: rng };
   if (typeof module !== 'undefined' && module.exports) module.exports = api;
   else root.KuyuGen = api;
 })(typeof window !== 'undefined' ? window : this);

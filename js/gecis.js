@@ -7,10 +7,13 @@
    - Ateşböcekleri tekrar ödenmez: uzun bölümde toplanan oran kadarı kısa bölümde ödenmiş sayılır (odenen).
    - İkinci yolculuğun kayıtları birebir yeni numaraya geçer. Hayaletler ve bölüm istatistikleri de yeni numaraya taşınır;
      eski uzun bölümlerinki (1–24) bırakılır (o bölümler artık yok).
+   v0.93 (A5.3, ikinciGecis, save.hikayeV 4): ikinci yolculuk da kısa bölümler oldu (84–166, ilk yolculuğun 83 kısa bölümünün
+   ikinci yolculuk hâli). v0.92'deki uzun ikinci yolculuk kayıtları (84–107) aynı kuralla taşınır: uzun bölüm geçildiyse ondan doğan
+   kısa bölümler geçildi, madalyasız; ateşböcekleri tekrar ödenmez. Uzun ikinci yolculuğun hayaletleri ve istatistikleri bırakılır.
    Kayıt nesnesi üzerinde çalışır, DOM bilmez; Node'da da yüklenir (tools/gecis-test.js). */
 (function (root) {
   'use strict';
-  var KISA_DENEME = 100, IKINCI_FARK = 59, SURUM = 3;
+  var KISA_DENEME = 100, IKINCI_FARK = 59, SURUM = 3, SURUM_IKINCI = 4;
 
   // eski bölüm numarası → yeni numara (null: artık yok)
   function esle(eski, kisaSayi) {
@@ -52,7 +55,30 @@
     return true;
   }
 
-  var api = { kisaGecis: kisaGecis, esle: esle, SURUM: SURUM, IKINCI_FARK: IKINCI_FARK };
+  // dep: { kisaSayi, kaynak(no) → uzun tarif no (1–24), ffKisaIkinci(no), ffUzunIkinci(u) (u: eski uzun ikinci yolculuk 25–48) }
+  function ikinciGecis(save, dep, hayalet) {
+    if ((save.hikayeV || 0) !== SURUM) return false; // önce kisaGecis (v3) çalışmış olmalı
+    var best = save.best || {}, K = dep.kisaSayi, eskiIkinci = {}, i;
+    for (i = K + 1; i <= K + 24; i++) if (best[i]) { eskiIkinci[i] = best[i]; delete best[i]; }
+    for (var c = 1; c <= K; c++) {
+      var t = dep.kaynak(c), u = t + 24, eb = eskiIkinci[u + IKINCI_FARK];
+      if (!(eb && eb.done)) continue;
+      var cT = dep.ffKisaIkinci(c), kT = dep.ffUzunIkinci(u), oran = kT ? Math.min(1, (eb.ff || 0) / kT) : 0;
+      best[K + c] = { done: true, ff: 0, perfect: false, flow: false, reward: 0, speed: 0, tasindi: true, odenen: Math.min(cT, Math.round(cT * oran)) };
+    }
+    if (Object.keys(eskiIkinci).length) save.uzunIkinci = eskiIkinci;
+    save.best = best;
+    var son = 2 * K, sira = 1;
+    while (best[sira] && best[sira].done && sira < son) sira++;
+    save.last = sira; save.maxLevel = Math.max(save.maxLevel || 1, sira); save.haritaSon = sira;
+    function birak(o) { for (var j = K + 1; j <= K + 24; j++) delete o[j]; }
+    if (save.istat && save.istat.bolum) birak(save.istat.bolum);
+    if (hayalet && hayalet.bolum) birak(hayalet.bolum);
+    save.hikayeV = SURUM_IKINCI;
+    return true;
+  }
+
+  var api = { kisaGecis: kisaGecis, ikinciGecis: ikinciGecis, esle: esle, SURUM: SURUM, SURUM_IKINCI: SURUM_IKINCI, IKINCI_FARK: IKINCI_FARK };
   if (typeof module !== 'undefined' && module.exports) module.exports = api;
   else root.KuyuGecis = api;
 })(typeof window !== 'undefined' ? window : this);
