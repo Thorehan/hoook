@@ -16,9 +16,9 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@600;800&family=Figtree:wght@400;600;800&family=Lilita+One&display=swap">
-<link rel="stylesheet" href="css/kuyu.css?v=0.90">
-<link rel="stylesheet" href="css/ekranlar.css?v=0.90">
-<link rel="stylesheet" href="css/arayuz.css?v=0.90">
+<link rel="stylesheet" href="css/kuyu.css?v=0.91">
+<link rel="stylesheet" href="css/ekranlar.css?v=0.91">
+<link rel="stylesheet" href="css/arayuz.css?v=0.91">
 </head>
 <body>
 <!-- v0.90: oyun alanı tam ekran; bölüm adı, göstergeler ve duraklat düğmesi oyunun içinde, saydam çıkartmalar.
@@ -72,7 +72,7 @@
   <img id="acilisLogo" class="marka-logo" src="assets/funday-morning-logo.webp" alt="Funday Morning Games">
   <div class="yukleme" aria-hidden="true"><div id="yuklemeDolgu"></div></div>
   <div class="yukleme-not" id="yuklemeNot">Yükleniyor…</div>
-  <div class="ek-surum">Hoook v0.90</div>
+  <div class="ek-surum">Hoook v0.91</div>
 </section>
 
 <!-- Giriş: yalnızca ilk açılışta -->
@@ -93,8 +93,9 @@
 <section class="ekran tanitim" id="ekTanitim" hidden>
   <canvas id="tanitimSahne" aria-hidden="true"></canvas>
   <div class="sunar" id="sunar"><img src="assets/funday-morning-logo.webp" alt="Funday Morning Games"><span>sunar</span></div>
+  <!-- v0.91 (İstişare 5 Aşama 4): ad iki iple asılı tahta tabela; üç "o" kuyunun bakır halkaları, sonuncusunda ipte küçük kor (Çıra) -->
   <div class="tanitim-baslik">
-    <h1>Hoook</h1>
+    <h1 class="tb-tabela" aria-label="Hoook"><span class="tb-harf" aria-hidden="true">H</span><i class="tb-o" aria-hidden="true"></i><i class="tb-o" aria-hidden="true"></i><i class="tb-o tb-cira" aria-hidden="true"><i class="tb-kor"></i></i><span class="tb-harf" aria-hidden="true">k</span></h1>
     <span class="alt-hap">ÇIRA'YI IŞIĞA ÇIKAR</span>
     <div class="dokun">Başlamak için dokun</div>
   </div>
@@ -341,7 +342,7 @@
     <button type="button" class="ay-git" id="tanitimBtn">Tanıtımı yeniden izle</button>
     <button type="button" class="ay-git" id="ipucuSifirBtn">Tanıtım kartlarını yeniden göster</button>
     </div>
-    <p class="surum">Hoook v0.90 · prototip · Funday Morning Games</p>
+    <p class="surum">Hoook v0.91 · prototip · Funday Morning Games</p>
   </div>
 </section>
 
@@ -410,20 +411,20 @@
 <div class="hikaye-kart" id="hikayeKart" role="status" hidden><b id="hkBaslik"></b><span id="hkMetin"></span></div>
 <div class="bildirim" id="bildirim" role="status" hidden></div>
 
-<script src="js/engine.js?v=0.90"></script>
-<script src="js/levels.js?v=0.90"></script>
-<script src="js/bolumler.js?v=0.90"></script>
-<script src="js/gen.js?v=0.90"></script>
-<script src="js/gorevler.js?v=0.90"></script>
-<script src="js/ekonomi.js?v=0.90"></script>
-<script src="js/istatistik.js?v=0.90"></script>
-<script src="js/muzik.js?v=0.90"></script>
-<script src="js/notlar.js?v=0.90"></script>
-<script src="js/hayalet.js?v=0.90"></script>
-<script src="js/online.js?v=0.90"></script>
-<script src="js/karakter.js?v=0.90"></script>
-<script src="js/ikon.js?v=0.90"></script>
-<script src="js/game.js?v=0.90"></script>
-<script src="js/screens.js?v=0.90"></script>
+<script src="js/engine.js?v=0.91"></script>
+<script src="js/levels.js?v=0.91"></script>
+<script src="js/bolumler.js?v=0.91"></script>
+<script src="js/gen.js?v=0.91"></script>
+<script src="js/gorevler.js?v=0.91"></script>
+<script src="js/ekonomi.js?v=0.91"></script>
+<script src="js/istatistik.js?v=0.91"></script>
+<script src="js/muzik.js?v=0.91"></script>
+<script src="js/notlar.js?v=0.91"></script>
+<script src="js/hayalet.js?v=0.91"></script>
+<script src="js/online.js?v=0.91"></script>
+<script src="js/karakter.js?v=0.91"></script>
+<script src="js/ikon.js?v=0.91"></script>
+<script src="js/game.js?v=0.91"></script>
+<script src="js/screens.js?v=0.91"></script>
 </body>
 </html>

@@ -245,6 +245,13 @@ Hikâye ekranındaki "Yeni Maden", "Yeni Kristal Mağara" ve "Yeni Eski Kule · 
 - [ ] **Harita:** duvar baştan sona aynı mı, renk yukarı doğru yumuşak değişiyor mu? Sıradaki bölümün üstü kararıyor mu, bu hoş mu?
 - [ ] **Halka ustalığı:** menzile giren hız, çark, yay, kor halkasının çevresinde renkli hale görünüyor mu? Kullanınca "+ustalık" yazısı ve ilk seferde kısa açıklama çıkıyor mu? Özel halkayı kullanmak "zaten böyle yapmak istiyordum" hissi veriyor mu, oyun akıcı kalıyor mu?
 
+## 34. Açılış, tanıtım ve sonuç kartları (v0.91, 4 dk)
+- [ ] Açılışta yükleme ipi ve ucundaki kanca hoş mu?
+- [ ] Tanıtımda "Hoook" tabelası iple iniyor ve sallanıyor mu? Üç "o" halka olarak okunuyor mu, ad hâlâ "Hoook" diye anlaşılıyor mu?
+- [ ] (Yeni kurulumda ya da tarayıcı verisi silinince) giriş ekranı: pano, ad kutusu, düğmeler rahat mı?
+- [ ] Bölüm sonu ve Günlük/Haftalık sonuç kartları: başlık tabelası, madalya renkleri, ödül sayısı okunuyor mu? Kart oyun göstergelerinin üstünde mi?
+- [ ] Hikâye kartı (krem not) ve kısa bildirimler okunuyor mu, oyunda göstergeleri kapatıyor mu?
+
 ## 5. Genel izlenim (serbest)
 - En sevdiğim an:
 - En çok zorlandığım yer:
