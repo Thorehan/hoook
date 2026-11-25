@@ -133,6 +133,7 @@ Kullanıcı hikâyeye online'dan önce geçti; online (5) sonra.
 - [?] Bekçinin adı.
 
 ## Yapılanlar
+- 2026-11-25 · v0.87 · İstişare 6 Yol A4 (Muhammed, Törehan'ın kararıyla): Hikâye haritası, kuyu duvarı (taslak `docs/istisare-6/harita-taslak.html` onaylandıktan sonra). Halkalar, bölge tabelaları, bölüm sayfası, Çıra'nın atlaması; "harita ›" ve "Bölümler" haritaya, "Liste" listeye. Yalnız arayüz; kontrol, birim testleri ve bot çalıştı, 360×640–430×932 tarayıcıda denendi.
 - 2026-11-25 · v0.86 · İstişare 6 Yol A3 (Muhammed, Törehan'ın kararıyla): yıldızlar (1★ geçiş, 2★ bir madalya, 3★ üç madalya; ödülsüz). Sonuç kartında, bölüm kartlarında, grup başlıklarında ve özette. Yalnız arayüz; kontrol, birim testleri ve bot çalıştı, 360×640–430×932 tarayıcıda denendi.
 - 2026-11-24 · v0.85 · İstişare 6 Yol A2 (Muhammed, Törehan'ın kararıyla): kısa bölümler denemesi, Taş Kuyu 6 uzun → 18 kısa bölüm (Hikâye ekranının başında, ayrı kayıt). Eski bölümler, Günlük ve Haftalık birebir aynı; bot, nişan, tek taraf, spam, hata, geri, ekonomi ve denge testleri çalıştı.
 - 2026-11-24 · v0.84 · İstişare 5 Aşama 2 (Muhammed): Market, Koleksiyon ve ürün sayfası Askıda Menü dilinde (kuyu duvarı, kirişe asılı tabela, çiviye asılı eğik çıkartma kartlar, alttan açılan ürün sayfası, aşağı çekerek kapatma, satın alma kutlaması); 360×640 / 375×667 / 390×844 / 430×932 tarandı.

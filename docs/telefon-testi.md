@@ -207,6 +207,15 @@ Kısa ya da uzun bir bölümü birkaç kez oyna; bir kez madalyasız, bir kez ma
 - [ ] Bölüm listesinde kartlardaki üç küçük yıldız ve grup başlığındaki toplam (ör. 7/18★) okunuyor mu?
 - [ ] Yıldızlar bölümleri tekrar oynama isteği veriyor mu?
 
+## 30. Hikâye haritası (v0.87, 6 dk)
+Ana ekranda OYNA'nın altındaki "harita ›" çipine dokun.
+- [ ] Harita sıradaki halkada mı açılıyor? Aşağı ve yukarı kaydırmak akıcı mı?
+- [ ] Bölgeler (taş, maden, kristal, kule) ve ikinci yolculuğun gece hâli ayırt ediliyor mu? Tabelalar okunuyor mu?
+- [ ] Halkaya dokununca bölüm sayfası açılıyor mu? OYNA bölümü başlatıyor mu? Aşağı çekince, boşluğa dokununca ve Android geri ile kapanıyor mu?
+- [ ] Bir bölümü geçip sonuç kartında "Bölümler"e bas: Çıra bir üst halkaya atlıyor mu? Atlama hoş mu, hızlı mı, yavaş mı?
+- [ ] Üstteki "Liste" bugünkü listeyi açıyor mu? Liste mi, harita mı daha çok işine yarıyor?
+- [ ] Çıra giydiğin karakter ve takılarla mı görünüyor?
+
 ## 5. Genel izlenim (serbest)
 - En sevdiğim an:
 - En çok zorlandığım yer:

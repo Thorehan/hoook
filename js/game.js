@@ -2401,7 +2401,8 @@
     closePause();
     paused = true;
     if (sim) E.release(sim);
-    if (window.KuyuScreens && window.KuyuScreens.levels) window.KuyuScreens.levels(); else goHome();
+    // v0.87: Hikâye bölümünden haritaya (Çıra'nın atlaması orada görülür); kısa deneme bölümünden listeye (deneme grubu orada)
+    if (window.KuyuScreens && window.KuyuScreens.levels) window.KuyuScreens.levels(mode === 'level' && kisaMi(levelNo)); else goHome();
   }
   function goHome() {
     istatBitir('terk');
@@ -2704,7 +2705,7 @@
     persist: persist,
     levelDef: levelDef,
     bolumSayi: BOLUM_SAYI, kisaBas: KISA_BAS, kisaSayi: KISA_SAYI,
-    yildiz: yildiz, yildizHtml: yildizHtml,
+    yildiz: yildiz, yildizHtml: yildizHtml, yildizIpucu: yildizIpucu, madalyaIkon: ICON,
     toggleMuzik: function () { return muzikDegis(); },
     muzikAcik: muzikAcik,
     muzikSahne: function (s) { MZ.sahne(s); MZ.kis(false); },

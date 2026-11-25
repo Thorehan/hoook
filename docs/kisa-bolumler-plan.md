@@ -2,7 +2,7 @@
 
 > İstişare 6, Yol A. Kararlar Törehan'ın (24/11, `docs/istisare-6-bolum-hesap.md`): uzun bölümler kısa bölümlere bölünür, yıldızlar madalyalardan gelir ve ödülsüzdür, harita ayrı ekrandır. Bu belge kuralları ve Taş Kuyu denemesini tanımlar.
 >
-> **Durum:** ✅ A1 kurallar. ✅ A2 (v0.85, telefonda deneme bekliyor): Taş Kuyu'nun 18 kısa bölümü Hikâye ekranının başında deneme olarak; ölçümler §6'da. ✅ A3 (v0.86): yıldızlar sonuç kartında, bölüm kartlarında, grup başlıklarında ve özette (§3).
+> **Durum:** ✅ A1 kurallar. ✅ A2 (v0.85, telefonda deneme bekliyor): Taş Kuyu'nun 18 kısa bölümü Hikâye ekranının başında deneme olarak; ölçümler §6'da. ✅ A3 (v0.86): yıldızlar sonuç kartında, bölüm kartlarında, grup başlıklarında ve özette (§3). ✅ A4 (v0.87): kuyu duvarı haritası, bugünkü 48 bölümle; A5'te kısa bölümlere geçince aynı harita kullanılır.
 
 ## 1 · Bölüm kuralları
 

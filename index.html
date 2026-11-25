@@ -16,9 +16,9 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@600;800&family=Figtree:wght@400;600;800&family=Lilita+One&display=swap">
-<link rel="stylesheet" href="css/kuyu.css?v=0.86">
-<link rel="stylesheet" href="css/ekranlar.css?v=0.86">
-<link rel="stylesheet" href="css/arayuz.css?v=0.86">
+<link rel="stylesheet" href="css/kuyu.css?v=0.87">
+<link rel="stylesheet" href="css/ekranlar.css?v=0.87">
+<link rel="stylesheet" href="css/arayuz.css?v=0.87">
 </head>
 <body>
 <div class="app" id="oyunEkrani" hidden>
@@ -73,7 +73,7 @@
   <img id="acilisLogo" class="marka-logo" src="assets/funday-morning-logo.webp" alt="Funday Morning Games">
   <div class="yukleme" aria-hidden="true"><div id="yuklemeDolgu"></div></div>
   <div class="yukleme-not" id="yuklemeNot">Yükleniyor…</div>
-  <div class="ek-surum">Hoook v0.86</div>
+  <div class="ek-surum">Hoook v0.87</div>
 </section>
 
 <!-- Giriş: yalnızca ilk açılışta -->
@@ -135,6 +135,18 @@
     </div>
     <button type="button" class="ana buyuk genis" id="yarTabloBtn" hidden>Skor tablosu</button>
     <p class="not">Günlük Kuyu'da günde 3, Haftalık Kuyu'da haftada 5 deneme. Herkes aynı kuyuda yarışır; Haftalık puanın ligini belirler, lig ödülü pazartesi gelir. Sonuç kartındaki "Meydan oku" ile arkadaşına aynı kuyuyu gönderebilirsin.</p>
+  </div>
+</section>
+
+<!-- Hikâye haritası (v0.87, İstişare 6 A4): kuyu duvarı, 1. bölüm dipte; halkalar bölümler -->
+<section class="ekran harita-ekran" id="ekHarita" hidden aria-label="Hikâye haritası">
+  <div class="hr-kuyu" id="hrKuyu"><div class="hr-duvar" id="hrDuvar"></div></div>
+  <div class="hr-kiris">
+    <h2 class="hr-tabela">Hikâye</h2>
+    <div class="hr-sag">
+      <span class="hr-cip" id="hrToplam"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2.6l2.8 5.9 6.4.8-4.7 4.4 1.2 6.4L12 17l-5.7 3.1 1.2-6.4-4.7-4.4 6.4-.8z"/></svg><b id="hrToplamSayi">0/0</b></span>
+      <button type="button" class="hr-liste" id="hrListe">Liste</button>
+    </div>
   </div>
 </section>
 
@@ -296,7 +308,7 @@
     <button type="button" id="istatBtn">Oyun istatistikleri</button>
     <button type="button" id="tanitimBtn">Tanıtımı yeniden izle</button>
     <button type="button" id="ipucuSifirBtn">Tanıtım kartlarını yeniden göster</button>
-    <p class="surum">Hoook v0.86 · prototip · Funday Morning Games</p>
+    <p class="surum">Hoook v0.87 · prototip · Funday Morning Games</p>
   </div>
 </section>
 
@@ -332,6 +344,11 @@
     <ol class="tablo-liste" id="tabloListe"></ol>
     <div class="dur-iki"><button type="button" id="tabloYenile">Yenile</button><button type="button" id="tabloKapat">Kapat</button></div>
   </div>
+</div>
+
+<!-- Harita bölüm sayfası (v0.87): adı, yıldızlar, madalyalar, en iyi süre, OYNA; ürün sayfası gibi alttan gelir -->
+<div class="katman-ust alt-sayfa" id="hrKatman" hidden role="dialog" aria-modal="true" aria-labelledby="hrAd">
+  <div class="kart urun-kart hr-kart" id="hrSayfa"></div>
 </div>
 
 <!-- Ürün kartı (v0.77): büyük önizleme, nadirlik, fiyat; al, giy ya da vitrin indirimi için video (yalnız oyuncu seçerse) -->
@@ -370,19 +387,19 @@
 <div class="hikaye-kart" id="hikayeKart" role="status" hidden><b id="hkBaslik"></b><span id="hkMetin"></span></div>
 <div class="bildirim" id="bildirim" role="status" hidden></div>
 
-<script src="js/engine.js?v=0.86"></script>
-<script src="js/levels.js?v=0.86"></script>
-<script src="js/bolumler.js?v=0.86"></script>
-<script src="js/gen.js?v=0.86"></script>
-<script src="js/gorevler.js?v=0.86"></script>
-<script src="js/ekonomi.js?v=0.86"></script>
-<script src="js/istatistik.js?v=0.86"></script>
-<script src="js/muzik.js?v=0.86"></script>
-<script src="js/notlar.js?v=0.86"></script>
-<script src="js/hayalet.js?v=0.86"></script>
-<script src="js/online.js?v=0.86"></script>
-<script src="js/karakter.js?v=0.86"></script>
-<script src="js/game.js?v=0.86"></script>
-<script src="js/screens.js?v=0.86"></script>
+<script src="js/engine.js?v=0.87"></script>
+<script src="js/levels.js?v=0.87"></script>
+<script src="js/bolumler.js?v=0.87"></script>
+<script src="js/gen.js?v=0.87"></script>
+<script src="js/gorevler.js?v=0.87"></script>
+<script src="js/ekonomi.js?v=0.87"></script>
+<script src="js/istatistik.js?v=0.87"></script>
+<script src="js/muzik.js?v=0.87"></script>
+<script src="js/notlar.js?v=0.87"></script>
+<script src="js/hayalet.js?v=0.87"></script>
+<script src="js/online.js?v=0.87"></script>
+<script src="js/karakter.js?v=0.87"></script>
+<script src="js/game.js?v=0.87"></script>
+<script src="js/screens.js?v=0.87"></script>
 </body>
 </html>
