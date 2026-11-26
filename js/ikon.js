@@ -20,6 +20,18 @@
     atla: '<path class="d" d="M5 5.5v13l8.5-6.5z" fill="#fff" stroke="' + C + '" stroke-width="2.2" stroke-linejoin="round"/><path d="M17.5 5.5v13" stroke="' + C + '" stroke-width="3" stroke-linecap="round"/>',
     hediye: '<rect class="d" x="3.5" y="9" width="17" height="11.5" rx="2" fill="#ff7a2f" stroke="' + C + '" stroke-width="2.3"/><rect x="2.6" y="6.4" width="18.8" height="4.4" rx="1.6" fill="#ffe066" stroke="' + C + '" stroke-width="2.3"/><path d="M12 6.6v13.8" stroke="' + C + '" stroke-width="2.3"/><path d="M12 6.4c-1.6-3.6-5.6-3.4-5 0M12 6.4c1.6-3.6 5.6-3.4 5 0" fill="none" stroke="' + C + '" stroke-width="2.1" stroke-linecap="round"/>'
   };
+  // v0.94 (İstişare 7 Faz 1): üç madalyanın kendine özgü ikonları; üst panelde, sonuç kartında ve bölüm sayfasında aynı
+  // ateşböceği: kanatlı küçük böcek, kuyruğu yanar · atış (Kusursuz): kanca · akış: art arda tutulan iki halka ve hız çizgileri
+  P.atesbocegi = '<circle cx="14.6" cy="14.6" r="7.4" fill="#ffe066" opacity=".3"/><path d="M5.6 6.2L3.4 3.6M7.6 5L6.8 1.9" stroke="' + C + '" stroke-width="1.6" stroke-linecap="round"/>' +
+    '<ellipse cx="5.8" cy="11.6" rx="4" ry="2.3" transform="rotate(-25 5.8 11.6)" fill="#d9f0ff" stroke="' + C + '" stroke-width="1.6"/><ellipse cx="11.6" cy="5.8" rx="2.3" ry="4" transform="rotate(-65 11.6 5.8)" fill="#d9f0ff" stroke="' + C + '" stroke-width="1.6"/>' +
+    '<ellipse cx="9.2" cy="9.2" rx="3" ry="4.4" transform="rotate(-45 9.2 9.2)" fill="#4b3f6e" stroke="' + C + '" stroke-width="1.8"/><circle class="d" cx="14.4" cy="14.4" r="4.2" fill="#ffe066" stroke="' + C + '" stroke-width="2"/>';
+  P.kanca = '<circle cx="15.5" cy="3.6" r="2.2" fill="none" stroke="' + C + '" stroke-width="2"/><path d="M15.5 5.8v8.7a5 5 0 1 1-10 0l-1.6 2.4" fill="none" stroke="' + C + '" stroke-width="5.4" stroke-linecap="round" stroke-linejoin="round"/>' +
+    '<path class="d" d="M15.5 5.8v8.7a5 5 0 1 1-10 0l-1.6 2.4" fill="none" stroke="#e4e9ec" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/>';
+  P.akis = '<path d="M1.6 7.2h4M1 11h3M1.6 14.8h2.4" stroke="#ff7a2f" stroke-width="2" stroke-linecap="round"/><circle cx="10.4" cy="13" r="5.2" fill="none" stroke="' + C + '" stroke-width="4.8"/><circle cx="16.6" cy="9.4" r="5.2" fill="none" stroke="' + C + '" stroke-width="4.8"/>' +
+    '<circle class="d" cx="10.4" cy="13" r="5.2" fill="none" stroke="#ff7a2f" stroke-width="2.4"/><circle class="d" cx="16.6" cy="9.4" r="5.2" fill="none" stroke="#ffa24f" stroke-width="2.4"/>';
+  // Günlük ve Haftalık rozetleri: yükseklik (ok ve çentikler), çarpan (çift ok)
+  P.metre = '<path d="M12 21V4M6.5 9.5L12 4l5.5 5.5" fill="none" stroke="' + C + '" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"/><path class="d" d="M12 21V4M6.5 9.5L12 4l5.5 5.5" fill="none" stroke="#7fe58e" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/>';
+  P.hiz = '<path d="M5 12.5L12 6l7 6.5M5 19l7-6.5 7 6.5" fill="none" stroke="' + C + '" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"/><path class="d" d="M5 12.5L12 6l7 6.5M5 19l7-6.5 7 6.5" fill="none" stroke="#5ec8ff" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/>';
   function svg(ad, cls) {
     return '<svg class="ik ik-' + ad + (cls ? ' ' + cls : '') + '" viewBox="0 0 24 24" aria-hidden="true">' + (P[ad] || '') + '</svg>';
   }

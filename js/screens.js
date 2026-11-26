@@ -39,7 +39,7 @@
     if (id !== 'ekDolap' && !$('urunKatman').hidden) urunKapat(true);
     if (id === 'ekKoleksiyon') kolBaslat(); else kolDur();
     if (id === 'ekProfil') prBaslat(); else prDur();
-    if (id !== 'ekHarita') hrDur();
+    if (id !== 'ekHarita') { hrDur(); ileriIptal(); }
     if (id !== 'oyun' && id !== 'ekAcilis') G.muzikSahne('menu'); // menülerde sakin müzik
     if (SEKMELER.indexOf(id) >= 0) { $('gorevNokta').hidden = !G.gorevBekleyen(); $('marketNokta').hidden = !G.vitrinYeni() || id === 'ekDolap'; } // Market: bugünün vitrini görülmedi
   }
@@ -866,15 +866,15 @@
     for (var ga = 1; ga <= listUpto;) {
       var gr = groupOf(ga), cards = '', gDone = 0, gGot = 0, gTot = 0, gY = 0;
       for (var n = gr.a; n <= gr.b; n++) {
-        var g = goalsOf(n), b = g.b, done = !!b.done, full = done && g.got >= g.total, isNext = n === nx;
+        var g = goalsOf(n), b = g.b, done = !!b.done, full = done && g.got >= g.total, isNext = n === nx, kilitli = !G.acikMi(n);
         gTot += g.total; gGot += g.got; gY += g.y; if (done) gDone++;
         if (filtre === 'eksik' && !(done && !full) && !isNext) continue;
         var dots = '';
         for (var k = 0; k < g.ff; k++) dots += '<i class="' + (k < (b.ff || 0) ? 'var' : '') + '"></i>';
         dots += '<i class="m' + (b.perfect ? ' var' : '') + '"></i><i class="m' + (b.flow ? ' var' : '') + '"></i>';
-        cards += '<button type="button" class="bkart' + (done ? ' gecildi' : '') + (full ? ' tam' : '') + (isNext ? ' siradaki' : '') + '" data-n="' + n + '"' +
-          (isNext ? ' data-siradaki aria-current="true"' : '') + ' aria-label="Bölüm ' + n + ', ' + g.d.name + (done ? ', geçildi, ' + g.y + ' yıldız' : '') + ', ' + g.got + '/' + g.total + ' hedef">' +
-          '<span class="bk-ust"><span class="no">' + n + '</span>' + kartIsaret(g, isNext) + '</span>' +
+        cards += '<button type="button" class="bkart' + (done ? ' gecildi' : '') + (full ? ' tam' : '') + (isNext ? ' siradaki' : '') + (kilitli ? ' kilitli' : '') + '" data-n="' + n + '"' +
+          (isNext ? ' data-siradaki aria-current="true"' : '') + ' aria-label="Bölüm ' + n + ', ' + g.d.name + (done ? ', geçildi, ' + g.y + ' yıldız' : kilitli ? ', kilitli' : '') + ', ' + g.got + '/' + g.total + ' hedef">' +
+          '<span class="bk-ust"><span class="no">' + n + '</span>' + (kilitli ? '<span class="bk-kilit" aria-hidden="true">' + IK.svg('kilit') + '</span>' : kartIsaret(g, isNext)) + '</span>' +
           '<b>' + g.d.name + '</b><span class="rozet">' + dots + '</span></button>';
         shown++;
       }
@@ -891,6 +891,7 @@
   }
   $('liste').addEventListener('click', function (e) {
     var b = e.target.closest('button[data-n]'); if (!b) return;
+    if (!G.acikMi(+b.dataset.n)) { toast('Önce ' + (+b.dataset.n - 1) + '. bölümü geç', 1800); return; } // v0.94: sıralı ilerleme
     G.startLevel(+b.dataset.n);
   });
 
@@ -955,10 +956,11 @@
     h += '<svg class="hr-ipler" width="' + W + '" height="' + hrH + '" aria-hidden="true"><path class="golge" d="' + yolG + '"/><path class="gecti" d="' + yolG + '"/><path class="sonra" d="' + yolS + '"/></svg>';
     var T = window.KuyuBolumler;
     for (var r = 1; r <= G.bolumSayi; r++) {
-      var g = gs[r], done = !!g.b.done, durum = done ? 'gecildi' : r === sira ? 'siradaki' : 'bekliyor', final = hrBuyuk(r), tf = T && r <= G.kisaSayi ? T.kisaBul(r) : null;
+      var g = gs[r], done = !!g.b.done, durum = done ? 'gecildi' : r === sira ? 'siradaki' : G.acikMi(r) ? 'bekliyor' : 'bekliyor kilitli', final = hrBuyuk(r), tf = T && r <= G.kisaSayi ? T.kisaBul(r) : null;
       h += '<button type="button" class="hr-halka ' + durum + (final ? ' final' : '') + (r > G.kisaSayi ? ' ikinci' : '') + '" data-n="' + r + '" style="left:' + hrKonum[r].x + 'px;top:' + hrUstten(hrKonum[r].y) + 'px"' +
-        (durum === 'siradaki' ? ' aria-current="step"' : '') + ' aria-label="Bölüm ' + r + ', ' + g.d.name + (done ? ', ' + g.y + ' yıldız' : durum === 'siradaki' ? ', sıradaki' : '') + '">' +
+        (durum === 'siradaki' ? ' aria-current="step"' : '') + ' aria-label="Bölüm ' + r + ', ' + g.d.name + (done ? ', ' + g.y + ' yıldız' : durum === 'siradaki' ? ', sıradaki' : !G.acikMi(r) ? ', kilitli' : '') + '">' +
         '<i class="h" aria-hidden="true"></i><span class="no" aria-hidden="true">' + r + '</span>' +
+        (durum === 'bekliyor kilitli' ? '<span class="hr-kilit" aria-hidden="true">' + IK.svg('kilit') + '</span>' : '') +
         (final ? HR_IK.gunes : tf && tf.not ? HR_IK.kagit : '') +
         (done ? G.yildizHtml(g.y, 'hr-yildiz') : '') +
         (durum === 'siradaki' ? '<span class="hr-sira" aria-hidden="true">Sıradaki</span>' : '') + '</button>';
@@ -1007,8 +1009,8 @@
   }
   function hrDur() { cancelAnimationFrame(hrRaf); hrRaf = 0; hrUcus = null; if (!$('hrKatman').hidden) hrKapat(true); }
   // atlama: ip hedef halkaya uzanır (0,26 sn) → Çıra kavisle atlar (0,52 sn) → ipinde savrulur
-  function hrAtla(a, b) {
-    if (reduceMotion) { hrCiraKoy(b); hrKaydir(b, false); return; }
+  function hrAtla(a, b, bitti) {
+    if (reduceMotion) { hrCiraKoy(b); hrKaydir(b, false); if (bitti) bitti(); return; }
     var bas = hrAsili(a), son = hrAsili(b), hx = hrKonum[b].x, hy = hrUstten(hrKonum[b].y) + 12, c = $('hrCira');
     var IP = 260, UC = 520, t0 = performance.now();
     hrUcus = { a: a, b: b };
@@ -1027,6 +1029,7 @@
         hrAtisIp(hx, hy, x + 32, y + 34);
       } else {
         hrAtisIp(0, 0, 0, 0); hrUcus = null; hrCiraKoy(b); hrSavrulT = now;
+        if (bitti) bitti();
         return;
       }
       requestAnimationFrame(kare);
@@ -1042,8 +1045,29 @@
     if (bas !== sira) setTimeout(function () { if (current === 'ekHarita') hrAtla(bas, sira); }, 380);
     if (s.haritaSon !== sira) { s.haritaSon = sira; G.persist(); }
   }
+  // Sıradaki bölüme geçiş (v0.94, İstişare 7 Faz 1): sonuç kartındaki "Bölüm N ›" haritayı açar, Çıra a'dan b'ye atlar
+  // ve bölüm kendiliğinden başlar. Haritaya dokunmak beklemeyi keser (hemen başlar); başka ekrana geçilirse iptal.
+  var ileriB = 0, ileriT = 0, ileriYedekT = 0;
+  function ileriBasla() { if (!ileriB) return; var b = ileriB; ileriIptal(); G.startLevel(b); }
+  function ileriDokun(e) { if (!ileriB) return; e.preventDefault(); e.stopPropagation(); ileriBasla(); }
+  function ileriIptal() { ileriB = 0; clearTimeout(ileriT); clearTimeout(ileriYedekT); $('ekHarita').removeEventListener('pointerdown', ileriDokun, true); $('ekHarita').classList.remove('ileri'); }
+  function ileri(a, b) {
+    show('ekHarita');
+    hrCiz(a); hrKaydir(a, false); hrDongu();
+    var s = save(), sira = Math.min(nextLevel(), G.bolumSayi);
+    if (s.haritaSon !== sira) { s.haritaSon = sira; G.persist(); } // haritayı sonra açınca aynı atlama yinelenmesin
+    ileriB = b;
+    $('ekHarita').classList.add('ileri');
+    $('ekHarita').addEventListener('pointerdown', ileriDokun, true);
+    ileriT = setTimeout(function () {
+      if (current !== 'ekHarita' || ileriB !== b) return;
+      hrAtla(a, b, function () { ileriT = setTimeout(ileriBasla, reduceMotion ? 250 : 420); });
+    }, reduceMotion ? 120 : 300);
+    ileriYedekT = setTimeout(ileriBasla, 2200); // yedek: animasyon kareleri durursa (arka plan, yavaş cihaz) bölüm yine başlar
+  }
   // bölüm sayfası
   function hrAc(n) {
+    if (!G.acikMi(n)) { toast('Önce ' + (n - 1) + '. bölümü geç', 1800); return; } // v0.94: sıralı ilerleme
     var g = goalsOf(n), b = g.b, d = g.d, ffT = g.ff, done = !!b.done, IK = G.madalyaIkon || {};
     var ffVar = done && ffT > 0 && (b.ff || 0) >= ffT, pVar = done && !!b.perfect, aVar = done && !!b.flow, ip = G.yildizIpucu ? G.yildizIpucu(b, ffT) : '';
     var bilgi = !done ? (n === nextLevel() ? 'Sıradaki bölüm' : 'Henüz geçilmedi') :
@@ -1057,6 +1081,7 @@
       md(pVar, IK.perfect, 'Kusursuz', pVar ? 'alındı' : 'en çok ' + d.par + ' atış', 1.5) +
       md(aVar, IK.flow, 'Akış', aVar ? 'alındı' : 'hedef x' + d.flow, -1) + '</div>' +
       '<p class="hr-s-bilgi">' + bilgi + '</p>' +
+      (d.hint ? '<p class="hr-s-ipucu">' + d.hint + '</p>' : '') + // v0.94: oyundaki alt yazı kalktı, bölümün ipucu burada
       '<button type="button" class="ana buyuk genis" id="hrOyna">' + (done ? 'Tekrar oyna' : 'OYNA') + '</button>' +
       '<button type="button" class="metin-btn" id="hrVazgec">Vazgeç</button>';
     hrAcikN = n;
@@ -1448,6 +1473,7 @@
       if (it) urunAc(id);
     },
     levels: function (liste) { if (liste) openLevels(); else openHarita(); },
+    ileri: ileri,
     showGame: function () { show('oyun'); },
     toast: toast,
     hikaye: hikaye,

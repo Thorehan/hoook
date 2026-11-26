@@ -368,6 +368,9 @@
   // Hikâye'de sıradaki bölüm: geçilmemiş ilk bölüm (dokun ve başla buradan sürer, v0.64)
   function siradakiBolum() { var n = 1; while (save.best[n] && save.best[n].done && n < BOLUM_SAYI) n++; return n; }
   function hikayeBitti() { for (var n = 1; n <= BOLUM_SAYI; n++) if (!(save.best[n] && save.best[n].done)) return false; return true; }
+  // Sıralı ilerleme (v0.94, İstişare 7 Faz 1): bölüm açıksa geçilmiştir ya da önceki bölüm geçilmiştir (1. bölüm hep açık).
+  // Bölüm atlama yok; kilitli bölüme her girişte (harita, liste, bağlantı) sıradaki bölüm açılır.
+  function acikMi(n) { n = Math.floor(n) || 1; if (n <= 1) return true; var b = save.best || {}; return !!(b[n] && b[n].done) || !!(b[n - 1] && b[n - 1].done); }
   function msToNextDay() { var n = new Date(Date.now() + GUN_KAYMA), t = Date.UTC(n.getUTCFullYear(), n.getUTCMonth(), n.getUTCDate() + 1); return t - n.getTime(); }
   function dailyInfo() {
     var key = todayKey(), d = save.daily || {}, st = save.streak || {};
@@ -409,7 +412,6 @@
     save.last = levelNo; if (levelNo > save.maxLevel) save.maxLevel = levelNo;
     persist();
     deaths = 0;
-    $('ipucu').textContent = def.hint;
     $('puan').hidden = true;
     $('baslik').textContent = noYazi(levelNo) + '. ' + def.name + (def.ikinci ? ' · ikinci yolculuk' : '');
     levelBolge = def.bolge || 0;
@@ -424,7 +426,13 @@
   function bestKayit() { return save.best; }
   function startHikaye(n) { startLevel(n); }
   function sonBolumMu() { return levelNo >= BOLUM_SAYI; }
-  function sonrakiBolum() { if (!sonBolumMu()) startLevel(levelNo + 1); else goLevels(); }
+  // v0.94: sıradaki bölüme haritadan geçilir: Çıra bir üst halkaya atlar, bölüm kendiliğinden başlar (screens.js → ileri)
+  function sonrakiBolum() {
+    if (sonBolumMu()) { goLevels(); return; }
+    if (!(window.KuyuScreens && window.KuyuScreens.ileri)) { startLevel(levelNo + 1); return; }
+    istatBitir('terk'); closePause(); paused = true; if (sim) E.release(sim);
+    window.KuyuScreens.ileri(levelNo, levelNo + 1);
+  }
   // Yeni bir bölgeye ilk girişte oyunu durdurmayan kısa duyuru (bölge başına bir kez)
   function bolgeDuyur(bi, ek) {
     if (!save.bolgeler) save.bolgeler = {};
@@ -456,7 +464,6 @@
     reset();
     if (meydan && window.KuyuScreens && window.KuyuScreens.hikaye) window.KuyuScreens.hikaye(meydan.ad + ' sana meydan okudu', 'Aynı kuyu, ' + meydan.puan + ' puan. Geçebilir misin? Devam hakkı yok.', 4200);
     var kural = dailyKey ? GEN.gunKurali(dailyKey) : null;
-    $('ipucu').textContent = kural ? 'Günün kuralı: ' + kural.ad + '. ' + kural.metin + ' Kuyu herkes için aynı; günün en iyi puanın ve serin sayılır.' : def.hint;
     // günün kuralı: koşu başında oyunu durdurmayan kısa kart
     if (kural && window.KuyuScreens && window.KuyuScreens.hikaye) window.KuyuScreens.hikaye('Günün kuralı · ' + kural.ad, kural.metin, 3800);
   }
@@ -481,7 +488,6 @@
       persist();
     }
     istatBitir('terk'); // Baştan başla / Yeni koşu
-    $('ipucu').classList.remove('gizli'); // v0.90: ipucu balonu her koşu başında görünür, ilk atışta kaybolur
     if (mode === 'endless') def = newEndlessDef();
     sim = E.createSim(def); hisSifirla(); anlarSifirla();
     notKur();
@@ -641,24 +647,31 @@
     for (var i = alt; i < ust; i++) h += '<i' + (pu > i ? ' style="background:' + renk + ';box-shadow:0 0 5px ' + renk + '"' : '') + '></i>';
     return h + '</span>';
   }
+  // Üst panel (v0.94, İstişare 7 Faz 1): Hikâye'de üç madalyanın canlı hâli, sonuç kartındaki ikonlarla aynı:
+  // ateşböceği (toplanan / bölümdeki), Kusursuz (kalan atış; aşılınca "kaçtı"), akış (şimdiki / hedef). Hedefe ulaşan rozet yanar,
+  // kaçan söner. İlk 3 bölümde ikonların altında adları yazar. Günlük ve Haftalık'ta puan ortada büyük; metre, akış ve çarpan rozet.
+  function rozet(cls, ik, deger, ad, aria, ek) {
+    var etiket = mode === 'level' && levelNo <= 3;
+    return '<span class="rozet ' + cls + '" role="img" aria-label="' + aria + '">' + IKS(ik) + '<b>' + deger + '</b>' + (ek || '') + (etiket ? '<small>' + ad + '</small>' : '') + '</span>';
+  }
   function updateHud(force) {
     var m = E.meters(sim), mult = E.speedMult(sim), combo = sim.combo;
-    var akis = cip('akis' + (combo >= 2 ? ' aktif' : ''), IK.akis, 'x' + combo, 'akış x' + combo).replace('</b></span>', '</b>' + alevPip(combo) + '</span>');
     if (mode === 'endless') {
       var sc = E.score(sim), key = 'e' + sc + '|' + m + '|' + combo + '|' + mult + '|' + sim.alevPuan + sim.alev;
       $('puan').innerHTML = sc + '<small>puan</small>';
       if (key === lastHud && !force) return; lastHud = key;
-      $('cipler').innerHTML = cip('', IK.metre, m + ' m', m + ' metre') + akis +
-        cip('hiz' + (mult > 1 ? ' aktif' : ''), IK.hiz, 'x' + mult.toFixed(2).replace('.', ','), 'çarpan x' + mult.toFixed(2) + ' (hız ve ustalık)');
+      $('cipler').innerHTML = rozet('r-metre', 'metre', m + ' m', 'yükseklik', m + ' metre') +
+        rozet('r-akis' + (combo >= 2 ? ' aktif' : ''), 'akis', 'x' + combo, 'akış', 'akış x' + combo, alevPip(combo)) +
+        rozet('r-hiz' + (mult > 1 ? ' aktif' : ''), 'hiz', 'x' + mult.toFixed(2).replace('.', ','), 'çarpan', 'çarpan x' + mult.toFixed(2) + ' (hız ve ustalık)');
     } else {
-      var n = E.fireflyCount(sim), shots = sim.shots - sim.misses;
-      var key2 = 'l' + n + '|' + combo + '|' + shots + '|' + sim.alevPuan + sim.alev;
+      var n = E.fireflyCount(sim), ffT = sim.fireflies.length, shots = sim.shots - sim.misses, kalan = def.par - shots;
+      var kusursuz = kalan >= 0 && !sim.donus, akisTam = sim.maxCombo >= def.flow;
+      var key2 = 'l' + n + '|' + combo + '|' + shots + '|' + sim.maxCombo + '|' + (sim.donus || 0) + '|' + sim.alevPuan + sim.alev;
       if (key2 === lastHud && !force) return; lastHud = key2;
-      var dots = '';
-      for (var i = 0; i < sim.fireflies.length; i++) dots += '<i class="' + (i < n ? 'var' : '') + '"></i>';
       $('cipler').innerHTML =
-        (sim.fireflies.length ? '<span class="cip ates" title="ateşböceği" aria-label="ateşböceği ' + n + ' / ' + sim.fireflies.length + '">' + dots + '</span>' : '') +
-        cip('atis' + (shots > def.par ? ' asti' : ''), IK.atis, shots + '/' + def.par, 'atış ' + shots + ' / ' + def.par + ' (Kusursuz için)') + akis;
+        (ffT ? rozet('r-ates' + (n >= ffT ? ' tam' : ''), 'atesbocegi', n + '/' + ffT, 'ateşböceği', 'ateşböceği ' + n + ' / ' + ffT) : '') +
+        rozet('r-atis' + (kusursuz ? '' : ' kacti'), 'kanca', kusursuz ? kalan + ' kaldı' : 'kaçtı', 'atış', kusursuz ? 'Kusursuz için ' + kalan + ' atış kaldı' : 'Kusursuz kaçtı') +
+        rozet('r-akis' + (akisTam ? ' tam' : '') + (combo >= 2 ? ' aktif' : ''), 'akis', 'x' + combo + '/' + def.flow, 'akış', 'akış x' + combo + ', hedef x' + def.flow, alevPip(combo));
     }
   }
 
@@ -2130,11 +2143,8 @@
   }
 
   // ---------- sonuçlar ----------
-  var ICON = {
-    ff: '<svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="5" fill="#e8f27c"/><circle cx="12" cy="12" r="10" fill="#e8f27c" opacity=".25"/></svg>',
-    perfect: '<svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9" fill="none" stroke="#bfe6ee" stroke-width="2.5"/><circle cx="12" cy="12" r="3.5" fill="#bfe6ee"/></svg>',
-    flow: '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 16c4 0 4-8 9-8s5 8 9 8" fill="none" stroke="#f26a3a" stroke-width="2.8" stroke-linecap="round"/></svg>'
-  };
+  // v0.94: madalya ikonları üst paneldekilerle aynı (js/ikon.js: ateşböceği, kanca, akış)
+  var ICON = { ff: IKS('atesbocegi'), perfect: IKS('kanca'), flow: IKS('akis') };
   // Yıldızlar (v0.86, İstişare 6 A3, docs/kisa-bolumler-plan.md §3): kayıttaki en iyi madalyalardan; ödülsüz, düşmez.
   // 1★ geçiş · 2★ en az bir madalya · 3★ üç madalya. ffT: bölümdeki ateşböceği sayısı.
   function yildiz(b, ffT) {
@@ -2603,13 +2613,11 @@
     if (mode === 'endless') {
       $('duraklatBilgi').textContent = (dailyKey ? 'Günlük Kuyu' : weekKey ? 'Haftalık Kuyu' : 'Sonsuz Kuyu') + ' · ' + m + ' m · ' + E.score(sim) + ' puan · akış x' + sim.combo;
       $('bastanYazi').textContent = 'Yeni koşu';
-      $('dAtlaBtn').hidden = true;
     } else {
       var depth = Math.max(0, Math.round(sim.p.y / 20));
       $('duraklatBilgi').textContent = noYazi(levelNo) + '. ' + def.name + ' · ' + depth + ' m · atış ' + (sim.shots - sim.misses) + '/' + def.par +
         ' · ateşböceği ' + E.fireflyCount(sim) + '/' + sim.fireflies.length;
       $('bastanYazi').textContent = 'Baştan başla';
-      $('dAtlaBtn').hidden = false;
     }
     syncPauseToggles();
     durAyarGoster(false);
@@ -2653,7 +2661,6 @@
   };
   $('devamBtn').onclick = resumeGame;
   $('bastanBtn').onclick = function () { closePause(); reset(); };
-  $('dAtlaBtn').onclick = function () { closePause(); if (mode === 'level') { istatBitir('atla'); sonrakiBolum(); } };
   $('anaMenuBtn').onclick = function () { goHome(); };
   $('dSesBtn').onclick = function () { save.mute = !save.mute; persist(); setMuteIcon(); syncPauseToggles(); };
   $('dMuzikBtn').onclick = function () { muzikDegis(); syncPauseToggles(); };
@@ -2678,7 +2685,6 @@
     ac();
     if (finalT !== null) { if (finalT > 1) finalBitir(); return; }
     if (!sim || paused || sim.status !== 'play') return;
-    $('ipucu').classList.add('gizli');
     active = ev.pointerId;
     try { canvas.setPointerCapture(ev.pointerId); } catch (e) {}
     // Tek el: dokunuşun ekrandaki yatay yeri yönü seçer (sol / orta / sağ), nişan yardımı hedefi bulur.
@@ -2743,8 +2749,9 @@
     // skor tablosu (v0.73): bugünün ve bu haftanın tahta adı, bitişe kalan süre
     tahtalar: function () { return { gunluk: 'g-' + todayKey(), haftalik: 'h-' + haftaKey(), haftaKalan: kalanYazi(msHaftaSonu()), gunKalan: kalanYazi(864e5 - (Date.now() + GUN_KAYMA) % 864e5) }; },
     onlineAcik: function () { return !!(ONLINE && ONLINE.acik()); },
-    startLevel: function (n) { ac(); startLevel(n); },
-    startHikaye: function (n) { ac(); startHikaye(n); },
+    startLevel: function (n) { ac(); startLevel(acikMi(n) ? n : siradakiBolum()); },
+    startHikaye: function (n) { ac(); startHikaye(acikMi(n) ? n : siradakiBolum()); },
+    acikMi: acikMi,
     startEndless: function () { ac(); startEndless(true); }, // v0.64: serbest Sonsuz kalktı; eski bağlantılar Günlük Kuyu'ya
     siradaki: siradakiBolum, hikayeBitti: hikayeBitti,
     hakDurum: function (tur) { return EKO.hakDurum(save, tur, tur === 'gunluk' ? todayKey() : haftaKey()); },

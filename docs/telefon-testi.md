@@ -266,6 +266,14 @@ Hikâye ekranındaki "Yeni Maden", "Yeni Kristal Mağara" ve "Yeni Eski Kule · 
 - [ ] v0.92'de ikinci yolculukta ilerlemen vardıysa: kısa bölümlere doğru taşındı mı (geçilmiş, 1 yıldız)?
 - [ ] Kâşif (18 / 83 / 166) mantıklı mı?
 
+## 37. Sıralı ilerleme ve üst panel (v0.94, 4 dk)
+- [ ] Bir bölümü geçince "Bölüm N ›": harita açılıp Çıra atlıyor mu, bölüm kendiliğinden başlıyor mu? Haritaya dokununca hemen başlıyor mu?
+- [ ] Haritada ve listede geçilmemiş bölümler kilitli mi; dokununca "Önce N. bölümü geç" yazıyor mu?
+- [ ] Duraklatmada "Bölümü atla" yok; üç düğme var.
+- [ ] Oyunda alttaki ipucu yazısı yok; haritada bir bölüme dokununca bölüm sayfasında ipucu var mı?
+- [ ] Üst panel: ateşböceği, kanca (kalan atış) ve akış rozetleri ne anlattığını hemen söylüyor mu? Hedefe ulaşınca sarı yanıyor, Kusursuz kaçınca sönüyor mu?
+- [ ] Günlük ve Haftalık'ta puan ortada okunuyor mu?
+
 ## 5. Genel izlenim (serbest)
 - En sevdiğim an:
 - En çok zorlandığım yer:

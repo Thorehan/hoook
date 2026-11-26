@@ -16,13 +16,14 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@600;800&family=Figtree:wght@400;600;800&family=Lilita+One&display=swap">
-<link rel="stylesheet" href="css/kuyu.css?v=0.93">
-<link rel="stylesheet" href="css/ekranlar.css?v=0.93">
-<link rel="stylesheet" href="css/arayuz.css?v=0.93">
+<link rel="stylesheet" href="css/kuyu.css?v=0.94">
+<link rel="stylesheet" href="css/ekranlar.css?v=0.94">
+<link rel="stylesheet" href="css/arayuz.css?v=0.94">
 </head>
 <body>
 <!-- v0.90: oyun alanı tam ekran; bölüm adı, göstergeler ve duraklat düğmesi oyunun içinde, saydam çıkartmalar.
-     İpucu altta küçük saydam balon: ilk dokunuşa kadar görünür, dokunuşu engellemez. -->
+     v0.94 (İstişare 7 Faz 1): alttaki ipucu yazısı kalktı (ipucu haritadaki bölüm sayfasında ve öğret bölümlerinin duvar yazılarında);
+     göstergeler üç madalyanın canlı rozetleri. -->
 <div class="app" id="oyunEkrani" hidden>
   <div class="sahne" id="sahne">
     <canvas id="oyun" aria-label="Hoook. Bir noktaya bas ve basılı tut: kanca oraya fırlar, ipe sarılırsın. Bırakınca düşersin."></canvas>
@@ -31,7 +32,6 @@
       <div class="puan" id="puan" hidden>0<small>puan</small></div>
       <button type="button" id="menuBtn" aria-label="Duraklat" title="Duraklat" data-ik="duraklat"></button>
     </div>
-    <p class="ipucu" id="ipucu"></p>
     <div class="katman" id="katman" hidden><div class="kart" id="kart"></div></div>
     <!-- Tanıtım kartı: yeni bir şey ilk kez görülünce oyun kısa süre durur -->
     <div class="katman alt tanitim-katman" id="yeniKatman" hidden role="dialog" aria-modal="true" aria-labelledby="yeniBaslik">
@@ -43,7 +43,7 @@
         <button type="button" class="ana buyuk genis" id="yeniTamam">Anladım</button>
       </div>
     </div>
-    <!-- Duraklatma (v0.90): iki iple inen pano. Üç ana düğme: Devam et, Baştan başla, Ana menü; altında küçük "Bölümü atla".
+    <!-- Duraklatma (v0.90): iki iple inen pano. Üç ana düğme: Devam et, Baştan başla, Ana menü (v0.94: "Bölümü atla" kalktı, ilerleme sıralı).
          Ses ve titreşim dişliyle açılan Ayarlar panosunda (oyundan çıkmadan). Oyun ve su durur, tutunduğun ip bırakılmaz -->
     <div class="katman duraklat pano" id="duraklat" hidden role="dialog" aria-modal="true" aria-labelledby="duraklatBaslik">
       <div class="kart">
@@ -54,7 +54,6 @@
           <button type="button" class="ana buyuk genis" id="devamBtn" data-ik="oynat">Devam et</button>
           <button type="button" class="genis pano-dugme krem" id="bastanBtn" data-ik="bastan"><span id="bastanYazi">Baştan başla</span></button>
           <button type="button" class="genis pano-dugme mavi" id="anaMenuBtn" data-ik="ev">Ana menü</button>
-          <button type="button" class="metin-btn" id="dAtlaBtn">Bölümü atla ›</button>
         </div>
         <div class="dur-ayar" id="durAyar" hidden>
           <div class="ayar-satir"><div><b>Müzik</b><span>Ortam müziği</span></div><button type="button" class="anahtar" id="dMuzikBtn" role="switch" aria-checked="true" aria-label="Müzik"><i></i></button></div>
@@ -72,7 +71,7 @@
   <img id="acilisLogo" class="marka-logo" src="assets/funday-morning-logo.webp" alt="Funday Morning Games">
   <div class="yukleme" aria-hidden="true"><div id="yuklemeDolgu"></div></div>
   <div class="yukleme-not" id="yuklemeNot">Yükleniyor…</div>
-  <div class="ek-surum">Hoook v0.93</div>
+  <div class="ek-surum">Hoook v0.94</div>
 </section>
 
 <!-- Giriş: yalnızca ilk açılışta -->
@@ -342,7 +341,7 @@
     <button type="button" class="ay-git" id="tanitimBtn">Tanıtımı yeniden izle</button>
     <button type="button" class="ay-git" id="ipucuSifirBtn">Tanıtım kartlarını yeniden göster</button>
     </div>
-    <p class="surum">Hoook v0.93 · prototip · Funday Morning Games</p>
+    <p class="surum">Hoook v0.94 · prototip · Funday Morning Games</p>
   </div>
 </section>
 
@@ -411,21 +410,21 @@
 <div class="hikaye-kart" id="hikayeKart" role="status" hidden><b id="hkBaslik"></b><span id="hkMetin"></span></div>
 <div class="bildirim" id="bildirim" role="status" hidden></div>
 
-<script src="js/engine.js?v=0.93"></script>
-<script src="js/levels.js?v=0.93"></script>
-<script src="js/bolumler.js?v=0.93"></script>
-<script src="js/gen.js?v=0.93"></script>
-<script src="js/gorevler.js?v=0.93"></script>
-<script src="js/ekonomi.js?v=0.93"></script>
-<script src="js/istatistik.js?v=0.93"></script>
-<script src="js/muzik.js?v=0.93"></script>
-<script src="js/notlar.js?v=0.93"></script>
-<script src="js/hayalet.js?v=0.93"></script>
-<script src="js/online.js?v=0.93"></script>
-<script src="js/karakter.js?v=0.93"></script>
-<script src="js/gecis.js?v=0.93"></script>
-<script src="js/ikon.js?v=0.93"></script>
-<script src="js/game.js?v=0.93"></script>
-<script src="js/screens.js?v=0.93"></script>
+<script src="js/engine.js?v=0.94"></script>
+<script src="js/levels.js?v=0.94"></script>
+<script src="js/bolumler.js?v=0.94"></script>
+<script src="js/gen.js?v=0.94"></script>
+<script src="js/gorevler.js?v=0.94"></script>
+<script src="js/ekonomi.js?v=0.94"></script>
+<script src="js/istatistik.js?v=0.94"></script>
+<script src="js/muzik.js?v=0.94"></script>
+<script src="js/notlar.js?v=0.94"></script>
+<script src="js/hayalet.js?v=0.94"></script>
+<script src="js/online.js?v=0.94"></script>
+<script src="js/karakter.js?v=0.94"></script>
+<script src="js/gecis.js?v=0.94"></script>
+<script src="js/ikon.js?v=0.94"></script>
+<script src="js/game.js?v=0.94"></script>
+<script src="js/screens.js?v=0.94"></script>
 </body>
 </html>
