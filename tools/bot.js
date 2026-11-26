@@ -322,8 +322,9 @@ if (!only && G.createBolum) {
       const ff = c.s.fireflies.filter(f => f.got && f.zincir == null).length, akisli = (def.dalSay || 0), ffT = c.s.fireflies.filter(f => f.zincir == null).length;
       let akisYedek = '';
       if (!b.ok) { const y = akisNisanla(def); akisYedek = y.won && y.max >= def.flow ? ` (nişanla akış: GEÇTİ x${y.max})` : ' (nişanla akış da KALDI)'; if (!(y.won && y.max >= def.flow)) allOk = false; }
-      if (!a.ok || !c.ok || ff < ffT - akisli || ffT < 1 || def.fenerler.length) allOk = false;
-      console.log(`${ikinci ? 'i' : 'k'}${no} ${def.name.padEnd(16)} rahat ${a.ok ? 'GEÇTİ' : 'KALDI ' + a.why} ${a.s.t.toFixed(0)} sn · akış ${b.ok ? 'GEÇTİ' : 'KALDI ' + b.why} ${b.s.t.toFixed(0)} sn x${b.s.maxCombo} (hedef x${def.flow})${akisYedek} · ateşböceği ${ff}/${ffT} · par ${def.par}`);
+      const neden = [!a.ok && 'rahat kaldı', !c.ok && 'ateşböceği rotası kaldı (' + c.why + ')', ff < ffT - akisli && 'ateşböceği ' + ff + '/' + ffT + ' (' + akisli + ' akışla)', ffT < 1 && 'ateşböceği yok', def.fenerler.length && !def.fenerli && 'fener var'].filter(Boolean);
+      if (neden.length) { allOk = false; console.log('  HATA ' + (ikinci ? 'i' : 'k') + no + ': ' + neden.join(', ')); } // v0.95: bölge sonları fenerli (Faz 2)
+      console.log(`${ikinci ? 'i' : 'k'}${no} ${def.name.padEnd(16)}${def.fenerli ? ' [fenerli '+def.fenerler.length+']' : ''} rahat ${a.ok ? 'GEÇTİ' : 'KALDI ' + a.why} ${a.s.t.toFixed(0)} sn · akış ${b.ok ? 'GEÇTİ' : 'KALDI ' + b.why} ${b.s.t.toFixed(0)} sn x${b.s.maxCombo} (hedef x${def.flow})${akisYedek} · ateşböceği ${ff}/${ffT} · par ${def.par}`);
     }
   }
 }

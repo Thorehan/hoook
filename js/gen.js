@@ -815,25 +815,48 @@
   }
   // Kısa bölümler (v0.85, deneme; docs/kisa-bolumler-plan.md): tek bölmeli tarif (son bölmeye fener konmaz), kendi tohum alanı.
   // Oyunda 100 + no numarasıyla açılır; uzun bölümler, Günlük ve Haftalık tohumları değişmez.
+  // Faz 2 (v0.95, İstişare 7, Törehan onayı 26/11): kısa bölümler ~%50 uzun, yoğunluk aynı. Düğümle birlikte ateşböceği ve özel halka
+  // sayıları da artar (saat başı ateşböceği değişmez), akış hedefi de. Öğret ×1,2; diğerleri ×1,5; bölge sonu (18, 36, 60, 83) iki bölme
+  // ×1,1 ve aralarında fener (90–120 sn). Öğret bölmesinde öğretilen halka en az 3 kez (geçit 2); hız ve geçit öğretiminde bir ateşböceği
+  // o halkanın hemen ardında (ffYeni: kullanan alır). Boş tırmanış eklenmez. Tarifler (bolumler.js) değişmez; dönüşüm burada.
+  var UZAT = { ogret: 1.2, diger: 1.5, final: 1.1 }, UZAT_SAY = ['ff', 'hiz', 'kor', 'yay', 'kapi', 'sarkac', 'gecit', 'dal', 'zincir', 'cark', 'akinti'];
+  var OGRET_EN_AZ = { hiz: 3, kor: 3, yay: 3, sarkac: 3, gecit: 2, cark: 3, akinti: 3 };
+  function uzatBolme(b, k, ogret) {
+    var o = Object.assign({}, b, { n: Math.round(b.n * k) });
+    UZAT_SAY.forEach(function (s) { if (b[s]) o[s] = Math.max(b[s], Math.round(b[s] * k)); });
+    if (ogret) { Object.keys(OGRET_EN_AZ).forEach(function (s) { if (b[s]) o[s] = Math.max(o[s], OGRET_EN_AZ[s]); }); if (b.hiz || b.gecit) o.ffYeni = true; }
+    return o;
+  }
+  function kisaFinal(T, no) { var t = T.kisaBul(no), s = T.kisaBul(no + 1); return !!t && (!s || s.bolge !== t.bolge); }
+  function kisaUzat(T, t) {
+    var b = t.bolmeler[0];
+    if (kisaFinal(T, t.no)) { var b2 = uzatBolme(b, UZAT.final, false); b2.yazilar = (b.yazilar || []).filter(function (yz) { return yz[0] === 'kova'; }); b2.kutu = false; b2.dal = 0; b2.akinti = 0; // fırlatma yolu ve akıntı ilk parçada (ikinci parçada yay ile akıntı üst üste gelince ateşböceği rotası kopuyordu)
+      var b1 = uzatBolme(b, UZAT.final, false); b1.yazilar = (b.yazilar || []).filter(function (yz) { return yz[0] !== 'kova'; });
+      return Object.assign({}, t, { bolmeler: [b1, b2], akis: Math.round(t.akis * UZAT.final), final: true }); }
+    var ogret = b.tur === 'ogret', k = ogret ? UZAT.ogret : UZAT.diger;
+    return Object.assign({}, t, { bolmeler: [uzatBolme(b, k, ogret)].concat(t.bolmeler.slice(1)), akis: Math.round(t.akis * k) });
+  }
   function createKisa(no) {
-    var T = tarifler(), tarif = T && T.kisaBul && T.kisaBul(no);
-    if (!tarif) return null;
+    var T = tarifler(), t = T && T.kisaBul && T.kisaBul(no);
+    if (!t) return null;
+    var tarif = kisaUzat(T, t);
     var d = bolumKur(tarif, 100 + no, 900001 + no * 7919);
-    d.kisa = no; d.fenerli = false;
+    d.kisa = no; d.fenerli = !!tarif.final;
     return d;
   }
   // İkinci yolculuğun kısa bölümleri (v0.93, A5.3): ilk yolculuğun kısa tarifinden, uzun ikinci yolculuğun kurallarıyla (ikinciTarif):
   // yazı ve kutu yok, öğret → sına (en az 1 ateşböceği), su baştan ve daha yakından izler, halkalar biraz seyrek, not yok.
   // Kendi tohum alanı (ilk yolculuğun aynı bölümünün farklı kuyusu); öteki üreticilerin rastgele sayı sırası değişmez.
   function createKisaIkinci(no) {
-    var T = tarifler(), t = T && T.kisaBul && T.kisaBul(no);
-    if (!t) return null;
+    var T = tarifler(), t0 = T && T.kisaBul && T.kisaBul(no);
+    if (!t0) return null;
+    var t = kisaUzat(T, t0); // Faz 2: ikinci yolculuk da aynı uzunlukta
     // öğretten sınaya dönen bölme ve zikzaklı bölme zikzak kalır: tek tarafa basan oyuncu ilerleyemesin (hikaye-denge: tek taraf 0)
     var bl = t.bolmeler.map(function (b) { var o = ikinciBolme(b); if ((b.tur === 'ogret' && !b.panel) || b.duzen === 'zikzak') o.duzen = 'zikzak'; return o; }); // panel öğreten bölmede panel zaten yön seçtirir
     var tarif = Object.assign({}, t, { bolmeler: bl, takip: Math.min(t.takip || 99, IKINCI_TAKIP[t.bolge]), su: 0, suFener: null, not: 0, ikinci: true,
       ipucu: 'İkinci yolculuk: su baştan ve daha yakından izliyor. ' + t.ipucu });
     var d = bolumKur(tarif, 200 + no, 1900003 + no * 7927);
-    d.kisa = no; d.kisaIkinci = no; d.fenerli = false;
+    d.kisa = no; d.kisaIkinci = no; d.fenerli = !!t.final;
     return d;
   }
   function bolumKur(tarif, no, tohum) {
@@ -878,6 +901,19 @@
     }
     bolmeler.forEach(function (bm) { alternatifKoy(bm, bm.B.ff || 0, ffRings); });
     bolmeler.forEach(function (bm) { alternatifKoy(bm, bm.B.hiz || 0, hizRings); });
+    // Faz 2 öğret kuralı (ffYeni): öğretilen hız halkasının iki düğüm ardında bir ateşböceği; hızı kullanan yol onu da alır
+    function ffArdina(bm, j) {
+      for (var k = j + 2; k <= Math.min(bm.son - 1, j + 3); k++) {
+        if (altAt[k] || altAt[k - 1] || altAt[k + 1] || nodes[k].fener || nodes[k].kutu || (nodes[k + 1] && nodes[k + 1].fener)) continue;
+        var al = ffAlternative(r, allPts[k], target(nodes[k]), target(nodes[k + 1]), out.rings.concat(ffRings, hizRings));
+        if (al) { ffRings.push(al); altAt[k] = al; return true; }
+      }
+      return false;
+    }
+    bolmeler.forEach(function (bm) {
+      if (!bm.B.ffYeni || !bm.B.hiz) return;
+      for (var j = bm.bas; j <= bm.son; j++) if (altAt[j] && hizRings.indexOf(altAt[j]) >= 0 && ffArdina(bm, j)) break;
+    });
     // rüzgâr şeritleri, yay ve sarkaç halkaları: bölmenin ana yolunda, karar noktası olmayan adımlarda (createLevel kuralları)
     function halkaNesne(nn) { for (var q = 0; q < out.rings.length; q++) if (out.rings[q].x === nn.x && out.rings[q].y === nn.y) return out.rings[q]; return null; }
     function serbest(j) { return nodes[j] && !nodes[j].fener && !nodes[j].kutu && !altAt[j] && !(nodes[j + 1] && altAt[j + 1]) && !(nodes[j + 1] && nodes[j + 1].fener); }
@@ -908,6 +944,11 @@
         if (!pp) return false;
         portals.push(pp); altAt[j] = pp.a; altAt[k] = pp.b; portalAt[j] = portalAt[k] = true; return true;
       });
+    });
+    // Faz 2 öğret kuralı (ffYeni): ilk geçidin çıkışının ardında bir ateşböceği
+    bolmeler.forEach(function (bm) {
+      if (!bm.B.ffYeni || !bm.B.gecit) return;
+      for (var j = bm.bas; j <= bm.son; j++) if (portalAt[j] && altAt[j] && portals.some(function (p) { return p.b === altAt[j]; }) && ffArdina(bm, j - 1)) break;
     });
     function portalNokta() { return portals.reduce(function (a, p) { return a.concat([p.a, p.b]); }, []); }
     var gates = [];

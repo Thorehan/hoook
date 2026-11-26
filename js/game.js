@@ -64,6 +64,14 @@
       ffKisaIkinci: function (c) { return ffSay(GEN.createKisaIkinci(c)); }, ffUzunIkinci: function (u) { return ffSay(GEN.createBolum(u)); } }, hk);
     try { if (hk) localStorage.setItem('kuyu.hayalet', JSON.stringify(hk)); localStorage.setItem(KEY, JSON.stringify(save)); } catch (e) {}
   })();
+  // Faz 2 (v0.95): bölümler uzadı; en iyi süreler ve bölüm hayaletleri bir kez silinir (save.hikayeV 5), madalyalar kalır
+  (function faz2() {
+    var GC = window.KuyuGecis;
+    if (!GC || !GC.faz2Sifirla || (save.hikayeV || 0) !== GC.SURUM_IKINCI) return;
+    var hk = null; try { hk = JSON.parse(localStorage.getItem('kuyu.hayalet') || 'null'); } catch (e) {}
+    GC.faz2Sifirla(save, hk);
+    try { if (hk) localStorage.setItem('kuyu.hayalet', JSON.stringify(hk)); localStorage.setItem(KEY, JSON.stringify(save)); } catch (e) {}
+  })();
   GOREV.ensure(save);
   EKO.ensure(save);
   IST.ensure(save);

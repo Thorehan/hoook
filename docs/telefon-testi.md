@@ -274,6 +274,12 @@ Hikâye ekranındaki "Yeni Maden", "Yeni Kristal Mağara" ve "Yeni Eski Kule · 
 - [ ] Üst panel: ateşböceği, kanca (kalan atış) ve akış rozetleri ne anlattığını hemen söylüyor mu? Hedefe ulaşınca sarı yanıyor, Kusursuz kaçınca sönüyor mu?
 - [ ] Günlük ve Haftalık'ta puan ortada okunuyor mu?
 
+## 38. Daha uzun bölümler (v0.95, 6 dk)
+- [ ] Bölümler önceki sürümden uzun mu, ama sıkıcı ya da yorucu değil mi? (hedef normal bölümde 45–75 sn)
+- [ ] Bölge sonları (18, 36, 60, 83) iki parçalı ve arada fener var mı; düşünce fenerden devam ediliyor mu?
+- [ ] Hız halkası (10) ve geçit (37) öğretiminde ateşböceği o halkanın hemen ardında mı, halkayı kullanmaya değiyor mu?
+- [ ] Madalyalar ve yıldızlar yerinde mi? En iyi süreler sıfırlanmış olmalı.
+
 ## 5. Genel izlenim (serbest)
 - En sevdiğim an:
 - En çok zorlandığım yer:

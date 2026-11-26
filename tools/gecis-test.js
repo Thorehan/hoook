@@ -72,6 +72,13 @@ assert.deepStrictEqual(Object.keys(hk.bolum), ['4']);
 assert.strictEqual(save.hikayeV, 4);
 assert.strictEqual(GC.ikinciGecis(save, dep2, hk), false);
 
+// 1c) v0.95 (Faz 2): en iyi süreler ve bölüm hayaletleri silinir, madalyalar kalır
+save.best[4].time = 12.3; hk.bolum['4'] = { d: 'x' };
+assert.strictEqual(GC.faz2Sifirla(save, hk), true);
+assert.strictEqual(save.best[4].time, undefined); assert.strictEqual(save.best[4].perfect, true); assert.strictEqual(save.best[4].done, true);
+assert.deepStrictEqual(hk.bolum, {}); assert.strictEqual(save.hikayeV, 5);
+assert.strictEqual(GC.faz2Sifirla(save, hk), false);
+
 // 2) Bütün Hikâye (24 uzun) geçilmiş eski oyuncu: 83 kısa geçildi, sıradaki 84 (ikinci yolculuk)
 const hepsi = { best: {} };
 for (let k = 1; k <= 24; k++) hepsi.best[k] = { done: true, ff: dep.ffUzun(k) };
@@ -94,8 +101,8 @@ assert.strictEqual(kasif.val, 83 + 18); assert.strictEqual(kasif.tier, 2); // 18
 
 // 3) Yeni oyuncu: boş kayıt
 const yeni = { best: {} };
-GC.kisaGecis(yeni, dep, null); GC.ikinciGecis(yeni, dep2, null);
-assert.deepStrictEqual(yeni.best, {}); assert.strictEqual(yeni.last, 1); assert.strictEqual(yeni.hikayeV, 4);
+GC.kisaGecis(yeni, dep, null); GC.ikinciGecis(yeni, dep2, null); GC.faz2Sifirla(yeni, null);
+assert.deepStrictEqual(yeni.best, {}); assert.strictEqual(yeni.last, 1); assert.strictEqual(yeni.hikayeV, 5);
 assert(!('uzunBest' in yeni) && !('kisaDeneme' in yeni) && !('uzunIkinci' in yeni));
 // v3 olmadan v4 çalışmaz
 assert.strictEqual(GC.ikinciGecis({ best: {}, hikayeV: 2 }, dep2, null), false);

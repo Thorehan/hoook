@@ -188,7 +188,11 @@
 - Günlük ve Haftalık **hep açık** kalır.
 - Üst panel: üç madalya rozeti, kalan atış (önerildiği gibi).
 
-**Bekleyen (Faz 2–5):** aşağıdaki 5–8. sorular.
+**Faz 2 (26/11, Muhammed; Törehan onayı) ✅ v0.95:** %50 uzun, bölge sonları fenerli; öğret bölümünde ateşböceği yeni halkada (hız, geçit); en iyi süreler ve hayaletler sıfırlandı.
+
+**Faz 3 kısmen (27/11):** Günlük bitişli (tepeye en kısa süre), Haftalık hedef çizgili; v0.96–v0.97.
+
+**Bekleyen (Faz 4–5):** aşağıdaki 6. ve 8. sorular.
 
 ## 6b · Karar soruları (ilk liste)
 

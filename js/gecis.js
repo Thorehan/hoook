@@ -13,7 +13,7 @@
    Kayıt nesnesi üzerinde çalışır, DOM bilmez; Node'da da yüklenir (tools/gecis-test.js). */
 (function (root) {
   'use strict';
-  var KISA_DENEME = 100, IKINCI_FARK = 59, SURUM = 3, SURUM_IKINCI = 4;
+  var KISA_DENEME = 100, IKINCI_FARK = 59, SURUM = 3, SURUM_IKINCI = 4, SURUM_FAZ2 = 5;
 
   // eski bölüm numarası → yeni numara (null: artık yok)
   function esle(eski, kisaSayi) {
@@ -78,7 +78,18 @@
     return true;
   }
 
-  var api = { kisaGecis: kisaGecis, ikinciGecis: ikinciGecis, esle: esle, SURUM: SURUM, SURUM_IKINCI: SURUM_IKINCI, IKINCI_FARK: IKINCI_FARK };
+  // v0.95 (İstişare 7 Faz 2, save.hikayeV 5): bölümler uzadı ve şekilleri değişti. Madalyalar, yıldızlar, ödüller ve ödenmiş
+  // ateşböcekleri kalır; en iyi süreler ve bölüm hayaletleri silinir (eski koşu yeni bölüme uymaz, süre karşılaştırılamaz).
+  function faz2Sifirla(save, hayalet) {
+    if ((save.hikayeV || 0) !== SURUM_IKINCI) return false;
+    var best = save.best || {};
+    Object.keys(best).forEach(function (k) { if (best[k] && best[k].time != null) delete best[k].time; });
+    if (hayalet && hayalet.bolum) hayalet.bolum = {};
+    save.hikayeV = SURUM_FAZ2;
+    return true;
+  }
+
+  var api = { kisaGecis: kisaGecis, ikinciGecis: ikinciGecis, faz2Sifirla: faz2Sifirla, esle: esle, SURUM: SURUM, SURUM_IKINCI: SURUM_IKINCI, SURUM_FAZ2: SURUM_FAZ2, IKINCI_FARK: IKINCI_FARK };
   if (typeof module !== 'undefined' && module.exports) module.exports = api;
   else root.KuyuGecis = api;
 })(typeof window !== 'undefined' ? window : this);
