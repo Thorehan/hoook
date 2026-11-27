@@ -1,6 +1,6 @@
 # Hoook (eski adı Kuyu) · Claude için çalışma kuralları
 
-Funday Morning Games'in 2D mobil oyunu **Hoook** (23/11/2026'ya kadar adı Kuyu'ydu; depo `Thorehan/hoook`; eski `/kuyu/` adresi ve `Thorehan/kuyu` yönlendirme deposu 24/11/2026'da kaldırıldı, testler yalnız /hoook/ adresinden). İç adlar (`window.Kuyu*`, `kuyu.*` kayıt anahtarları, `KUYU1.` yedek kodu, `css/kuyu.css`) uyumluluk için değişmez. Düz HTML + JS (derleme yok), GitHub Pages'te yayında: https://thorehan.github.io/hoook/ (`main`'e push edilince ~1 dk'da güncellenir). Ortaklar **sırayla** çalışır: **Törehan** (Windows), **Muhammed** (24/11/2026'dan beri devir onda) ve **Mustafa** (Mac). Yanıtlar Türkçe.
+Funday Morning Games'in 2D mobil oyunu **Hoook** (23/11/2026'ya kadar adı Kuyu'ydu; depo `Thorehan/hoook`; eski `/kuyu/` adresi ve `Thorehan/kuyu` yönlendirme deposu 24/11/2026'da kaldırıldı, testler yalnız /hoook/ adresinden). İç adlar (`window.Kuyu*`, `kuyu.*` kayıt anahtarları, `KUYU1.` yedek kodu, `css/kuyu.css`) uyumluluk için değişmez. Düz HTML + JS (derleme yok), GitHub Pages'te yayında: https://thorehan.github.io/hoook/ (`main`'e push edilince ~1 dk'da güncellenir). Ortaklar **sırayla** çalışır: **Törehan** (Windows), **Muhammed** (24–27/11/2026 devir ondaydı; 27/11'de Törehan'a geri verdi) ve **Mustafa** (Mac). Yanıtlar Türkçe.
 
 ## 1 · Devir kuralı (en önemli kural)
 
