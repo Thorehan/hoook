@@ -190,7 +190,7 @@
 
 **Faz 2 (26/11, Muhammed; Törehan onayı) ✅ v0.95:** %50 uzun, bölge sonları fenerli; öğret bölümünde ateşböceği yeni halkada (hız, geçit); en iyi süreler ve hayaletler sıfırlandı.
 
-**Faz 3 kısmen (27/11):** Günlük bitişli (tepeye en kısa süre), Haftalık hedef çizgili; v0.96–v0.97.
+**Faz 3 kısmen (27/11) ✅ v0.96:** Günlük bitişli (500 m, tepeye en kısa süre; 28/11'den, yıldız 75/35 sn, ödül 25/20/15), Haftalık'ın sonu yok; sıradaki hedef (haftanın yıldızları, rekorun, sonraki lig) üst panelde yazılır ve geçince kutlanır. Hedefler puanla ölçüldüğü için (metre değil) kuyuya çizgi olarak çizilmedi. Aynı sürümde kutu, video ile ateşböceği, ad hakkı, harita perdesi (6 bölüm üstü).
 
 **Bekleyen (Faz 4–5):** aşağıdaki 6. ve 8. sorular.
 

@@ -252,7 +252,8 @@
   // ---------- Market (v0.77, İstişare 4 Aşama 3) ----------
   // Günlük vitrin: herkes için aynı 4 ürün (tarihten): bir karakter, bir takı (baş/yüz/sırt), iki ürün daha; biri video ile %50.
   // Haftanın ürünü: Destansı ya da Efsane, pazartesi döner. Efsane ürünler yalnız haftanın ürünü oldukları hafta satılır.
-  // Rastgele kutu yok: her ürünün içeriği ve fiyatı görünür. Video yalnız oyuncu seçerse.
+  // v0.96: Market'te bir kutu var (aşağıda, Törehan onayı 27/11); kutunun olasılıkları üstünde yazar. Ürünlerin içeriği ve fiyatı görünür.
+  // Video yalnız oyuncu seçerse.
   function satilir(it) { return !!(it && it.fiyat > 0 && !it.isik && it.lig == null && !it.etkinlik); }
   function tohumla(str) { var h = 2166136261; for (var i = 0; i < str.length; i++) { h ^= str.charCodeAt(i); h = Math.imul(h, 16777619); } return h >>> 0; }
   function rasgele(seed) { var a = seed >>> 0; return function () { a = (a + 0x6D2B79F5) >>> 0; var t = Math.imul(a ^ (a >>> 15), 1 | a); t = (t + Math.imul(t ^ (t >>> 7), 61 | t)) ^ t; return ((t ^ (t >>> 14)) >>> 0) / 4294967296; }; }
@@ -348,19 +349,32 @@
   // Her gün bir hedef metre (600–1000, günün tarihinden); 1 yıldız hedef, 2 yıldız 1,5 kat, 3 yıldız 2 kat.
   // Her yıldız günde bir kez ödül verir.
   var YILDIZ_ODUL = [5, 5, 10]; // v0.64 ölçümü: daha büyükse ortalama gün ~120'den ~165'e çıkıyor
+  // v0.96 (İstişare 7, Törehan onayı 27/11): Günlük Kuyu 28/11'den itibaren bitişli: kuyunun 500. metresinde bitiş çizgisi,
+  // amaç tepeye en kısa sürede çıkmak. 1 yıldız bitirmek, 2 yıldız 75 sn, 3 yıldız 35 sn (ölçüm: temkinli bot ~46 sn,
+  // akışla oynayan ~13 sn; insan ~1,5–2 kat yavaş). Puan süreden: 10000 − süre × 10 (0,1 sn hassas); bitiremeyen metresi kadar.
+  // Haftalık Kuyu'nun sonu yok (puan ve lig aynı). Eski günler eski ölçüyle kalır (metre hedefi).
+  // Ödül: bitişli koşu ~1 dk sürer (eskisi 3 dk'ya kadar), yolda daha az ateşböceği toplanır; yıldız ödülü bunu karşılar,
+  // ortalama gün ~147 kalır (ölçüm node tools/ekonomi-olcum.js; eski günler ESKI_GUN=1).
+  var GUN_BITIS = { metre: 500, sure: [75, 35], basla: '2026-11-28', odul: [25, 20, 15] };
+  function gunYildizOdul(key) { return gunBitisli(key) ? GUN_BITIS.odul : YILDIZ_ODUL; }
+  function gunBitisli(key) { return !!key && key >= GUN_BITIS.basla; }
+  function gunBitisPuan(sn) { return Math.max(1000, 10000 - Math.round(sn * 10)); }
+  function gunSureYildiz(sn) { return sn == null ? 0 : sn <= GUN_BITIS.sure[1] ? 3 : sn <= GUN_BITIS.sure[0] ? 2 : 1; }
   function gunHedef(key) {
+    if (gunBitisli(key)) return { metre: GUN_BITIS.metre, bitis: true, sure: GUN_BITIS.sure.slice(), yazi: 'tepe ' + GUN_BITIS.metre + ' m' };
     var h = 2166136261 >>> 0;
     for (var i = 0; i < key.length; i++) { h ^= key.charCodeAt(i); h = Math.imul(h, 16777619) >>> 0; }
     var m = 600 + (h % 9) * 50;
-    return { metre: m, esik: [m, Math.round(m * 1.5), m * 2] };
+    return { metre: m, esik: [m, Math.round(m * 1.5), m * 2], yazi: 'hedef ' + m + ' m' };
   }
-  function yildizSay(key, metre) { var e = gunHedef(key).esik, n = 0; for (var i = 0; i < 3; i++) if (metre >= e[i]) n = i + 1; return n; }
+  function yildizSay(key, metre) { var e = gunHedef(key).esik, n = 0; if (!e) return 0; for (var i = 0; i < 3; i++) if (metre >= e[i]) n = i + 1; return n; }
   // Koşu bitti: bugünün yıldızlarını güncelle, yeni yıldızların ödülünü öde. Döner: { yildiz, yeni, odul }
-  function gunYildizKaydet(save, key, metre) {
+  // Bitişli günde sn: bitiş süresi (bitiremediyse null)
+  function gunYildizKaydet(save, key, metre, sn) {
     ensure(save);
     var g = save.gunYildiz && save.gunYildiz.key === key ? save.gunYildiz : { key: key, yildiz: 0 };
-    var n = yildizSay(key, metre), odul = 0, yeni = 0;
-    for (var i = g.yildiz; i < n; i++) { odul += YILDIZ_ODUL[i]; yeni++; }
+    var n = gunBitisli(key) ? gunSureYildiz(sn) : yildizSay(key, metre), odul = 0, yeni = 0, YO = gunYildizOdul(key);
+    for (var i = g.yildiz; i < n; i++) { odul += YO[i]; yeni++; }
     g.yildiz = Math.max(g.yildiz, n); save.gunYildiz = g;
     if (odul) kazan(save, odul);
     return { yildiz: g.yildiz, yeni: yeni, odul: odul };
@@ -403,8 +417,63 @@
     while (keys.length > sinir) delete g[keys.shift()];
   }
 
+  // ---------- Kutu (v0.96, Törehan onayı 27/11; "rastgele kutu yok" kararı bu kurallarla değişti) ----------
+  // Market'te art arda 3 video izlenince açılır, günde en çok 2; günlük girişin 7. günü bedava bir kutu (günlük sınıra sayılmaz).
+  // İçinden eşya ya da ateşböceği çıkar; olasılıklar kutunun üstünde yazar. Işık, lig, etkinlik ve bedava eşyalar çıkmaz.
+  // Efsane düşük olasılıkla çıkabilir. Sahip olunan eşya çıkarsa ateşböceğine döner. Para ile alınmaz, açılmaz.
+  var KUTU = { video: 3, gunluk: 2, olasilik: [['sira', 45], ['nadir', 25], ['destansi', 8], ['efsane', 2], ['ates', 20]], ates: [20, 60] };
+  var KUTU_DONUSUM = { sira: 15, nadir: 30, destansi: 60, efsane: 120 };
+  function kutuHavuz(nad) { return KATALOG.filter(function (it) { return satilir(it) && nadirlik(it) === nad; }); }
+  function kutuDurum(save, gunKey) {
+    var k = save.kutu && save.kutu.gun === gunKey ? save.kutu : null, acilan = k ? k.acilan : 0;
+    return { video: KUTU.video, gunluk: KUTU.gunluk, acilan: acilan, kalan: Math.max(0, KUTU.gunluk - acilan), olasilik: KUTU.olasilik.slice(), ates: KUTU.ates.slice() };
+  }
+  // kaynak: 'market' (videolar izlendi, günlük sınır sayılır) | 'giris' (7. gün). rnd: [0, 1) üreten fonksiyon (test için)
+  function kutuAc(save, gunKey, kaynak, rnd) {
+    ensure(save); rnd = rnd || Math.random;
+    if (kaynak === 'market') { var d = kutuDurum(save, gunKey); if (!d.kalan) return null; save.kutu = { gun: gunKey, acilan: d.acilan + 1 }; }
+    var top = 0, x, sec = 'ates', i;
+    KUTU.olasilik.forEach(function (o) { top += o[1]; });
+    x = rnd() * top;
+    for (i = 0; i < KUTU.olasilik.length; i++) { x -= KUTU.olasilik[i][1]; if (x < 0) { sec = KUTU.olasilik[i][0]; break; } }
+    if (sec !== 'ates') {
+      var havuz = kutuHavuz(sec);
+      if (havuz.length) {
+        var it = havuz[Math.min(havuz.length - 1, Math.floor(rnd() * havuz.length))];
+        if (sahip(save, it.id)) return { tur: 'esya', id: it.id, nadir: sec, yinelenen: true, ates: kazan(save, KUTU_DONUSUM[sec]) };
+        save.dolap.sahip.push(it.id);
+        return { tur: 'esya', id: it.id, nadir: sec, yinelenen: false };
+      }
+    }
+    return { tur: 'ates', ates: kazan(save, KUTU.ates[0] + Math.floor(rnd() * (KUTU.ates[1] - KUTU.ates[0] + 1))) };
+  }
+  // Günlük girişin 7. günü: ateşböceği yerine kutu (bugün alınmadıysa açılır, takvim ilerler)
+  function girisKutuMu(save, key) { var d = girisDurum(save, key); return d.hazir && d.gun === GIRIS.length - 1; }
+  function girisKutuAl(save, key, rnd) {
+    if (!girisKutuMu(save, key)) return null;
+    save.giris.son = key; save.giris.gun = 0; save.giris.toplam++;
+    return kutuAc(save, key, 'giris', rnd);
+  }
+
+  // ---------- Video ile ateşböceği (v0.96, Törehan onayı): bir bölümden az verir, oyuncu oynamaya yönelsin ----------
+  var VIDEO_ATES = { odul: 2, gunluk: 5 };
+  function videoAtesDurum(save, gunKey) { var n = save.videoAtes && save.videoAtes.gun === gunKey ? save.videoAtes.n : 0; return { odul: VIDEO_ATES.odul, gunluk: VIDEO_ATES.gunluk, izlenen: n, kalan: Math.max(0, VIDEO_ATES.gunluk - n) }; }
+  function videoAtesAl(save, gunKey) { var d = videoAtesDurum(save, gunKey); if (!d.kalan) return 0; save.videoAtes = { gun: gunKey, n: d.izlenen + 1 }; return kazan(save, VIDEO_ATES.odul); }
+
+  // ---------- Ad değiştirme (v0.96): ilki bedava; sonrakiler art arda 2 video ya da 250 ateşböceği (video öne çıksın diye pahalı) ----------
+  var ISIM = { bedava: 1, video: 2, ates: 250 };
+  function isimDurum(save) { ensure(save); var n = save.isimDegisim || 0; return { degisim: n, bedava: n < ISIM.bedava, video: ISIM.video, ates: ISIM.ates, yeter: save.cuzdan.ates >= ISIM.ates }; }
+  // yol: 'bedava' | 'video' (videolar izlendi) | 'ates'. Başarılıysa true
+  function isimHakki(save, yol) {
+    var d = isimDurum(save);
+    if (yol === 'bedava' && !d.bedava) return false;
+    if (yol === 'ates') { if (!d.yeter) return false; save.cuzdan.ates -= ISIM.ates; save.cuzdan.harcanan += ISIM.ates; }
+    save.isimDegisim = d.degisim + 1;
+    return true;
+  }
+
   var api = { HAK: HAK, YENILEME_EN: YENILEME_EN, hakDurum: hakDurum, hakKullan: hakKullan, hakVideo: hakVideo,
-    YILDIZ_ODUL: YILDIZ_ODUL, gunHedef: gunHedef, yildizSay: yildizSay, gunYildizKaydet: gunYildizKaydet, gunYildizDurum: gunYildizDurum,
+    YILDIZ_ODUL: YILDIZ_ODUL, gunHedef: gunHedef, yildizSay: yildizSay, GUN_BITIS: GUN_BITIS, gunBitisli: gunBitisli, gunBitisPuan: gunBitisPuan, gunSureYildiz: gunSureYildiz, gunYildizOdul: gunYildizOdul, gunYildizKaydet: gunYildizKaydet, gunYildizDurum: gunYildizDurum,
     SERI_ODUL: SERI_ODUL, gecmisYaz: gecmisYaz,
     HAFTA_YILDIZ_ODUL: HAFTA_YILDIZ_ODUL, haftaHedef: haftaHedef, haftaYildizSay: haftaYildizSay, haftaYildizKaydet: haftaYildizKaydet, haftaYildizDurum: haftaYildizDurum,
     GIRIS: GIRIS, GOREV_ATES: GOREV_ATES, BASARIM_ATES: BASARIM_ATES, KATALOG: KATALOG, TURLER: TURLER, VARSAYILAN: VARSAYILAN, NADIRLIK: NADIRLIK, nadirlik: nadirlik,
@@ -412,6 +481,8 @@
     ensure: ensure, kazan: kazan, bolumOde: bolumOde, girisDurum: girisDurum, girisAl: girisAl,
     LIG: LIG, ligOf: ligOf, ligOdul: ligOdul, haftalikDurum: haftalikDurum, haftalikKaydet: haftalikKaydet, haftalikKapat: haftalikKapat,
     ISIK: ISIK, isikSeviye: isikSeviye, isikOdul: isikOdul, isikSiradaki: isikSiradaki,
-    item: item, sahip: sahip, satinAl: satinAl, kusan: kusan, gorunum: gorunum, DEVAM_BEDEL: DEVAM_BEDEL, devamBedel: devamBedel, devamOde: devamOde };
+    item: item, sahip: sahip, satinAl: satinAl, kusan: kusan, gorunum: gorunum, DEVAM_BEDEL: DEVAM_BEDEL, devamBedel: devamBedel, devamOde: devamOde,
+    KUTU: KUTU, KUTU_DONUSUM: KUTU_DONUSUM, kutuDurum: kutuDurum, kutuAc: kutuAc, girisKutuMu: girisKutuMu, girisKutuAl: girisKutuAl,
+    VIDEO_ATES: VIDEO_ATES, videoAtesDurum: videoAtesDurum, videoAtesAl: videoAtesAl, ISIM: ISIM, isimDurum: isimDurum, isimHakki: isimHakki };
   if (typeof module !== 'undefined' && module.exports) module.exports = api; else root.KuyuEkonomi = api;
 })(this);

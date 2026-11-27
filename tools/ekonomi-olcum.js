@@ -61,11 +61,17 @@ const N = 10, gunler = [], KOSU_SN = 200;
 for (const [ad, tarz, p, ates] of PROFIL) {
   // Günlük Kuyu (v0.64: serbest Sonsuz kalktı): günde 3 deneme (createEndless + günün kuralı); Haftalık: haftada 5 deneme
   let gff = 0, gm = 0, yildiz = 0, puan = [], hff = 0;
+  // v0.96: Günlük 28/11'den bitişli (500 m; yıldız süreden). ESKI_GUN=1: eski metre hedefli günler (11–20 Kasım)
+  const ESKI = !!process.env.ESKI_GUN;
   for (let sd = 1; sd <= N; sd++) {
-    const key = '2026-11-' + String(10 + sd).padStart(2, '0'), kural = G.gunKurali(key);
-    let enM = 0;
-    for (let d = 0; d < EKO.HAK.gunluk; d++) { const s = oyna(G.createEndless(sd * 13 + d * 101, kural), tarz, p, sd * 7 + d, KOSU_SN, ates); gff += E.fireflyCount(s); enM = Math.max(enM, E.meters(s)); }
-    gm += enM; const y = EKO.yildizSay(key, enM); yildiz += EKO.YILDIZ_ODUL.slice(0, y).reduce((a, b) => a + b, 0);
+    const key = (ESKI ? '2026-11-' : '2026-12-') + String(10 + sd).padStart(2, '0'), kural = G.gunKurali(key), bitisli = EKO.gunBitisli && EKO.gunBitisli(key);
+    let enM = 0, enSn = null;
+    for (let d = 0; d < EKO.HAK.gunluk; d++) {
+      const def = G.createEndless(sd * 13 + d * 101, kural); if (bitisli) def.bitisM = EKO.GUN_BITIS.metre;
+      const s = oyna(def, tarz, p, sd * 7 + d, KOSU_SN, ates); gff += E.fireflyCount(s); enM = Math.max(enM, E.meters(s));
+      if (s.status === 'won' && s.bitisT != null) enSn = enSn == null ? s.bitisT : Math.min(enSn, s.bitisT);
+    }
+    gm += enM; const y = bitisli ? EKO.gunSureYildiz(enSn) : EKO.yildizSay(key, enM); yildiz += (EKO.gunYildizOdul ? EKO.gunYildizOdul(key) : EKO.YILDIZ_ODUL).slice(0, y).reduce((a, b) => a + b, 0);
   }
   let haftaYildiz = 0;
   if (G.createHaftalik) for (let sd = 1; sd <= 4; sd++) { let en = 0; for (let d = 0; d < EKO.HAK.haftalik; d++) { const s = oyna(G.createHaftalik(sd * 7), tarz, p, sd * 11 + d, KOSU_SN, false); hff += E.fireflyCount(s); en = Math.max(en, E.finalScore(s)); } puan.push(en);

@@ -801,6 +801,8 @@
     }
 
     if (p.y < s.topY) s.topY = p.y;
+    // Günlük Kuyu bitişi (v0.96, İstişare 7): def.bitisM metreye çıkılınca koşu kazanılır; süre s.bitisT (puan ve yıldız süreden)
+    if (s.def.bitisM && meters(s) >= s.def.bitisM) { s.status = 'won'; s.bitisT = s.t; s.events.push({ type: 'won', bitis: true }); return; }
     // Raunttaki en yüksek hız: ipte değilken, yukarı ya da yana giderken. Kancanın çekme hızı ve düşüş sayılmaz.
     if (!s.rope) {
       var fvx = (p.x - p.px) / dt, fvy = (p.y - p.py) / dt;

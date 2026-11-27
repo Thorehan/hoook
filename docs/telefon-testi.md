@@ -280,6 +280,17 @@ Hikâye ekranındaki "Yeni Maden", "Yeni Kristal Mağara" ve "Yeni Eski Kule · 
 - [ ] Hız halkası (10) ve geçit (37) öğretiminde ateşböceği o halkanın hemen ardında mı, halkayı kullanmaya değiyor mu?
 - [ ] Madalyalar ve yıldızlar yerinde mi? En iyi süreler sıfırlanmış olmalı.
 
+## 39. Kutu, video, ad hakkı, bitişli Günlük (v0.96, 8 dk)
+- [ ] Market'te Kutu kartı: 3 video izleyince kutu açılıyor mu (1/3, 2/3, 3/3)? Kutu sallanıp açılıyor, içinden çıkan yükseliyor mu? Olasılıklar kartın altında okunuyor mu?
+- [ ] Video sırasında uygulamadan çıkıp dönünce sayaç kaldığı yerden mi sürüyor? Vazgeç ve geri tuşu ödül vermiyor mu?
+- [ ] Market'te "+2" video kartı: günde 5 kez, sonra bitti görünüyor mu?
+- [ ] Ayarlar'da ad değiştirme: ilk değişiklik bedava; sonra 2 video ya da 250 ateşböceği soruyor mu?
+- [ ] Günlük giriş 7. gün: "Kutuyu aç" ve açılış animasyonu.
+- [ ] Günlük Kuyu (28/11'den): 500 m'de TEPE çizgisi görünüyor mu? Üstte süre, rozetlerin altında "3 yıldız için 35 sn"; çizgiyi geçince "Tepedesin!" ve süreli sonuç kartı.
+- [ ] Haftalık Kuyu: rozetlerin altında "Sıradaki: …"; geçince kutlama yazısı çıkıyor mu, oyunu kapatmıyor mu?
+- [ ] Haritada 6 bölüm yukarısı karanlık; oraya kaydırılamıyor mu?
+- [ ] Alt menü ikonları ve ayar dişlisi düzgün mü? OYNA altındaki levhada yazı taşıyor mu?
+- [ ] Yarışma'da Haftalık ↔ Günlük'e hızlı geçişte kendi satırın sıfırlanıp yeniden oluşuyor mu? (olmamalı)
 ## 5. Genel izlenim (serbest)
 - En sevdiğim an:
 - En çok zorlandığım yer:

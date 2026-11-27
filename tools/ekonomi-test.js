@@ -84,8 +84,15 @@ ok(dv.cuzdan.harcanan === 75, 'harcanan sayılır');
   let v = 0; while (K.hakVideo(hs, 'gunluk', 'G')) v++;
   ok(v === 12 && K.hakDurum(hs, 'gunluk', 'G').son && K.hakVideo(hs, 'gunluk', 'G') === null, 'en çok 5 yenileme (toplam 15 video)');
   ok(K.hakDurum(hs, 'gunluk', 'H').kalan === 3, 'yeni gün yeni haklar');
-  const g = K.gunHedef('X');
-  ok(K.gunYildizKaydet(hs, 'X', g.metre * 2).yildiz === 3 && K.gunYildizKaydet(hs, 'X', g.metre * 2).odul === 0, 'yıldız ödülü bir kez');
+  const g = K.gunHedef('2026-11-20');
+  ok(K.gunYildizKaydet(hs, '2026-11-20', g.metre * 2).yildiz === 3 && K.gunYildizKaydet(hs, '2026-11-20', g.metre * 2).odul === 0, 'yıldız ödülü bir kez');
+  // v0.96: bitişli Günlük (28/11'den): yıldız süreden, puan süreden, bitiremeyen yıldızsız
+  const gb = K.gunHedef('2026-11-28');
+  ok(gb.bitis && gb.metre === 500 && !K.gunBitisli('2026-11-27') && K.gunHedef('2026-11-27').esik, 'bitişli gün 28/11, öncesi metre hedefi');
+  ok(K.gunYildizKaydet(hs, '2026-11-28', 480, null).yildiz === 0, 'bitiremeyen yıldız almaz');
+  ok(K.gunYildizOdul('2026-11-28')[0] === K.GUN_BITIS.odul[0] && K.gunYildizOdul('2026-11-27') === K.YILDIZ_ODUL, 'bitişli günde kendi yıldız ödülü');
+  ok(K.gunYildizKaydet(hs, '2026-11-28', 500, 90).yildiz === 1 && K.gunYildizKaydet(hs, '2026-11-28', 500, 60).yildiz === 2 && K.gunYildizKaydet(hs, '2026-11-28', 500, 30).yildiz === 3, 'süreyle 1–3 yıldız');
+  ok(K.gunBitisPuan(30) > K.gunBitisPuan(31) && K.gunBitisPuan(30.04) === 9700 && K.gunBitisPuan(5000) === 1000 && K.gunBitisPuan(5000) > 500, 'puan: kısa süre çok, bitiren bitiremeyenden önde');
   // v0.66: haftanın hedefi (puan)
   const hh = K.haftaHedef('2026-11-23'), once = hs.cuzdan.ates;
   ok(hh.esik[1] === Math.round(hh.puan * 1.5) && K.haftaYildizKaydet(hs, '2026-11-23', hh.puan).yildiz === 1 && hs.cuzdan.ates === once + K.HAFTA_YILDIZ_ODUL[0], 'haftanın hedefi 1 yıldız');
@@ -113,5 +120,40 @@ ok(dv.cuzdan.harcanan === 75, 'harcanan sayılır');
   if (ef && K.haftalikUrun('2026-11-23') !== ef.id) ok(K.satinAl(s2, ef.id, { gun: '2026-11-24', hafta: '2026-11-23' }).neden === 'haftalik', 'haftanın ürünü olmayan Efsane alınamaz');
   ok(K.satinAl(s2, 'kr-anka').neden === 'etkinlik', 'etkinlik karakteri satılmaz');
 }
-console.log(bad ? bad + ' hata' : 'Tamam: cüzdan, günlük giriş, dolap, lig, haklar ve günün hedefi');
+// kutu (v0.96): olasılıklar, günlük sınır, yinelenen eşya ateşböceğine döner, ışık/lig/etkinlik çıkmaz, 7. gün kutusu
+{
+  const sk = { best: {} }; K.ensure(sk);
+  const top = K.KUTU.olasilik.reduce((a, o) => a + o[1], 0);
+  ok(top === 100, 'kutu olasılıkları %100');
+  ok(K.kutuAc(sk, 'g1', 'market') && K.kutuAc(sk, 'g1', 'market') && K.kutuAc(sk, 'g1', 'market') === null, 'günde en çok 2 market kutusu');
+  ok(K.kutuDurum(sk, 'g2').kalan === 2, 'ertesi gün kutu hakkı yenilenir');
+  let r = 7; const rnd = () => { r = (r * 16807) % 2147483647; return r / 2147483647; };
+  let yasak = 0, sayac = {}, yin = 0;
+  for (let i = 0; i < 1500; i++) {
+    const o = K.kutuAc(sk, 'x' + i, 'giris', rnd), it = o.id && K.item(o.id);
+    sayac[o.tur === 'ates' ? 'ates' : o.nadir] = (sayac[o.tur === 'ates' ? 'ates' : o.nadir] || 0) + 1;
+    if (it && (it.isik || it.lig != null || it.etkinlik || !(it.fiyat > 0))) yasak++;
+    if (o.yinelenen) { yin++; if (!(o.ates === K.KUTU_DONUSUM[o.nadir])) yasak++; }
+    if (o.tur === 'ates' && !(o.ates >= K.KUTU.ates[0] && o.ates <= K.KUTU.ates[1])) yasak++;
+  }
+  ok(yasak === 0, 'kutudan ışık/lig/etkinlik/bedava eşya çıkmaz, yinelenen ve ateşböceği tutarları doğru');
+  ok(yin > 0 && Math.abs(sayac.sira / 1500 - 0.45) < 0.05 && Math.abs(sayac.ates / 1500 - 0.2) < 0.04, 'dağılım olasılıklara yakın');
+  const sg = { best: {} }; K.ensure(sg); sg.giris = { gun: 6, son: '2026-11-26', toplam: 6 };
+  ok(K.girisKutuMu(sg, '2026-11-27') && !!K.girisKutuAl(sg, '2026-11-27') && sg.giris.gun === 0 && !K.girisKutuMu(sg, '2026-11-27'), '7. gün kutusu bir kez, takvim başa döner');
+  ok(K.girisKutuAl(sg, '2026-11-28') === null, 'kutu günü değilse kutu yok');
+}
+// video ile ateşböceği (v0.96): 2 ateşböceği, günde 5
+{
+  const sv = { best: {} }; K.ensure(sv); const once = sv.cuzdan.ates; let t = 0;
+  for (let i = 0; i < 7; i++) t += K.videoAtesAl(sv, 'g1');
+  ok(t === 10 && sv.cuzdan.ates - once === 10 && K.videoAtesDurum(sv, 'g2').kalan === 5, 'video ateşböceği günde 5 × 2');
+}
+// ad değiştirme (v0.96): ilki bedava, sonra 2 video ya da 250 ateşböceği
+{
+  const si = { best: {} }; K.ensure(si); si.cuzdan.ates = 300;
+  ok(K.isimDurum(si).bedava && K.isimHakki(si, 'bedava') && !K.isimDurum(si).bedava, 'ilk ad değişikliği bedava');
+  ok(!K.isimHakki(si, 'bedava') && K.isimHakki(si, 'ates') && si.cuzdan.ates === 50 && !K.isimHakki(si, 'ates'), 'sonraki 250 ateşböceği, yetmezse olmaz');
+  ok(K.isimHakki(si, 'video') && si.isimDegisim === 3, 'video ile ad değişikliği');
+}
+console.log(bad ? bad + ' hata' : 'Tamam: cüzdan, günlük giriş, dolap, lig, haklar, günün hedefi, kutu, video ateşböceği, ad değiştirme');
 process.exit(bad ? 1 : 0);

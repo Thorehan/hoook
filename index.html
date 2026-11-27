@@ -16,9 +16,9 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@600;800&family=Figtree:wght@400;600;800&family=Lilita+One&display=swap">
-<link rel="stylesheet" href="css/kuyu.css?v=0.95">
-<link rel="stylesheet" href="css/ekranlar.css?v=0.95">
-<link rel="stylesheet" href="css/arayuz.css?v=0.95">
+<link rel="stylesheet" href="css/kuyu.css?v=0.96">
+<link rel="stylesheet" href="css/ekranlar.css?v=0.96">
+<link rel="stylesheet" href="css/arayuz.css?v=0.96">
 </head>
 <body>
 <!-- v0.90: oyun alanı tam ekran; bölüm adı, göstergeler ve duraklat düğmesi oyunun içinde, saydam çıkartmalar.
@@ -28,7 +28,7 @@
   <div class="sahne" id="sahne">
     <canvas id="oyun" aria-label="Hoook. Bir noktaya bas ve basılı tut: kanca oraya fırlar, ipe sarılırsın. Bırakınca düşersin."></canvas>
     <div class="serit">
-      <div class="bilgi"><b id="baslik">Hoook</b><div class="cipler" id="cipler" aria-live="off"></div></div>
+      <div class="bilgi"><b id="baslik">Hoook</b><div class="cipler" id="cipler" aria-live="off"></div><small class="hud-hedef" id="hudHedef" hidden></small></div>
       <div class="puan" id="puan" hidden>0<small>puan</small></div>
       <button type="button" id="menuBtn" aria-label="Duraklat" title="Duraklat" data-ik="duraklat"></button>
     </div>
@@ -71,7 +71,7 @@
   <img id="acilisLogo" class="marka-logo" src="assets/funday-morning-logo.webp" alt="Funday Morning Games">
   <div class="yukleme" aria-hidden="true"><div id="yuklemeDolgu"></div></div>
   <div class="yukleme-not" id="yuklemeNot">Yükleniyor…</div>
-  <div class="ek-surum">Hoook v0.95</div>
+  <div class="ek-surum">Hoook v0.96</div>
 </section>
 
 <!-- Giriş: yalnızca ilk açılışta -->
@@ -108,7 +108,7 @@
   <div class="ana-ust">
     <button type="button" class="selam" id="profilBtn" aria-label="Profil"><span class="avatar" aria-hidden="true"></span><span class="selam-yazi"><b id="selamAd">Tırmanıcı</b></span></button>
     <button type="button" class="para-hap" id="paraBtn" aria-label="Ateşböceği bakiyesi, Market'i aç"><i class="ikon-ates" aria-hidden="true"></i><b id="toplamAtes">0</b><span class="arti" aria-hidden="true">+</span></button>
-    <button type="button" class="cark-btn" id="ayarBtn" aria-label="Ayarlar"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 8.5a3.5 3.5 0 1 0 0 7 3.5 3.5 0 0 0 0-7z" fill="#fff" stroke="#1a0f2e" stroke-width="1.6"/><path d="M19.4 13.5l1.6 1.2-1.8 3.1-1.9-.7a7.6 7.6 0 0 1-2 1.2l-.3 2h-3.6l-.3-2a7.6 7.6 0 0 1-2-1.2l-1.9.7-1.8-3.1 1.6-1.2a7.7 7.7 0 0 1 0-2.4L2.9 9.3l1.8-3.1 1.9.7a7.6 7.6 0 0 1 2-1.2l.3-2h3.6l.3 2a7.6 7.6 0 0 1 2 1.2l1.9-.7 1.8 3.1-1.6 1.2a7.7 7.7 0 0 1 0 2.4z" fill="#fff" stroke="#1a0f2e" stroke-width="1.4" stroke-linejoin="round"/><circle cx="12" cy="12" r="2.6" fill="#4b3f8c"/></svg></button>
+    <button type="button" class="cark-btn" id="ayarBtn" aria-label="Ayarlar"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M19.38 10.19L22.46 10.31L22.46 13.69L19.38 13.81A7.6 7.6 0 0 1 18.50 15.94L20.59 18.21L18.21 20.59L15.94 18.50A7.6 7.6 0 0 1 13.81 19.38L13.69 22.46L10.31 22.46L10.19 19.38A7.6 7.6 0 0 1 8.06 18.50L5.79 20.59L3.41 18.21L5.50 15.94A7.6 7.6 0 0 1 4.62 13.81L1.54 13.69L1.54 10.31L4.62 10.19A7.6 7.6 0 0 1 5.50 8.06L3.41 5.79L5.79 3.41L8.06 5.50A7.6 7.6 0 0 1 10.19 4.62L10.31 1.54L13.69 1.54L13.81 4.62A7.6 7.6 0 0 1 15.94 5.50L18.21 3.41L20.59 5.79L18.50 8.06A7.6 7.6 0 0 1 19.38 10.19Z" fill="#fff4dc" stroke="#1a0f2e" stroke-width="1.8" stroke-linejoin="round"/><circle cx="12" cy="12" r="3.4" fill="#9b6bff" stroke="#1a0f2e" stroke-width="1.8"/></svg></button>
     <span class="sr">Toplam ödül puanı <b id="toplamOdul">0</b></span>
   </div>
   <!-- İstişare 5 (v0.82): Askıda Menü. Kirişe ip ve çengelle asılı etiketler; alttaki etiket üsttekine zincirli -->
@@ -198,6 +198,12 @@
     <div class="aski-sutun iki-ip"><div class="aski aski-iki"><span class="ip-cift" aria-hidden="true"><i></i><i></i></span>
     <button type="button" class="m-haftalik" id="mHaftalik"><img id="mHaftalikImg" alt=""><span class="mh-bilgi"><small>HAFTANIN ÜRÜNÜ</small><b id="mHaftalikAd"></b><span class="m-sure" id="mHaftalikSure"></span></span><span class="m-fiyat" id="mHaftalikFiyat"></span></button>
     </div></div>
+    <!-- v0.96: kutu (art arda 3 video, günde 2; olasılıklar kartta) ve video ile ateşböceği (bir bölümden az) -->
+    <div class="m-ekstra">
+      <button type="button" class="m-kutu" id="mKutu"><span class="kutu-cizim kucuk" aria-hidden="true"><i class="kc-kapak"></i><i class="kc-govde"></i></span><span class="mk-bilgi"><b>Kutu</b><small id="mKutuAlt"></small></span></button>
+      <button type="button" class="m-video-ates" id="mVideoAtes"><span class="mv-ik" aria-hidden="true" data-ik="video"></span><span class="mk-bilgi"><b id="mVideoAtesBas">+2</b><small id="mVideoAtesAlt"></small></span></button>
+    </div>
+    <p class="m-olasilik" id="mKutuOlasilik"></p>
     <div class="m-bas"><h3>Günlük vitrin</h3><small id="mVitrinSure"></small></div>
     <div class="m-vitrin" id="mVitrin"></div>
     <div class="m-bas"><h3>Kategoriler</h3><small>Dokun, önizle, al</small></div>
@@ -317,7 +323,7 @@
     </div>
     <div class="ay-grup g-oyuncu"><h3 class="ay-bas">Oyuncu</h3>
     <form class="ayar-satir ad-satir" id="adForm">
-      <label for="adDegis"><b>Oyuncu adı</b></label>
+      <label for="adDegis"><b>Oyuncu adı</b> <span id="adHak"></span></label>
       <div class="git"><input id="adDegis" maxlength="16" autocomplete="nickname"><button type="submit">Kaydet</button></div>
     </form>
     <div class="ayar-satir"><div><b>Hesap</b><span id="hesapYazi">Misafir · ilerleme bu cihazda</span></div></div>
@@ -341,17 +347,17 @@
     <button type="button" class="ay-git" id="tanitimBtn">Tanıtımı yeniden izle</button>
     <button type="button" class="ay-git" id="ipucuSifirBtn">Tanıtım kartlarını yeniden göster</button>
     </div>
-    <p class="surum">Hoook v0.95 · prototip · Funday Morning Games</p>
+    <p class="surum">Hoook v0.96 · prototip · Funday Morning Games</p>
   </div>
 </section>
 
 <!-- Alt gezinme (v0.75): Market · Koleksiyon · OYNA · Yarışma · Profil (başparmak bölgesinde; OYNA ortada ve büyük) -->
 <nav class="alt-menu" id="altMenu" aria-label="Ana gezinme" hidden>
-  <button type="button" data-sekme="ekDolap" data-mod="market"><i class="nokta" id="marketNokta" hidden></i><span class="am-ik"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 9l2-5h12l2 5M4 9h16v11H4z" fill="#ff7a2f" stroke="#1a0f2e" stroke-width="2" stroke-linejoin="round"/><path d="M4 9q2 3 4 0 2 3 4 0 2 3 4 0 2 3 4 0" fill="#fff" stroke="#1a0f2e" stroke-width="1.6"/></svg></span><span>Market</span></button>
-  <button type="button" data-sekme="ekKoleksiyon"><span class="am-ik"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2.5c2 3 5.5 4.5 4.4 8.6 1.6.9 3.1 3 3.1 5.4 0 3.7-3.4 6-7.5 6s-7.5-2.3-7.5-6c0-2.6 1.4-4.5 3-5.5 0 1.5.8 2.6.8 2.6S8 11 9.5 8.6C10.9 6.4 12.6 5.6 12 2.5z" fill="#ff7a2f" stroke="#1a0f2e" stroke-width="1.8" stroke-linejoin="round"/><circle cx="9.8" cy="16" r="1.4" fill="#1a0f2e"/><circle cx="14.2" cy="16" r="1.4" fill="#1a0f2e"/></svg></span><span>Koleksiyon</span></button>
-  <button type="button" data-sekme="ekAna" class="oyna-sekme"><span class="am-ik"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M8 5v14l11-7z" fill="#fff" stroke="#1a0f2e" stroke-width="2" stroke-linejoin="round"/></svg></span><span>OYNA</span><i class="nokta" id="gorevNokta" hidden></i></button>
-  <button type="button" data-sekme="ekYarisma"><span class="am-ik"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M7 4h10v4a5 5 0 0 1-10 0z" fill="#ffd23f" stroke="#1a0f2e" stroke-width="2"/><path d="M7 6H4a3 3 0 0 0 3 4M17 6h3a3 3 0 0 1-3 4" fill="none" stroke="#1a0f2e" stroke-width="1.8"/><path d="M10 13h4v4h-4zM8 20h8" stroke="#1a0f2e" stroke-width="2" fill="#ffd23f"/></svg></span><span>Yarışma</span></button>
-  <button type="button" data-sekme="ekProfil"><span class="am-ik"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="9" r="4" fill="#35d0e8" stroke="#1a0f2e" stroke-width="2"/><path d="M4 21c1-5 4-7 8-7s7 2 8 7z" fill="#35d0e8" stroke="#1a0f2e" stroke-width="2" stroke-linejoin="round"/></svg></span><span>Profil</span></button>
+  <button type="button" data-sekme="ekDolap" data-mod="market"><i class="nokta" id="marketNokta" hidden></i><span class="am-ik"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 11h16v9.2a.8.8 0 0 1-.8.8H4.8a.8.8 0 0 1-.8-.8z" fill="#fff4dc" stroke="#1a0f2e" stroke-width="2" stroke-linejoin="round"/><rect x="9.6" y="14.4" width="4.8" height="6.6" rx=".8" fill="#ff6fa8" stroke="#1a0f2e" stroke-width="1.8"/><path d="M2.6 9.6L4.6 3.6h14.8l2 6c0 1.5-1.2 2.6-2.6 2.6s-2.5-1.1-2.5-2.4c0 1.3-1.1 2.4-2.6 2.4s-2.5-1.1-2.6-2.4c0 1.3-1.1 2.4-2.5 2.4S8 11.1 8 9.8c0 1.3-1.2 2.4-2.7 2.4-1.5 0-2.7-1.1-2.7-2.6z" fill="#ff7a2f" stroke="#1a0f2e" stroke-width="2" stroke-linejoin="round"/><path d="M9.6 3.8L8.7 9.6M14.4 3.8l.9 5.8" stroke="#fff" stroke-width="1.6"/></svg></span><span>Market</span></button>
+  <button type="button" data-sekme="ekKoleksiyon"><span class="am-ik"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M8.2 3.6L3 6.6l2.3 4.4 2.3-1.1v10.6h8.8V9.9l2.3 1.1L21 6.6l-5.2-3c-.6 1.6-2.1 2.6-3.8 2.6s-3.2-1-3.8-2.6z" fill="#5ec8ff" stroke="#1a0f2e" stroke-width="2" stroke-linejoin="round"/><path d="M12 10.6l1.1 2.2 2.4.3-1.8 1.7.5 2.4-2.2-1.2-2.2 1.2.5-2.4-1.8-1.7 2.4-.3z" fill="#ffe066" stroke="#1a0f2e" stroke-width="1.3" stroke-linejoin="round"/></svg></span><span>Koleksiyon</span></button>
+  <button type="button" data-sekme="ekAna" class="oyna-sekme"><span class="am-ik"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M8.2 4.6v14.8c0 .9 1 1.4 1.7.9l10.3-7.4c.6-.4.6-1.4 0-1.8L9.9 3.7c-.7-.5-1.7 0-1.7.9z" fill="#fff" stroke="#1a0f2e" stroke-width="2.2" stroke-linejoin="round"/></svg></span><span>OYNA</span><i class="nokta" id="gorevNokta" hidden></i></button>
+  <button type="button" data-sekme="ekYarisma"><span class="am-ik"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M7 5.4H4.3a3.1 3.1 0 0 0 3.4 4.8M17 5.4h2.7a3.1 3.1 0 0 1-3.4 4.8" fill="none" stroke="#1a0f2e" stroke-width="2"/><path d="M7 3.4h10v5.2a5 5 0 0 1-10 0z" fill="#ffd23f" stroke="#1a0f2e" stroke-width="2" stroke-linejoin="round"/><path d="M10.6 13.4h2.8v3h-2.8z" fill="#ffd23f" stroke="#1a0f2e" stroke-width="1.8"/><rect x="7" y="16.4" width="10" height="4.4" rx="1.2" fill="#a2693a" stroke="#1a0f2e" stroke-width="2"/><path d="M9.4 5.4v2.8" stroke="#fff" stroke-width="1.6" stroke-linecap="round"/></svg></span><span>Yarışma</span></button>
+  <button type="button" data-sekme="ekProfil"><span class="am-ik"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3.8 21c.6-4.7 3.9-7.4 8.2-7.4s7.6 2.7 8.2 7.4z" fill="#5fd38d" stroke="#1a0f2e" stroke-width="2" stroke-linejoin="round"/><circle cx="12" cy="8.4" r="4.5" fill="#fff4dc" stroke="#1a0f2e" stroke-width="2"/><circle cx="10.4" cy="8.3" r=".9" fill="#1a0f2e"/><circle cx="13.6" cy="8.3" r=".9" fill="#1a0f2e"/></svg></span><span>Profil</span></button>
 </nav>
 
 <!-- Pencereler (v0.90, İstişare 5 Aşama 3): yukarıdan iki iple inen pano; kapanınca yukarı çekilir -->
@@ -398,33 +404,59 @@
 </div>
 
 <!-- Ödüllü video (yer tutucu): ipte dönen kanca ve geri sayım -->
+<!-- v0.96: süre yalnız sayfa görünürken akar (uygulamadan çıkıp girmek videoyu atlatmaz); Vazgeç ödül vermez; art arda videolarda 1/3 -->
 <div class="katman-ust pano" id="videoKatman" hidden role="dialog" aria-modal="true" aria-labelledby="videoBaslik">
   <div class="kart video-kart">
     <h2 class="pano-tabela" id="videoBaslik">Ödüllü video</h2>
     <div class="video-kanca" aria-hidden="true"><i class="vk-ip"></i><i class="vk-kanca"></i></div>
-    <b class="video-sayac" id="videoSayac">3</b>
-    <p class="pano-bilgi">Deneme sürümünde reklam yok; burada ödüllü video oynayacak. Ödülün birazdan geliyor.</p>
+    <b class="video-sayac" id="videoSayac">5</b>
+    <small class="video-sira" id="videoSira" hidden></small>
+    <p class="pano-bilgi" id="videoBilgi">Deneme sürümünde reklam yok; burada ödüllü video oynayacak. Video bitince ödülün gelir.</p>
+    <button type="button" class="metin-btn" id="videoVazgec">Vazgeç (ödül yok)</button>
+  </div>
+</div>
+
+<!-- v0.96: kutu açılışı: kutu sallanır, kapak açılır, içinden çıkan yükselir (büyüme yok) -->
+<div class="katman-ust pano" id="kutuKatman" hidden role="dialog" aria-modal="true" aria-labelledby="kutuBaslik">
+  <div class="kart kutu-kart">
+    <h2 class="pano-tabela" id="kutuBaslik">Kutu</h2>
+    <div class="kutu-sahne" id="kutuSahne"><div class="kutu-cizim" aria-hidden="true"><i class="kc-kapak"></i><i class="kc-govde"></i></div><div class="kutu-cikan" id="kutuCikan"></div></div>
+    <small class="n-yazi" id="kutuNadir"></small>
+    <p class="pano-bilgi" id="kutuMetin">Dokun, kutu açılsın</p>
+    <button type="button" class="ana buyuk genis" id="kutuGiy" hidden>GİY</button>
+    <button type="button" class="genis pano-dugme krem" id="kutuTamam" hidden>Tamam</button>
+  </div>
+</div>
+
+<!-- v0.96: seçim panosu (ad değiştirme hakkı): video öne, ateşböceği pahalı -->
+<div class="katman-ust pano" id="secimKatman" hidden role="dialog" aria-modal="true" aria-labelledby="secimBaslik">
+  <div class="kart">
+    <h2 class="pano-tabela" id="secimBaslik"></h2>
+    <p class="pano-bilgi" id="secimMetin"></p>
+    <button type="button" class="ana buyuk genis" id="secimVideo"></button>
+    <button type="button" class="genis pano-dugme krem" id="secimAtes"></button>
+    <button type="button" class="metin-btn" id="secimKapat">Vazgeç</button>
   </div>
 </div>
 
 <div class="hikaye-kart" id="hikayeKart" role="status" hidden><b id="hkBaslik"></b><span id="hkMetin"></span></div>
 <div class="bildirim" id="bildirim" role="status" hidden></div>
 
-<script src="js/engine.js?v=0.95"></script>
-<script src="js/levels.js?v=0.95"></script>
-<script src="js/bolumler.js?v=0.95"></script>
-<script src="js/gen.js?v=0.95"></script>
-<script src="js/gorevler.js?v=0.95"></script>
-<script src="js/ekonomi.js?v=0.95"></script>
-<script src="js/istatistik.js?v=0.95"></script>
-<script src="js/muzik.js?v=0.95"></script>
-<script src="js/notlar.js?v=0.95"></script>
-<script src="js/hayalet.js?v=0.95"></script>
-<script src="js/online.js?v=0.95"></script>
-<script src="js/karakter.js?v=0.95"></script>
-<script src="js/gecis.js?v=0.95"></script>
-<script src="js/ikon.js?v=0.95"></script>
-<script src="js/game.js?v=0.95"></script>
-<script src="js/screens.js?v=0.95"></script>
+<script src="js/engine.js?v=0.96"></script>
+<script src="js/levels.js?v=0.96"></script>
+<script src="js/bolumler.js?v=0.96"></script>
+<script src="js/gen.js?v=0.96"></script>
+<script src="js/gorevler.js?v=0.96"></script>
+<script src="js/ekonomi.js?v=0.96"></script>
+<script src="js/istatistik.js?v=0.96"></script>
+<script src="js/muzik.js?v=0.96"></script>
+<script src="js/notlar.js?v=0.96"></script>
+<script src="js/hayalet.js?v=0.96"></script>
+<script src="js/online.js?v=0.96"></script>
+<script src="js/karakter.js?v=0.96"></script>
+<script src="js/gecis.js?v=0.96"></script>
+<script src="js/ikon.js?v=0.96"></script>
+<script src="js/game.js?v=0.96"></script>
+<script src="js/screens.js?v=0.96"></script>
 </body>
 </html>

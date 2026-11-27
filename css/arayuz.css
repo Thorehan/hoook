@@ -1316,3 +1316,83 @@ body:has(#oyunEkrani:not([hidden])) .hikaye-kart { top: calc(84px + env(safe-are
   transform: translateX(-50%); padding: 6px 14px; border-radius: 999px; background: rgba(21,17,42,.8); border: 2px solid var(--s-cizgi); color: var(--s-krem);
   font: 400 15px var(--font-afis); letter-spacing: .3px; white-space: nowrap; pointer-events: none; }
 @media (prefers-reduced-motion: reduce) { #oyunEkrani .rozet { transition: none; } }
+
+/* v0.96: haritada kilit perdesi. Sıradakinin 6 bölüm üstünden yukarısı tamamen karanlık; kaydırma perdenin hemen altında durur.
+   Perde dokunuşu tutar (arkasındaki kilitli halkalar seçilmez). Bölüm geçtikçe perde yukarı kayar. */
+.hr-perde { position: absolute; z-index: 4; left: 0; right: 0; top: 0;
+  background: linear-gradient(0deg, rgba(5,4,12,0) 0, rgba(5,4,12,.96) 90px, #05040c 160px); }
+.hr-perde-tabela { position: absolute; z-index: 5; left: 50%; transform: translateX(-50%) rotate(-2deg); display: flex; align-items: center; gap: 9px;
+  padding: 7px 14px 6px 10px; border-radius: 12px; background: var(--s-gece2); border: 3px solid var(--s-cizgi); box-shadow: 0 4px 0 var(--s-cizgi); color: #fff; white-space: nowrap; pointer-events: none; }
+.hr-perde-tabela .ik { width: 22px; height: 22px; }
+.hr-perde-tabela span { display: flex; flex-direction: column; line-height: 1.15; }
+.hr-perde-tabela b { font: 400 16px var(--font-afis); letter-spacing: .3px; }
+.hr-perde-tabela small { font: 800 11px var(--font-metin); color: var(--s-soluk); }
+
+/* =====================================================================
+   v0.96: kutu (Market ve günlük girişin 7. günü), video ile ateşböceği, ad değiştirme hakkı, video sayacı.
+   Kutu: tahta sandık, kor rengi kuşak; açılışta sallanır, kapak yukarı savrulur, içinden çıkan yükselir (büyüme yok).
+   ===================================================================== */
+.kutu-cizim { position: relative; display: inline-block; width: 92px; height: 78px; flex: none; }
+.kutu-cizim .kc-govde { position: absolute; left: 6px; right: 6px; bottom: 0; height: 56px; border-radius: 8px; border: 3px solid var(--s-cizgi); box-shadow: 0 4px 0 var(--s-cizgi);
+  background: linear-gradient(90deg, transparent 42%, var(--s-kor) 42% 58%, transparent 58%), repeating-linear-gradient(180deg, #a2693a 0 15px, #8a5530 15px 18px); }
+.kutu-cizim .kc-kapak { position: absolute; z-index: 1; left: 0; right: 0; top: 4px; height: 22px; border-radius: 7px; border: 3px solid var(--s-cizgi); box-shadow: 0 3px 0 var(--s-cizgi);
+  background: linear-gradient(90deg, transparent 42%, var(--s-kor) 42% 58%, transparent 58%), linear-gradient(180deg, #b87a45, #94653a); transform-origin: 12% 100%; transition: transform .45s cubic-bezier(.3, 1.3, .5, 1), opacity .45s; }
+.kutu-cizim .kc-kapak::after { content: ''; position: absolute; left: 50%; top: -12px; width: 22px; height: 12px; margin-left: -11px; border: 3px solid var(--s-cizgi); border-bottom: 0; border-radius: 12px 12px 0 0; background: var(--s-kor); }
+.kutu-cizim.kucuk { width: 58px; height: 50px; } .kutu-cizim.kucuk .kc-govde { height: 34px; left: 4px; right: 4px; } .kutu-cizim.kucuk .kc-kapak { height: 15px; top: 3px; }
+.kutu-cizim.kucuk .kc-kapak::after { width: 14px; height: 8px; top: -9px; margin-left: -7px; }
+.kutu-cizim.mini { width: 36px; height: 32px; } .kutu-cizim.mini .kc-govde { height: 21px; left: 3px; right: 3px; border-width: 2px; box-shadow: 0 2px 0 var(--s-cizgi); }
+.kutu-cizim.mini .kc-kapak { height: 10px; top: 2px; border-width: 2px; box-shadow: none; } .kutu-cizim.mini .kc-kapak::after { width: 10px; height: 6px; top: -7px; margin-left: -5px; border-width: 2px; }
+
+/* Market: kutu ve video kartları */
+.askida .m-ekstra { display: grid; grid-template-columns: 1.35fr 1fr; gap: 10px; margin-top: 4px; }
+.askida .m-kutu, .askida .m-video-ates { display: flex; align-items: center; gap: 8px; min-height: 72px; padding: 8px 10px; border-radius: 16px; border: 3px solid var(--s-cizgi); box-shadow: 0 4px 0 var(--s-cizgi);
+  color: #fff; text-align: left; transition: transform .1s ease, box-shadow .1s ease; }
+.askida .m-kutu { background: #6a3fd0 !important; transform: rotate(-1.5deg); }
+.askida .m-video-ates { background: var(--s-mavi) !important; transform: rotate(1.2deg); color: var(--s-cizgi); }
+.askida .m-kutu:active, .askida .m-video-ates:active { transform: translateY(4px); box-shadow: 0 0 0 var(--s-cizgi); }
+.askida .m-kutu.bitti, .askida .m-video-ates.bitti { filter: saturate(.35) brightness(.8); }
+.mk-bilgi { display: flex; flex-direction: column; gap: 2px; min-width: 0; }
+.mk-bilgi b { font: 400 19px/1.05 var(--font-afis); letter-spacing: .3px; text-shadow: 0 2px 0 rgba(21,17,42,.5); display: inline-flex; align-items: center; gap: 4px; }
+.m-video-ates .mk-bilgi b { text-shadow: none; }
+.mk-bilgi b .ikon-ates { width: 20px; height: 20px; }
+.mk-bilgi small { font: 800 11.5px/1.25 var(--font-metin); opacity: .95; }
+.mk-bilgi small .ik { width: 15px; height: 15px; }
+.mv-ik .ik { width: 34px; height: 34px; }
+.askida .m-olasilik { margin: 2px 2px 0; font: 700 11px/1.4 var(--font-metin); color: var(--s-soluk); text-shadow: 0 1px 0 var(--s-cizgi); }
+
+/* kutu açılış panosu */
+#kutuKatman .kutu-kart { align-items: center; }
+.kutu-sahne { position: relative; display: grid; place-items: center; width: 180px; height: 170px; margin: 0 auto; cursor: pointer; }
+.kutu-sahne .kutu-cizim { width: 120px; height: 100px; } .kutu-sahne .kutu-cizim .kc-govde { height: 72px; } .kutu-sahne .kutu-cizim .kc-kapak { height: 28px; }
+.kutu-sahne.sallan .kutu-cizim { animation: kutuSalla .32s ease-in-out infinite alternate; }
+@keyframes kutuSalla { from { transform: rotate(-6deg) translateY(0); } to { transform: rotate(6deg) translateY(-3px); } }
+.kutu-sahne.acik .kc-kapak { transform: translate(-34px, -46px) rotate(-38deg); opacity: .85; }
+.kutu-cikan { position: absolute; left: 50%; top: 4px; width: 104px; height: 104px; margin-left: -52px; display: grid; place-items: center; opacity: 0; transform: translateY(46px);
+  transition: transform .5s cubic-bezier(.3, 1.3, .5, 1) .15s, opacity .3s .15s; pointer-events: none; }
+.kutu-sahne.acik .kutu-cikan { opacity: 1; transform: translateY(-14px); }
+.kutu-cikan img { width: 96px; height: 96px; border-radius: 18px; border: 3px solid var(--s-cizgi); background: var(--s-gece); box-shadow: 0 0 0 4px rgba(255,224,102,.35), 0 0 26px rgba(255,224,102,.55); }
+.kutu-cikan .ikon-ates { width: 54px; height: 54px; }
+.kutu-cikan b { font: 400 32px var(--font-afis); color: var(--s-bocek); text-shadow: 0 3px 0 var(--s-cizgi); }
+#kutuKatman .n-yazi { font: 800 12px var(--font-metin); letter-spacing: .5px; padding: 2px 9px; border-radius: 999px; background: var(--nd, var(--s-cizgi)); color: var(--s-cizgi); border: 2px solid var(--s-cizgi); }
+#kutuKatman .n-yazi:empty { display: none; }
+#kutuKatman .n-yazi.n-ates { --nd: var(--s-bocek); }
+
+/* video: kaçıncı video, vazgeç; ad değiştirme hakkı yazısı */
+.video-sira { font: 800 12px var(--font-metin); color: var(--s-bocek); text-shadow: 0 1px 0 var(--s-cizgi); }
+#adHak { font: 700 11.5px var(--font-metin); color: var(--s-soluk); margin-left: 6px; }
+#secimKatman button:disabled { opacity: .55; }
+@media (prefers-reduced-motion: reduce) { .kutu-sahne.sallan .kutu-cizim { animation: none; } .kutu-cizim .kc-kapak, .kutu-cikan { transition: none; } }
+
+/* =====================================================================
+   v0.96: Günlük bitiş ve Haftalık hedef (üst panelde puanın altında sıradaki hedef);
+   OYNA altındaki harita levhası: bölge adı tek satıra sığmazsa alta iner, taşmaz (en az 48 px yükseklik).
+   ===================================================================== */
+#oyunEkrani .hud-hedef { display: flex; align-items: center; gap: 4px; margin-top: 5px; font: 800 12px/1.1 var(--font-metin); color: var(--s-bocek);
+  text-shadow: 0 1px 0 var(--s-cizgi), 0 0 3px var(--s-cizgi); letter-spacing: .2px; pointer-events: none; }
+#oyunEkrani .hud-hedef[hidden] { display: none; }
+#oyunEkrani .hud-hedef .ik { width: 15px; height: 15px; flex: none; }
+#ekAna .bolum-hap { min-width: 176px; max-width: min(272px, 76vw); min-height: 48px; padding: 15px 14px 8px; }
+#ekAna .bh-alt { max-width: none; white-space: normal; font-size: 13px; line-height: 1.2; row-gap: 4px; column-gap: 8px; }
+#ekAna #dokunBolge { flex-basis: 100%; text-align: center; overflow-wrap: anywhere; }
+#ekAna .bolum-hap .hedefler { order: 2; flex-basis: auto; }
+#ekAna .bh-alt::after { order: 3; }

@@ -484,6 +484,9 @@
   function newEndlessDef() {
     var d = newEndlessDef0();
     d.halkaUstalik = dailyKey ? dailyKey >= HALKA_GUNLUK : weekKey ? weekKey >= HALKA_HAFTALIK : meydan ? (meydan.tur === 'h' ? haftaKey() >= HALKA_HAFTALIK : todayKey() >= HALKA_GUNLUK) : true;
+    // v0.96: Günlük Kuyu 28/11'den itibaren bitişli (500 m; js/ekonomi.js → GUN_BITIS); Günlük meydan okuması açıldığı güne göre
+    var gk = dailyKey || (meydan && meydan.tur !== 'h' ? todayKey() : null);
+    if (gk && EKO.gunBitisli(gk)) d.bitisM = EKO.GUN_BITIS.metre;
     return d;
   }
   function newEndlessDef0() { return meydan ? (meydan.tur === 'h' ? GEN.createHaftalik(meydan.seed, korAyar(haftaKey(), KOR_HAFTALIK)) : GEN.createEndless(meydan.seed, null, korAyar(todayKey(), KOR_GUNLUK))) : dailyKey ? GEN.createEndless(dailySeed(dailyKey), GEN.gunKurali(dailyKey), korAyar(dailyKey, KOR_GUNLUK)) : weekKey ? GEN.createHaftalik(tohum('kuyu-haftalik-' + weekKey), korAyar(weekKey, KOR_HAFTALIK)) : GEN.createEndless((Date.now() ^ (Math.random() * 1e9)) >>> 0, null, { kor: true, cark: true, akinti: true }); }
@@ -662,16 +665,51 @@
     var etiket = mode === 'level' && levelNo <= 3;
     return '<span class="rozet ' + cls + '" role="img" aria-label="' + aria + '">' + IKS(ik) + '<b>' + deger + '</b>' + (ek || '') + (etiket ? '<small>' + ad + '</small>' : '') + '</span>';
   }
+  // Haftalık hedef sırası (v0.96, İstişare 7): koşu başında bir kez kurulur: alınmamış hafta yıldızları, haftanın en iyisi
+  // (rekorun), üstteki ligler. Puan ölçüsü sonuçtaki puan (çarpanlı, E.finalScore). Geçilen hedef kutlanır, sıradaki görünür.
+  function haftaSiradaki() {
+    if (!sim._hedef) {
+      var hy = EKO.haftaYildizDurum(save, weekKey), hh = EKO.haftaHedef(weekKey), hd = EKO.haftalikDurum(save, weekKey), L = [];
+      for (var i = hy; i < 3; i++) L.push({ ad: (i + 1) + '. yıldız', puan: hh.esik[i], ik: 'yildiz' });
+      if (hd.best > 0) L.push({ ad: 'rekorun', puan: hd.best, ik: 'kanca' });
+      EKO.LIG.forEach(function (lg, k) { if (k > hd.lig) L.push({ ad: lg.ad, puan: lg.puan, ik: 'kilit' }); });
+      L.sort(function (a, b) { return a.puan - b.puan; });
+      sim._hedef = L;
+    }
+    var fs = E.finalScore(sim), L2 = sim._hedef;
+    while (L2.length && fs >= L2[0].puan) {
+      var g = L2.shift();
+      if (sim.status === 'play') { floatText(sim.p.x, sim.p.y - 52, g.ad === 'rekorun' ? 'Rekorunu geçtin!' : g.ik === 'kilit' ? g.ad + ' ligi!' : g.ad + '!', '#ffe066', 20); burst(sim.p.x, sim.p.y, 14, '#ffe066', 180, 0.7, -40); buzz(18); }
+    }
+    return L2[0] || null;
+  }
+  // rozet satırının altındaki sıradaki hedef yazısı (v0.96; Hikâye'de gizli)
+  function hudHedef(h) { var el = $('hudHedef'); if (!el || el._h === h) return; el._h = h; el.innerHTML = h; el.hidden = !h; }
   function updateHud(force) {
     var m = E.meters(sim), mult = E.speedMult(sim), combo = sim.combo;
-    if (mode === 'endless') {
+    if (mode === 'endless' && sim.def.bitisM) {
+      // v0.96: bitişli Günlük: ortada süre; altında sıradaki yıldızın süresi. Rozetler: tepeye kalan metre, akış
+      var BM = sim.def.bitisM, sn = sim.status === 'won' ? sim.bitisT : sim.t, ss = EKO.GUN_BITIS.sure;
+      var hd = sn <= ss[1] ? '3 yıldız için ' + ss[1] + ' sn' : sn <= ss[0] ? '2 yıldız için ' + ss[0] + ' sn' : '1 yıldız için tepeye çık';
+      var keyB = 'b' + Math.floor(sn) + '|' + m + '|' + combo + '|' + sim.alev;
+      if (keyB === lastHud && !force) return; lastHud = keyB;
+      $('puan').innerHTML = sureYazi(sn).replace(/,\d$/, '') + '<small>süre</small>';
+      hudHedef(IKS('yildiz') + hd);
+      $('cipler').innerHTML = rozet('r-metre' + (m >= BM ? ' tam' : ''), 'metre', Math.min(m, BM) + '/' + BM, 'tepe', 'tepeye ' + Math.max(0, BM - m) + ' metre kaldı') +
+        rozet('r-akis' + (combo >= 2 ? ' aktif' : ''), 'akis', 'x' + combo, 'akış', 'akış x' + combo, alevPip(combo));
+    } else if (mode === 'endless') {
       var sc = E.score(sim), key = 'e' + sc + '|' + m + '|' + combo + '|' + mult + '|' + sim.alevPuan + sim.alev;
+      // v0.96: Haftalık'ta sıradaki hedef (haftanın yıldızları, rekorun, sonraki lig) puanın altında; geçince kutlama
+      var hdf = weekKey && !meydan ? haftaSiradaki() : null;
+      if (key === lastHud && !force) return;
       $('puan').innerHTML = sc + '<small>puan</small>';
+      hudHedef(hdf ? IKS(hdf.ik) + 'Sıradaki: ' + hdf.ad + ' · ' + hdf.puan + ' puan' : '');
       if (key === lastHud && !force) return; lastHud = key;
       $('cipler').innerHTML = rozet('r-metre', 'metre', m + ' m', 'yükseklik', m + ' metre') +
         rozet('r-akis' + (combo >= 2 ? ' aktif' : ''), 'akis', 'x' + combo, 'akış', 'akış x' + combo, alevPip(combo)) +
         rozet('r-hiz' + (mult > 1 ? ' aktif' : ''), 'hiz', 'x' + mult.toFixed(2).replace('.', ','), 'çarpan', 'çarpan x' + mult.toFixed(2) + ' (hız ve ustalık)');
     } else {
+      hudHedef('');
       var n = E.fireflyCount(sim), ffT = sim.fireflies.length, shots = sim.shots - sim.misses, kalan = def.par - shots;
       var kusursuz = kalan >= 0 && !sim.donus, akisTam = sim.maxCombo >= def.flow;
       var key2 = 'l' + n + '|' + combo + '|' + shots + '|' + sim.maxCombo + '|' + (sim.donus || 0) + '|' + sim.alevPuan + sim.alev;
@@ -844,7 +882,7 @@
         anlar.sonme = { x: sim.p.x, y: sim.p.y, t0: lastT, su: suya, buhar: 0 };
         burst(sim.p.x, sim.p.y, suya ? 10 : 16, suya ? COL.suAcik : (look().govde || COL.kahraman), suya ? 150 : 220, 0.6);
         deadT = 0;
-      } else if (e.type === 'won') { SFX.won(); buzz([20, 60, 30]); winT = 0; burst(sim.p.x, sim.p.y, 20, COL.gok, 200, 0.8, -60); kovaBasla(); }
+      } else if (e.type === 'won') { SFX.won(); buzz([20, 60, 30]); winT = 0; burst(sim.p.x, sim.p.y, 20, COL.gok, 200, 0.8, -60); if (e.bitis) { burst(sim.p.x, sim.p.y, 26, '#ffe066', 260, 1, -40); floatText(sim.p.x, sim.p.y - 40, 'Tepedesin!', '#ffe066', 24); } else kovaBasla(); }
     }
   }
 
@@ -1006,6 +1044,25 @@
     ctx.lineTo(g.x + 11, g.y + 30 + bob); ctx.lineTo(g.x - 11, g.y + 30 + bob); ctx.closePath(); ctx.fill();
     ctx.fillStyle = '#5c6664';
     ctx.fillRect(g.x - 14, g.y + 11 + bob, 28, 3); ctx.fillRect(g.x - 12, g.y + 23 + bob, 24, 3);
+  }
+
+  // Günlük bitiş çizgisi (v0.96): kuyunun def.bitisM metresinde kenardan kenara damalı şerit ve tabela
+  function drawBitis(t) {
+    var BM = sim.def.bitisM; if (!BM) return;
+    var y = sim.startY - BM * 20, x0 = CFG.WALL, x1 = CFG.W - CFG.WALL, kare = 10;
+    var pg = ctx.createLinearGradient(0, y - 70, 0, y + 10);
+    pg.addColorStop(0, 'rgba(255,224,102,0)'); pg.addColorStop(1, 'rgba(255,224,102,' + (0.22 + 0.08 * Math.sin(t / 400)) + ')');
+    ctx.fillStyle = pg; ctx.fillRect(x0, y - 70, x1 - x0, 80);
+    ctx.fillStyle = '#15112a'; ctx.fillRect(x0, y - 2 * kare - 2, x1 - x0, 2 * kare + 4);
+    for (var x = x0, k = 0; x < x1; x += kare, k++) {
+      ctx.fillStyle = k % 2 ? '#ffe066' : '#fff4dc'; ctx.fillRect(x, y - 2 * kare, Math.min(kare, x1 - x), kare);
+      ctx.fillStyle = k % 2 ? '#fff4dc' : '#ffe066'; ctx.fillRect(x, y - kare, Math.min(kare, x1 - x), kare);
+    }
+    ctx.save(); ctx.textAlign = 'center'; ctx.textBaseline = 'alphabetic';
+    ctx.font = '400 20px "Lilita One", "Baloo 2", system-ui, sans-serif'; ctx.lineWidth = 4; ctx.strokeStyle = '#15112a'; ctx.fillStyle = '#ffe066';
+    var tx = CFG.W / 2, ty = y - 2 * kare - 10;
+    ctx.strokeText('TEPE · ' + BM + ' m', tx, ty); ctx.fillText('TEPE · ' + BM + ' m', tx, ty);
+    ctx.restore();
   }
 
   function drawBox(b) {
@@ -1885,6 +1942,7 @@
     }
     drawKorIsigi(t);
     drawGoal(t);
+    drawBitis(t);
     var vh = viewH / K;
     for (var i = 0; i < sim.rects.length; i++) drawRect(sim.rects[i]);
     sim.buttons.forEach(drawButton);
@@ -2127,12 +2185,15 @@
       if (HY) HY.ornekle(hayaletKayit, sim);
     } else if (sim.status === 'won' && winT !== null) {
       winT += dt;
+      if (!sim.goal) { sim.p.px = sim.p.x; sim.p.py = sim.p.y; sim.p.y -= 70 * dt * Math.max(0, 1 - winT); if (winT > 1 && !resultShown) showEndlessResult(); } // Günlük bitiş (v0.96)
+      else {
       sim.p.px = sim.p.x; sim.p.py = sim.p.y;
       sim.p.x += (sim.goal.x - sim.p.x) * Math.min(1, dt * 8);
       sim.p.y += (sim.goal.y + 34 - sim.p.y) * Math.min(1, dt * 8);
       if (winT > 0.35) { sim.goal.y -= 420 * dt; sim.p.y = sim.goal.y + 34; }
       if (winT > 1.1 && !resultShown && finalT === null) { if (finalBekliyor()) finalBasla(); else showLevelResult(); }
       if (finalT !== null) { finalT += dt; finalSes(); if (finalT > FINAL_SURE) finalBitir(); }
+      }
     } else if (sim.status === 'dead' && deadT !== null) {
       deadT += dt;
       if (mode === 'level' && deadT > 0.75) {
@@ -2183,6 +2244,8 @@
       (isNew ? '<span class="yeni-etiket">YENİ</span>' : '') + icon + '<b>' + title + '</b><span>' + sub + '</span></div>';
   }
   function fmt(n, d) { return n.toFixed(d).replace('.', ','); }
+  // Günlük bitiş süresi (v0.96): 0:42,3
+  function sureYazi(sn) { var t = Math.max(0, Math.round(sn * 10)), dk = Math.floor(t / 600), k = t % 600; return dk + ':' + (k < 100 ? '0' : '') + Math.floor(k / 10) + ',' + (k % 10); }
   function stat(icon, text, label, rec) {
     return '<span class="cip buyuk-cip' + (rec ? ' rekor-cip' : '') + '" aria-label="' + label + '">' + icon + '<b>' + text + '</b>' + (rec ? '<em>REKOR</em>' : '') + '</span>';
   }
@@ -2342,7 +2405,7 @@
     if (v) v.onclick = function () {
       clearInterval(devamDurum.iv); // video sırasında sayaç durur
       var kosu = sim;
-      if (window.KuyuScreens && window.KuyuScreens.video) window.KuyuScreens.video(function () { if (sim === kosu) devamBitir(true); });
+      if (window.KuyuScreens && window.KuyuScreens.video) window.KuyuScreens.video(function () { if (sim === kosu) devamBitir(true); }, 1, function () { if (sim === kosu) devamBitir(false); }); // v0.96: video yarıda kalırsa devam yok
       else devamBitir(true);
     };
     $('devamAtes').onclick = function () { if (EKO.devamOde(save, sim.devam || 0)) { persist(); devamBitir(true); } };
@@ -2367,6 +2430,9 @@
     var cuzdanOnce = save.cuzdan.ates;
     var raw = E.score(sim), mult = E.speedMult(sim), sc = E.finalScore(sim), m = E.meters(sim);
     var speed = E.speedMs(sim.maxSpeed);
+    // v0.96: bitişli Günlük: puan süreden (bitiren her zaman bitiremeyenden önde), bitiremeyen metresi kadar
+    var bitisM = sim.def.bitisM || 0, bitti = !!bitisM && sim.status === 'won', sure = bitti ? sim.bitisT : null;
+    if (bitisM) sc = bitti ? EKO.gunBitisPuan(sure) : Math.min(m, bitisM - 1);
     var isRecord, recM, recC = false, title, sub, recLine;
     if (dailyKey) {
       // Günlük: günün en iyisi, deneme sayısı, seri
@@ -2386,15 +2452,16 @@
         if (st.count % 7 === 0) st.donma = 1;
       }
       save.streak = st;
-      var yz = EKO.gunYildizKaydet(save, dailyKey, m), hedef = EKO.gunHedef(dailyKey);
+      var yz = EKO.gunYildizKaydet(save, dailyKey, m, sure), hedef = EKO.gunHedef(dailyKey);
       EKO.gecmisYaz(save, 'gunluk', dailyKey, { puan: d.best, metre: d.meters, yildiz: yz.yildiz });
-      var yildizHtml = '<div class="gun-yildiz" aria-label="Günün hedefi ' + hedef.metre + ' metre, ' + yz.yildiz + ' yıldız"><span class="yildizlar">' +
-        [0, 1, 2].map(function (i) { return '<i class="' + (i < yz.yildiz ? 'var' : '') + '">' + IKS('yildiz') + '</i>'; }).join('') + '</span><small>Günün hedefi ' + hedef.esik.join(' · ') + ' m' +
+      var hedefYazi = hedef.bitis ? 'Tepe ' + hedef.metre + ' m · 2 yıldız ' + hedef.sure[0] + ' sn · 3 yıldız ' + hedef.sure[1] + ' sn' : 'Günün hedefi ' + hedef.esik.join(' · ') + ' m';
+      var yildizHtml = '<div class="gun-yildiz" aria-label="' + hedefYazi + ', ' + yz.yildiz + ' yıldız"><span class="yildizlar">' +
+        [0, 1, 2].map(function (i) { return '<i class="' + (i < yz.yildiz ? 'var' : '') + '">' + IKS('yildiz') + '</i>'; }).join('') + '</span><small>' + hedefYazi +
         (yz.odul ? ' · +' + yz.odul + ' ateşböceği' : '') + '</small></div>' +
         (seriOdul ? '<p class="seri-odul">' + st.count + ' günlük seri! +' + seriOdul + ' ateşböceği</p>' : '') +
         (donmaKul ? '<p class="seri-odul">Dün kaçırdın ama donma hakkın seriyi korudu.</p>' : '');
       var left = msToNextDay(), hh = Math.floor(left / 3600000), mm = Math.floor(left % 3600000 / 60000);
-      title = isRecord && d.tries > 1 ? 'Günün rekoru!' : isRecord ? 'Bugünün ilk puanı' : 'Su yetişti';
+      title = bitisM && !bitti ? 'Su yetişti' : isRecord && d.tries > 1 ? 'Günün rekoru!' : bitti ? 'Tepedesin!' : isRecord ? 'Bugünün ilk puanı' : 'Su yetişti';
       sub = 'Günlük Kuyu · ' + new Date(dailyKey + 'T12:00:00Z').toLocaleDateString('tr-TR', { day: 'numeric', month: 'long' }) + ' · ' + d.tries + '. deneme';
       var gh = EKO.hakDurum(save, 'gunluk', dailyKey);
       recLine = 'Bugünün en iyisi ' + d.best + ' puan · seri ' + st.count + ' gün · ' + gh.kalan + ' deneme kaldı · yeni kuyu ' + hh + ' sa ' + mm + ' dk sonra';
@@ -2436,8 +2503,10 @@
     $('kart').innerHTML =
       '<div class="sonuc-bas"><h2>' + title + '</h2><span>' + sub + '</span></div>' +
       '<div class="odul-satir"><b id="odulSayi">0</b><small>puan</small>' + (isRecord ? '<em class="rekor-etiket">REKOR</em>' : '') + '</div>' +
-      '<p class="odul-hesap">' + m + ' m + ' + sim.bonus + ' akış + ' + sim.fireflyPts + ' ateşböceği' + (mult > 1 ? ' = ' + raw + ' × x' + fmt(mult, 2) + ' hız' : '') + '</p>' +
+      '<p class="odul-hesap">' + (bitti ? 'Tepeye ' + sureYazi(sure) + ' · puan 10000 − süre × 10' : bitisM ? 'Tepeye ' + (bitisM - m) + ' m kaldı · bitiremeyen metresi kadar puan alır'
+        : m + ' m + ' + sim.bonus + ' akış + ' + sim.fireflyPts + ' ateşböceği' + (mult > 1 ? ' = ' + raw + ' × x' + fmt(mult, 2) + ' hız' : '')) + '</p>' +
       '<div class="istatistik">' +
+      (bitti ? stat(SURE_IK, sureYazi(sure), 'süre ' + sureYazi(sure), isRecord) : '') +
       stat(IK.metre, m + ' m', m + ' metre', recM && !isRecord) +
       stat(IK.akis, 'x' + sim.maxCombo, 'en uzun akış x' + sim.maxCombo, recC) +
       stat(IK.hiz, fmt(speed, 0) + ' m/sn', 'en yüksek hız', false) +
@@ -2664,7 +2733,7 @@
   // Bölüm sonu yürüyüşü ya da bölge finali sürerken menü düğmesi sonuç kartını açar (bölüm kaydedilmeden çıkılmasın).
   $('menuBtn').onclick = function () {
     if (devamDurum) { devamBitir(false); return; } // teklif açıkken: geç (koşu kaydedilir)
-    if (sim && sim.status === 'won' && !resultShown) { if (finalT !== null) finalBitir(); else showLevelResult(); return; }
+    if (sim && sim.status === 'won' && !resultShown) { if (mode === 'endless') showEndlessResult(); else if (finalT !== null) finalBitir(); else showLevelResult(); return; }
     if (sim && sim.status === 'play' && !paused) pauseGame(); else goHome();
   };
   $('devamBtn').onclick = resumeGame;
@@ -2789,6 +2858,15 @@
     cuzdan: function () { return save.cuzdan; },
     giris: function () { return EKO.girisDurum(save, todayKey()); },
     girisAl: function (kat) { var r = EKO.girisAl(save, todayKey(), kat); persist(); return r; },
+    // v0.96: kutu (Market'te 3 video, günde 2; günlük girişin 7. günü), video ile ateşböceği, ad değiştirme hakkı
+    girisKutuMu: function () { return EKO.girisKutuMu(save, todayKey()); },
+    girisKutuAl: function () { var r = EKO.girisKutuAl(save, todayKey()); GORUNUM = null; persist(); return r; },
+    kutuDurum: function () { return EKO.kutuDurum(save, todayKey()); },
+    kutuAc: function () { var r = EKO.kutuAc(save, todayKey(), 'market'); GORUNUM = null; persist(); return r; },
+    videoAtesDurum: function () { return EKO.videoAtesDurum(save, todayKey()); },
+    videoAtesAl: function () { var r = EKO.videoAtesAl(save, todayKey()); persist(); return r; },
+    isimDurum: function () { return EKO.isimDurum(save); },
+    isimHakki: function (yol) { var r = EKO.isimHakki(save, yol); persist(); return r; },
     satinAl: function (id) { var r = EKO.satinAl(save, id, { gun: todayKey(), hafta: haftaKey() }); GORUNUM = null; persist(); return r; },
     // Market (v0.77): günün vitrini, haftanın ürünü, bugünkü fiyat, video indirimi
     vitrin: function () { return EKO.vitrin(todayKey()); },
