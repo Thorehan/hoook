@@ -32,6 +32,8 @@
   // Günlük ve Haftalık rozetleri: yükseklik (ok ve çentikler), çarpan (çift ok)
   P.metre = '<path d="M12 21V4M6.5 9.5L12 4l5.5 5.5" fill="none" stroke="' + C + '" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"/><path class="d" d="M12 21V4M6.5 9.5L12 4l5.5 5.5" fill="none" stroke="#7fe58e" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/>';
   P.hiz = '<path d="M5 12.5L12 6l7 6.5M5 19l7-6.5 7 6.5" fill="none" stroke="' + C + '" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"/><path class="d" d="M5 12.5L12 6l7 6.5M5 19l7-6.5 7 6.5" fill="none" stroke="#5ec8ff" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/>';
+  // v0.97: yeni ürün rozetinin içindeki kıvılcım (dört köşeli parıltı)
+  P.yeni = '<path d="M12 2.5c.7 4.6 2.6 6.6 7.4 7.4-4.8.8-6.7 2.8-7.4 7.4-.7-4.6-2.6-6.6-7.4-7.4 4.8-.8 6.7-2.8 7.4-7.4z" fill="#fff" stroke="' + C + '" stroke-width="1.6" stroke-linejoin="round"/><circle cx="18.6" cy="18.4" r="2.2" fill="#fff" stroke="' + C + '" stroke-width="1.4"/>';
   function svg(ad, cls) {
     return '<svg class="ik ik-' + ad + (cls ? ' ' + cls : '') + '" viewBox="0 0 24 24" aria-hidden="true">' + (P[ad] || '') + '</svg>';
   }

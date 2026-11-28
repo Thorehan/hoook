@@ -125,7 +125,10 @@ ok(dv.cuzdan.harcanan === 75, 'harcanan sayılır');
   const sk = { best: {} }; K.ensure(sk);
   const top = K.KUTU.olasilik.reduce((a, o) => a + o[1], 0);
   ok(top === 100, 'kutu olasılıkları %100');
-  ok(K.kutuAc(sk, 'g1', 'market') && K.kutuAc(sk, 'g1', 'market') && K.kutuAc(sk, 'g1', 'market') === null, 'günde en çok 2 market kutusu');
+  const v3 = g => { let r; for (let i = 0; i < 3; i++) r = K.kutuVideo(sk, g); return r; };
+  ok(K.kutuAc(sk, 'g1', 'market') === null && K.kutuVideo(sk, 'g1').izlenen === 1 && K.kutuAc(sk, 'g1', 'market') === null, 'v0.97: kutu videoları tek tek, 3 video olmadan açılmaz');
+  ok(K.kutuVideo(sk, 'g1') && K.kutuVideo(sk, 'g1').hazir && K.kutuDurum(sk, 'g1').izlenen === 3 && K.kutuAc(sk, 'g1', 'market') && K.kutuDurum(sk, 'g1').izlenen === 0, '3. video bitince kutu açılır, sayaç sıfırlanır');
+  ok(v3('g1').hazir && K.kutuAc(sk, 'g1', 'market') && K.kutuVideo(sk, 'g1') === null && K.kutuAc(sk, 'g1', 'market') === null, 'günde en çok 2 market kutusu');
   ok(K.kutuDurum(sk, 'g2').kalan === 2, 'ertesi gün kutu hakkı yenilenir');
   let r = 7; const rnd = () => { r = (r * 16807) % 2147483647; return r / 2147483647; };
   let yasak = 0, sayac = {}, yin = 0;
@@ -153,7 +156,23 @@ ok(dv.cuzdan.harcanan === 75, 'harcanan sayılır');
   const si = { best: {} }; K.ensure(si); si.cuzdan.ates = 300;
   ok(K.isimDurum(si).bedava && K.isimHakki(si, 'bedava') && !K.isimDurum(si).bedava, 'ilk ad değişikliği bedava');
   ok(!K.isimHakki(si, 'bedava') && K.isimHakki(si, 'ates') && si.cuzdan.ates === 50 && !K.isimHakki(si, 'ates'), 'sonraki 250 ateşböceği, yetmezse olmaz');
-  ok(K.isimHakki(si, 'video') && si.isimDegisim === 3, 'video ile ad değişikliği');
+  ok(!K.isimHakki(si, 'video') && K.isimVideo(si).izlenen === 1 && !K.isimHakki(si, 'video') && K.isimVideo(si).hazir && K.isimHakki(si, 'video') && si.isimDegisim === 3 && K.isimDurum(si).izlenen === 0, 'video ile ad değişikliği: 2 video tek tek');
 }
-console.log(bad ? bad + ' hata' : 'Tamam: cüzdan, günlük giriş, dolap, lig, haklar, günün hedefi, kutu, video ateşböceği, ad değiştirme');
+// ---------- Yeni ürün rozeti (v0.97) ----------
+{
+  const sy = {}; K.ensure(sy);
+  const g = '2026-11-28', h = '2026-11-23', L = K.yeniUrunler(sy, g, h);
+  ok(L.length === 5 && L.every(y => K.urunYeniMi(sy, y.id, g, h)) && K.yeniVarMi(sy, g, h), 'vitrin (4) ve haftanın ürünü yeni');
+  const a = L[0], tur = K.item(a.id).tur, ayniTur = L.filter(y => y.id !== a.id && K.item(y.id).tur === tur);
+  ok(K.sekmeYeniMi(sy, tur, g, h), 'kategori sekmesinde rozet');
+  K.sekmeGordu(sy, tur, g, h);
+  ok(!K.sekmeYeniMi(sy, tur, g, h) && K.urunYeniMi(sy, a.id, g, h), 'sekmeye dokunmak yalnız sekme rozetini siler, ürün rozeti kalır');
+  K.urunGordu(sy, a.id, g, h);
+  ok(!K.urunYeniMi(sy, a.id, g, h) && ayniTur.every(y => K.urunYeniMi(sy, y.id, g, h)), 'ürünü görmek o ürünün rozetini siler, diğerleri kalır');
+  L.forEach(y => K.urunGordu(sy, y.id, g, h));
+  ok(!K.yeniVarMi(sy, g, h) && K.yeniUrunler(sy, '2026-11-29', h).some(y => y.yer === 'vitrin' && K.urunYeniMi(sy, y.id, '2026-11-29', h)), 'hepsi görülünce rozet yok; ertesi günün vitrini yine yeni');
+  sy.dolap.sahip.push(K.yeniUrunler(sy, '2026-11-29', h)[0].id);
+  ok(K.yeniUrunler(sy, '2026-11-29', h).length === 4, 'sende olan ürün yeni sayılmaz');
+}
+console.log(bad ? bad + ' hata' : 'Tamam: cüzdan, günlük giriş, dolap, lig, haklar, günün hedefi, kutu, video ateşböceği, ad değiştirme, yeni ürün rozeti');
 process.exit(bad ? 1 : 0);

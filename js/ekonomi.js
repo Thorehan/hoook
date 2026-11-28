@@ -295,6 +295,27 @@
     return v;
   }
   function vitrinGordu(save, gunKey) { marketDurum(save).gorulen = gunKey; }
+  // ---------- Yeni ürün rozeti (v0.97) ----------
+  // Yeni: bugünün vitrinine ya da bu haftanın ürününe gelen, sende olmayan ürün. Rozet üç yerde: ürünün üstünde, bölüm başlığında
+  // ve kategori sekmesinde. Ürüne dokunmak (ürün sayfası) o ürünün bütün rozetlerini siler; kategori sekmesine dokunmak yalnız o
+  // sekmenin rozetini siler. Görülen, ürünün geldiği gün/hafta anahtarıyla saklanır: ürün yeniden gelirse yine yeni olur.
+  function yeniUrunler(save, gunKey, haftaKey) {
+    var L = vitrin(gunKey).urunler.map(function (id) { return { id: id, key: gunKey, yer: 'vitrin' }; }), hu = haftalikUrun(haftaKey);
+    if (hu) L.push({ id: hu, key: haftaKey, yer: 'haftalik' });
+    return L.filter(function (y) { return satilir(item(y.id)) && !sahip(save, y.id); });
+  }
+  function yeniBul(save, id, gunKey, haftaKey) { var L = yeniUrunler(save, gunKey, haftaKey); for (var i = 0; i < L.length; i++) if (L[i].id === id) return L[i]; return null; }
+  function gorulenler(save) { var m = marketDurum(save); if (!m.gorulenUrun) m.gorulenUrun = {}; if (!m.gorulenSekme) m.gorulenSekme = {}; return m; }
+  function urunYeniMi(save, id, gunKey, haftaKey) { var y = yeniBul(save, id, gunKey, haftaKey); return !!y && gorulenler(save).gorulenUrun[id] !== y.key; }
+  function urunGordu(save, id, gunKey, haftaKey) { var y = yeniBul(save, id, gunKey, haftaKey), m = gorulenler(save); if (y) { m.gorulenUrun[id] = y.key; m.gorulenSekme[id] = y.key; } }
+  // kategori sekmesinde rozet: o türden, ne ürünü ne sekmesi görülmüş yeni ürün varsa
+  function sekmeYeniMi(save, tur, gunKey, haftaKey) {
+    var m = gorulenler(save);
+    return yeniUrunler(save, gunKey, haftaKey).some(function (y) { return item(y.id).tur === tur && m.gorulenUrun[y.id] !== y.key && m.gorulenSekme[y.id] !== y.key; });
+  }
+  function sekmeGordu(save, tur, gunKey, haftaKey) { var m = gorulenler(save); yeniUrunler(save, gunKey, haftaKey).forEach(function (y) { if (item(y.id).tur === tur) m.gorulenSekme[y.id] = y.key; }); }
+  // Market'te görülmemiş yeni ürün var mı (yer: 'vitrin' | 'haftalik' | boş = hepsi)
+  function yeniVarMi(save, gunKey, haftaKey, yer) { var m = gorulenler(save); return yeniUrunler(save, gunKey, haftaKey).some(function (y) { return (!yer || y.yer === yer) && m.gorulenUrun[y.id] !== y.key; }); }
 
   function kusan(save, id) {
     var it = item(id);
@@ -424,14 +445,23 @@
   var KUTU = { video: 3, gunluk: 2, olasilik: [['sira', 45], ['nadir', 25], ['destansi', 8], ['efsane', 2], ['ates', 20]], ates: [20, 60] };
   var KUTU_DONUSUM = { sira: 15, nadir: 30, destansi: 60, efsane: 120 };
   function kutuHavuz(nad) { return KATALOG.filter(function (it) { return satilir(it) && nadirlik(it) === nad; }); }
+  // v0.97: videolar art arda değil, tek tek: her video ayrı izlenir ve sayılır (save.kutu.izlenen, gün içinde saklanır);
+  // 3. video bitince kutu açılır. Uygulamadan çıkılsa da izlenenler kaybolmaz.
   function kutuDurum(save, gunKey) {
-    var k = save.kutu && save.kutu.gun === gunKey ? save.kutu : null, acilan = k ? k.acilan : 0;
-    return { video: KUTU.video, gunluk: KUTU.gunluk, acilan: acilan, kalan: Math.max(0, KUTU.gunluk - acilan), olasilik: KUTU.olasilik.slice(), ates: KUTU.ates.slice() };
+    var k = save.kutu && save.kutu.gun === gunKey ? save.kutu : null, acilan = k ? k.acilan : 0, izlenen = k ? (k.izlenen || 0) : 0;
+    return { video: KUTU.video, gunluk: KUTU.gunluk, acilan: acilan, izlenen: izlenen, kalan: Math.max(0, KUTU.gunluk - acilan), olasilik: KUTU.olasilik.slice(), ates: KUTU.ates.slice() };
   }
-  // kaynak: 'market' (videolar izlendi, günlük sınır sayılır) | 'giris' (7. gün). rnd: [0, 1) üreten fonksiyon (test için)
+  // Bir kutu videosu izlendi. Döner: { izlenen, gerek, hazir } ya da bugünkü kutular bittiyse null
+  function kutuVideo(save, gunKey) {
+    var d = kutuDurum(save, gunKey); if (!d.kalan) return null;
+    var k = save.kutu && save.kutu.gun === gunKey ? save.kutu : (save.kutu = { gun: gunKey, acilan: 0, izlenen: 0 });
+    k.izlenen = Math.min(KUTU.video, (k.izlenen || 0) + 1);
+    return { izlenen: k.izlenen, gerek: KUTU.video, hazir: k.izlenen >= KUTU.video };
+  }
+  // kaynak: 'market' (3 video izlendi, günlük sınır sayılır) | 'giris' (7. gün). rnd: [0, 1) üreten fonksiyon (test için)
   function kutuAc(save, gunKey, kaynak, rnd) {
     ensure(save); rnd = rnd || Math.random;
-    if (kaynak === 'market') { var d = kutuDurum(save, gunKey); if (!d.kalan) return null; save.kutu = { gun: gunKey, acilan: d.acilan + 1 }; }
+    if (kaynak === 'market') { var d = kutuDurum(save, gunKey); if (!d.kalan || d.izlenen < KUTU.video) return null; save.kutu = { gun: gunKey, acilan: d.acilan + 1, izlenen: 0 }; }
     var top = 0, x, sec = 'ates', i;
     KUTU.olasilik.forEach(function (o) { top += o[1]; });
     x = rnd() * top;
@@ -462,11 +492,14 @@
 
   // ---------- Ad değiştirme (v0.96): ilki bedava; sonrakiler art arda 2 video ya da 250 ateşböceği (video öne çıksın diye pahalı) ----------
   var ISIM = { bedava: 1, video: 2, ates: 250 };
-  function isimDurum(save) { ensure(save); var n = save.isimDegisim || 0; return { degisim: n, bedava: n < ISIM.bedava, video: ISIM.video, ates: ISIM.ates, yeter: save.cuzdan.ates >= ISIM.ates }; }
-  // yol: 'bedava' | 'video' (videolar izlendi) | 'ates'. Başarılıysa true
+  function isimDurum(save) { ensure(save); var n = save.isimDegisim || 0; return { degisim: n, bedava: n < ISIM.bedava, video: ISIM.video, izlenen: save.isimVideo || 0, ates: ISIM.ates, yeter: save.cuzdan.ates >= ISIM.ates }; }
+  // v0.97: ad videoları da tek tek; izlenen sayı saklanır (save.isimVideo), 2. videodan sonra ad değişir
+  function isimVideo(save) { var n = Math.min(ISIM.video, (save.isimVideo || 0) + 1); save.isimVideo = n; return { izlenen: n, gerek: ISIM.video, hazir: n >= ISIM.video }; }
+  // yol: 'bedava' | 'video' (2 video izlendi) | 'ates'. Başarılıysa true
   function isimHakki(save, yol) {
     var d = isimDurum(save);
     if (yol === 'bedava' && !d.bedava) return false;
+    if (yol === 'video') { if (d.izlenen < ISIM.video) return false; save.isimVideo = 0; }
     if (yol === 'ates') { if (!d.yeter) return false; save.cuzdan.ates -= ISIM.ates; save.cuzdan.harcanan += ISIM.ates; }
     save.isimDegisim = d.degisim + 1;
     return true;
@@ -478,11 +511,12 @@
     HAFTA_YILDIZ_ODUL: HAFTA_YILDIZ_ODUL, haftaHedef: haftaHedef, haftaYildizSay: haftaYildizSay, haftaYildizKaydet: haftaYildizKaydet, haftaYildizDurum: haftaYildizDurum,
     GIRIS: GIRIS, GOREV_ATES: GOREV_ATES, BASARIM_ATES: BASARIM_ATES, KATALOG: KATALOG, TURLER: TURLER, VARSAYILAN: VARSAYILAN, NADIRLIK: NADIRLIK, nadirlik: nadirlik,
     satilir: satilir, satista: satista, vitrin: vitrin, haftalikUrun: haftalikUrun, fiyatBugun: fiyatBugun, vitrinVideo: vitrinVideo, vitrinGordu: vitrinGordu, marketDurum: marketDurum,
+    yeniUrunler: yeniUrunler, urunYeniMi: urunYeniMi, urunGordu: urunGordu, sekmeYeniMi: sekmeYeniMi, sekmeGordu: sekmeGordu, yeniVarMi: yeniVarMi,
     ensure: ensure, kazan: kazan, bolumOde: bolumOde, girisDurum: girisDurum, girisAl: girisAl,
     LIG: LIG, ligOf: ligOf, ligOdul: ligOdul, haftalikDurum: haftalikDurum, haftalikKaydet: haftalikKaydet, haftalikKapat: haftalikKapat,
     ISIK: ISIK, isikSeviye: isikSeviye, isikOdul: isikOdul, isikSiradaki: isikSiradaki,
     item: item, sahip: sahip, satinAl: satinAl, kusan: kusan, gorunum: gorunum, DEVAM_BEDEL: DEVAM_BEDEL, devamBedel: devamBedel, devamOde: devamOde,
-    KUTU: KUTU, KUTU_DONUSUM: KUTU_DONUSUM, kutuDurum: kutuDurum, kutuAc: kutuAc, girisKutuMu: girisKutuMu, girisKutuAl: girisKutuAl,
-    VIDEO_ATES: VIDEO_ATES, videoAtesDurum: videoAtesDurum, videoAtesAl: videoAtesAl, ISIM: ISIM, isimDurum: isimDurum, isimHakki: isimHakki };
+    KUTU: KUTU, KUTU_DONUSUM: KUTU_DONUSUM, kutuDurum: kutuDurum, kutuVideo: kutuVideo, kutuAc: kutuAc, girisKutuMu: girisKutuMu, girisKutuAl: girisKutuAl,
+    VIDEO_ATES: VIDEO_ATES, videoAtesDurum: videoAtesDurum, videoAtesAl: videoAtesAl, ISIM: ISIM, isimDurum: isimDurum, isimVideo: isimVideo, isimHakki: isimHakki };
   if (typeof module !== 'undefined' && module.exports) module.exports = api; else root.KuyuEkonomi = api;
 })(this);

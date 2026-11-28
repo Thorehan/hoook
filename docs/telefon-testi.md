@@ -291,6 +291,15 @@ Hikâye ekranındaki "Yeni Maden", "Yeni Kristal Mağara" ve "Yeni Eski Kule · 
 - [ ] Haritada 6 bölüm yukarısı karanlık; oraya kaydırılamıyor mu?
 - [ ] Alt menü ikonları ve ayar dişlisi düzgün mü? OYNA altındaki levhada yazı taşıyor mu?
 - [ ] Yarışma'da Haftalık ↔ Günlük'e hızlı geçişte kendi satırın sıfırlanıp yeniden oluşuyor mu? (olmamalı)
+## 40. Kıvılcım, tek tek video, harita ve Market (v0.97, 6 dk)
+- [ ] Kutu: her video ayrı oynuyor mu, bitince "1/3 izlendi" onayı ve Tamam var mı? Uygulamadan çıkıp dönünce izlenen sayı duruyor mu? 3. videodan sonra kutu açılıyor mu?
+- [ ] Ad değiştirme: 2 video tek tek; ikincisinden sonra ad değişiyor mu?
+- [ ] Harita: sıradakinin 12 bölüm üstüne kadar görünüyor mu? En üste gelince "Karanlık" tabelası iple iniyor mu? Biraz daha yukarı kaydırıp bırakınca yumuşakça geri kayıyor mu?
+- [ ] Haritada geçilmiş bir bölüme dokun: Çıra önce oraya iniyor, sonra sayfa açılıyor mu? Vazgeç: Çıra hızlıca sıradaki bölüme tırmanıyor mu (kaydırmaya gerek kalmadan)?
+- [ ] Ana menü: yalnız OYNA parlak mı, yan etiketler göz yormuyor mu?
+- [ ] Market: ürün resimlerinin nadirlik çerçevesi ve köşedeki taşlar; yeni ürün rozeti (ürün, "Günlük vitrin" başlığı, kategori sekmesi). Ürünü açınca rozetleri siliniyor mu?
+- [ ] Para: cüzdanda ve fiyatlarda kıvılcım ikonu; bölüm sonunda "N ateşböceği kıvılcıma döndü". Ayrım anlaşılıyor mu?
+
 ## 5. Genel izlenim (serbest)
 - En sevdiğim an:
 - En çok zorlandığım yer:

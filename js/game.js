@@ -2281,7 +2281,7 @@
   };
   function kazanimHtml(r, ates) {
     var items = [];
-    if (ates > 0) items.push('<li class="kz-ates"><i class="ikon-ates" aria-hidden="true"></i><span><small>Ateşböceği</small>cüzdana eklendi</span><em>+' + ates + '</em></li>');
+    if (ates > 0) items.push('<li class="kz-ates"><i class="ikon-ates" aria-hidden="true"></i><span><small>Kıvılcım</small>' + ates + ' ateşböceği kıvılcıma döndü</span><em>+' + ates + '</em></li>');
     r.missions.forEach(function (m) { items.push('<li class="kz-gorev">' + KAZ_IK.gorev + '<span><small>Görev · Görevler\'den al</small>' + m.text + '</span><em>+' + m.reward + '</em></li>'); });
     r.ach.forEach(function (a) { items.push('<li class="kz-basarim t' + a.tier + '">' + KAZ_IK.basarim + '<span><small>' + a.kademe + '</small>' + a.ad + '</span>' + (a.ates ? '<em>+' + a.ates + '</em>' : '') + '</li>'); });
     if (!items.length) return '';
@@ -2392,7 +2392,7 @@
       '<h2>Devam?</h2><p class="devam-alt">' + E.meters(sim) + ' m · ' + (n + 1) + '. devam (bir koşuda en çok ' + EKO.DEVAM_BEDEL.length + ')</p>' +
       '<div class="devam-sayac" aria-hidden="true"><svg viewBox="0 0 44 44"><circle cx="22" cy="22" r="19"></circle><circle class="dolu" cx="22" cy="22" r="19"></circle></svg><b id="devamSn">5</b></div>' +
       (n === 0 ? '<button type="button" class="ana buyuk genis" id="devamVideo">' + IKS('video') + 'Video izle, devam et</button>' : '') +
-      '<button type="button" class="' + (n === 0 ? 'genis' : 'ana buyuk genis') + '" id="devamAtes"' + (yeter ? '' : ' disabled') + '><i class="ikon-ates" aria-hidden="true"></i> ' + bedel + ' ateşböceği ile devam' + (yeter ? '' : ' · ' + (bedel - bakiye) + ' eksik') + '</button>' +
+      '<button type="button" class="' + (n === 0 ? 'genis' : 'ana buyuk genis') + '" id="devamAtes"' + (yeter ? '' : ' disabled') + '><i class="ikon-ates" aria-hidden="true"></i> ' + bedel + ' kıvılcım ile devam' + (yeter ? '' : ' · ' + (bedel - bakiye) + ' eksik') + '</button>' +
       '<button type="button" class="metin-btn" id="devamGec">Geç</button>';
     $('katman').classList.remove('alt');
     $('katman').hidden = false;
@@ -2457,8 +2457,8 @@
       var hedefYazi = hedef.bitis ? 'Tepe ' + hedef.metre + ' m · 2 yıldız ' + hedef.sure[0] + ' sn · 3 yıldız ' + hedef.sure[1] + ' sn' : 'Günün hedefi ' + hedef.esik.join(' · ') + ' m';
       var yildizHtml = '<div class="gun-yildiz" aria-label="' + hedefYazi + ', ' + yz.yildiz + ' yıldız"><span class="yildizlar">' +
         [0, 1, 2].map(function (i) { return '<i class="' + (i < yz.yildiz ? 'var' : '') + '">' + IKS('yildiz') + '</i>'; }).join('') + '</span><small>' + hedefYazi +
-        (yz.odul ? ' · +' + yz.odul + ' ateşböceği' : '') + '</small></div>' +
-        (seriOdul ? '<p class="seri-odul">' + st.count + ' günlük seri! +' + seriOdul + ' ateşböceği</p>' : '') +
+        (yz.odul ? ' · +' + yz.odul + ' kıvılcım' : '') + '</small></div>' +
+        (seriOdul ? '<p class="seri-odul">' + st.count + ' günlük seri! +' + seriOdul + ' kıvılcım</p>' : '') +
         (donmaKul ? '<p class="seri-odul">Dün kaçırdın ama donma hakkın seriyi korudu.</p>' : '');
       var left = msToNextDay(), hh = Math.floor(left / 3600000), mm = Math.floor(left % 3600000 / 60000);
       title = bitisM && !bitti ? 'Su yetişti' : isRecord && d.tries > 1 ? 'Günün rekoru!' : bitti ? 'Tepedesin!' : isRecord ? 'Bugünün ilk puanı' : 'Su yetişti';
@@ -2478,12 +2478,12 @@
       var hy = EKO.haftaYildizKaydet(save, weekKey, sc), hh = EKO.haftaHedef(weekKey);
       var haftaYildizHtml = '<div class="gun-yildiz" aria-label="Haftanın hedefi ' + hh.puan + ' puan, ' + hy.yildiz + ' yıldız"><span class="yildizlar">' +
         [0, 1, 2].map(function (i) { return '<i class="' + (i < hy.yildiz ? 'var' : '') + '">' + IKS('yildiz') + '</i>'; }).join('') + '</span><small>Haftanın hedefi ' + hh.esik.join(' · ') + ' puan' +
-        (hy.odul ? ' · +' + hy.odul + ' ateşböceği' : '') + '</small></div>';
+        (hy.odul ? ' · +' + hy.odul + ' kıvılcım' : '') + '</small></div>';
       isRecord = hk.rekor; recM = false;
       title = hk.ligAtladi ? hd.ligAd + ' ligi!' : isRecord && hd.tries > 1 ? 'Haftanın rekoru!' : isRecord ? 'Haftanın ilk puanı' : 'Su yetişti';
       sub = 'Haftalık Kuyu · ' + hd.tries + '. deneme · ' + EKO.hakDurum(save, 'haftalik', weekKey).kalan + ' deneme kaldı';
       if (hk.yeniGorunum && hk.yeniGorunum.length) setTimeout(function () { bildir('Dolap\'ta yeni: ' + hk.yeniGorunum.map(function (it) { return it.ad; }).join(', ') + ' (lig ödülü)', 3600); }, 900);
-      recLine = 'Haftanın en iyisi ' + hd.best + ' puan · ' + (hd.ligAd ? hd.ligAd + ' ligi (hafta sonunda +' + hd.odul + ' ateşböceği)' : 'henüz lig yok') +
+      recLine = 'Haftanın en iyisi ' + hd.best + ' puan · ' + (hd.ligAd ? hd.ligAd + ' ligi (hafta sonunda +' + hd.odul + ' kıvılcım)' : 'henüz lig yok') +
         (hd.sonraki ? ' · ' + hd.sonraki.ad + ' için ' + (hd.sonraki.puan - hd.best) + ' puan daha' : '') + ' · yeni kuyu ' + kalanYazi(msHaftaSonu()) + ' sonra';
     } else {
       var rec = save.endless || {};
@@ -2862,10 +2862,12 @@
     girisKutuMu: function () { return EKO.girisKutuMu(save, todayKey()); },
     girisKutuAl: function () { var r = EKO.girisKutuAl(save, todayKey()); GORUNUM = null; persist(); return r; },
     kutuDurum: function () { return EKO.kutuDurum(save, todayKey()); },
+    kutuVideo: function () { var r = EKO.kutuVideo(save, todayKey()); persist(); return r; },
     kutuAc: function () { var r = EKO.kutuAc(save, todayKey(), 'market'); GORUNUM = null; persist(); return r; },
     videoAtesDurum: function () { return EKO.videoAtesDurum(save, todayKey()); },
     videoAtesAl: function () { var r = EKO.videoAtesAl(save, todayKey()); persist(); return r; },
     isimDurum: function () { return EKO.isimDurum(save); },
+    isimVideo: function () { var r = EKO.isimVideo(save); persist(); return r; },
     isimHakki: function (yol) { var r = EKO.isimHakki(save, yol); persist(); return r; },
     satinAl: function (id) { var r = EKO.satinAl(save, id, { gun: todayKey(), hafta: haftaKey() }); GORUNUM = null; persist(); return r; },
     // Market (v0.77): günün vitrini, haftanın ürünü, bugünkü fiyat, video indirimi
@@ -2876,7 +2878,13 @@
     vitrinVideo: function () { var v = EKO.vitrinVideo(save, todayKey()); persist(); return v; },
     vitrinIndirimde: function (id) { return EKO.marketDurum(save).video[todayKey()] === id; },
     vitrinGordu: function () { EKO.vitrinGordu(save, todayKey()); persist(); },
-    vitrinYeni: function () { return EKO.marketDurum(save).gorulen !== todayKey(); },
+    vitrinYeni: function () { return EKO.marketDurum(save).gorulen !== todayKey() && EKO.yeniVarMi(save, todayKey(), haftaKey()); }, // alt menü: Market'e bugün girilmedi ve yeni ürün var
+    // v0.97: yeni ürün rozetleri (js/ekonomi.js → urunYeniMi)
+    urunYeni: function (id) { return EKO.urunYeniMi(save, id, todayKey(), haftaKey()); },
+    urunGordu: function (id) { var once = EKO.urunYeniMi(save, id, todayKey(), haftaKey()); EKO.urunGordu(save, id, todayKey(), haftaKey()); if (once) persist(); },
+    sekmeYeni: function (tur) { return EKO.sekmeYeniMi(save, tur, todayKey(), haftaKey()); },
+    sekmeGordu: function (tur) { EKO.sekmeGordu(save, tur, todayKey(), haftaKey()); persist(); },
+    yeniVar: function (yer) { return EKO.yeniVarMi(save, todayKey(), haftaKey(), yer); },
     kusan: function (id) { var r = EKO.kusan(save, id); GORUNUM = null; persist(); return r; },
     gorunum: function () { return look(); },
     korCiz: function (c, x, y, r, t, r1, r2, sade) { korCiz(c, x, y, r, t, r1, r2, sade); },

@@ -41,7 +41,7 @@
     if (id === 'ekProfil') prBaslat(); else prDur();
     if (id !== 'ekHarita') { hrDur(); ileriIptal(); }
     if (id !== 'oyun' && id !== 'ekAcilis') G.muzikSahne('menu'); // menülerde sakin müzik
-    if (SEKMELER.indexOf(id) >= 0) { $('gorevNokta').hidden = !G.gorevBekleyen(); $('marketNokta').hidden = !G.vitrinYeni() || id === 'ekDolap'; } // Market: bugünün vitrini görülmedi
+    if (SEKMELER.indexOf(id) >= 0) { $('gorevNokta').hidden = !G.gorevBekleyen(); marketNoktaYaz(id); } // Market: bugünün vitrini görülmedi
   }
 
   // Hikâye kartı: ekranın üstünde, oyunu durdurmaz; dokununca ya da birkaç saniye sonra kapanır.
@@ -177,7 +177,7 @@
     var di = G.dailyInfo();
     // Haftalık Kuyu: geçen haftanın lig ödülü (varsa) ve bu haftanın durumu
     var gecen = G.haftalikKapat();
-    if (gecen) { $('toplamAtes').textContent = G.cuzdan().ates; setTimeout(function () { toast('Geçen hafta ' + gecen.ligAd + ' ligindeydin · +' + gecen.odul + ' ateşböceği', 3600); }, 1600); }
+    if (gecen) { $('toplamAtes').textContent = G.cuzdan().ates; setTimeout(function () { toast('Geçen hafta ' + gecen.ligAd + ' ligindeydin · +' + gecen.odul + ' kıvılcım', 3600); }, 1600); }
     var hf = G.haftalikInfo();
     // ana ekranın yan kartları (v0.75): kısa durum. v0.89: Yarışma sekmesindeki kartlar kalktı (sekme Sıralama oldu)
     $('yanGunlukAlt').innerHTML = IK.yildizlar(di.yildiz, 'mini') + ' · ' + (di.hak.kalan > 0 ? di.hak.kalan + '/' + di.hak.toplam : 'bitti');
@@ -438,7 +438,7 @@
     $('pHiz').textContent = fmt(st.maxSpeed, 1) + ' m/sn';
     var ik = G.isik();
     $('isikSeviye').textContent = 'Işık ' + ik.seviye + '/' + ik.en;
-    $('isikYazi').textContent = ik.toplam + ' ateşböceği' + (ik.ust ? ' · sonraki ışığa ' + (ik.ust - ik.toplam) : ' · kuyu tümüyle aydınlık') +
+    $('isikYazi').textContent = ik.toplam + ' kıvılcım' + (ik.ust ? ' · sonraki ışığa ' + (ik.ust - ik.toplam) : ' · kuyu tümüyle aydınlık') +
       (ik.siradaki ? ' · Işık ' + ik.siradaki.isik + '\'te ' + ik.siradaki.ad + ' ' + window.KuyuEkonomi.TURLER[ik.siradaki.tur].toLocaleLowerCase('tr-TR') + ' açılır' : '');
     $('isikDolu').style.width = (ik.ust ? Math.round((ik.toplam - ik.alt) / (ik.ust - ik.alt) * 100) : 100) + '%';
     $('hikayeListe').innerHTML = G.hikaye().map(function (hb) {
@@ -511,7 +511,7 @@
   function renderGirisSatir() {
     var gd = G.giris();
     $('girisSatir').innerHTML = '<i class="ikon-ates" aria-hidden="true"></i><span><b>Günlük giriş · ' + (gd.gun + 1) + '. gün</b><small>' +
-      (gd.hazir ? 'Bugünün ödülü ' + gd.odul + ' ateşböceği' : 'Bugün alındı · yarın ' + gd.odul + ' ateşböceği') + '</small></span>' +
+      (gd.hazir ? 'Bugünün ödülü ' + gd.odul + ' kıvılcım' : 'Bugün alındı · yarın ' + gd.odul + ' kıvılcım') + '</small></span>' +
       (gd.hazir ? '<button type="button" class="ana g-al" id="girisSatirBtn">Aç</button>' : '<span class="g-alindi" aria-label="alındı">' + IK.svg('tik') + '</span>');
     var b = $('girisSatirBtn'); if (b) b.onclick = openGiris;
   }
@@ -523,7 +523,7 @@
       var pct = Math.round(m.prog / m.target * 100), text = window.KuyuGorev.missionText(m);
       var sag = m.claimed ? '<span class="g-alindi">' + IK.svg('tik') + 'Alındı</span>'
         : m.done ? '<span class="g-al-ikili"><button type="button" class="ana g-al" data-al="' + i + '">Al +' + ODUL[m.tier] + '</button>' +
-          '<button type="button" class="g-al video-btn" data-al2="' + i + '" aria-label="Video izle, ' + ODUL[m.tier] * 2 + ' ateşböceği al">' + IK.svg('video') + '+' + ODUL[m.tier] * 2 + '</button></span>'
+          '<button type="button" class="g-al video-btn" data-al2="' + i + '" aria-label="Video izle, ' + ODUL[m.tier] * 2 + ' kıvılcım al">' + IK.svg('video') + '+' + ODUL[m.tier] * 2 + '</button></span>'
         : '<span class="g-odul"><i class="ikon-ates" aria-hidden="true"></i>' + ODUL[m.tier] + '</span>';
       return '<div class="gorev' + (m.done ? ' tamam' : '') + (m.claimed ? ' alindi' : '') + '">' +
         '<div class="g-ic"><small class="g-zor z' + m.tier + '">' + ZORLUK[m.tier] + '</small><b>' + text + '</b>' +
@@ -547,37 +547,47 @@
   }
   $('gorevListe').addEventListener('click', function (e) {
     var b2 = e.target.closest('[data-al2]');
-    if (b2) { video(function () { var r2 = G.gorevAl(+b2.dataset.al2, 2); if (r2) { if (G.sfx) G.sfx.firefly(); toast('+' + r2 + ' ateşböceği'); } renderTasks(); }); return; }
+    if (b2) { video(function () { var r2 = G.gorevAl(+b2.dataset.al2, 2); if (r2) { if (G.sfx) G.sfx.firefly(); toast('+' + r2 + ' kıvılcım'); } renderTasks(); }); return; }
     var b = e.target.closest('[data-al]'); if (!b) return;
     var r = G.gorevAl(+b.dataset.al);
-    if (r) { if (G.sfx) G.sfx.firefly(); toast('+' + r + ' ateşböceği'); }
+    if (r) { if (G.sfx) G.sfx.firefly(); toast('+' + r + ' kıvılcım'); }
     renderTasks();
   });
 
   // ---------- ödüllü video (yer tutucu) ----------
   // Web sürümünde reklam yok. Unity'de burada ödüllü reklam oynar; yalnızca oyuncu seçerse (Pofi kuralı).
   // v0.96: süre yalnız sayfa görünürken akar; uygulamadan çıkıp dönmek videoyu atlatmaz (uzun aralıklar sayılmaz).
-  // "Vazgeç" ve Android geri ödül vermez. adet > 1: art arda videolar (1/3, 2/3 …); biri yarıda kalırsa hiçbiri sayılmaz.
-  var VIDEO_SN = 5, videoAcik = null;
+  // "Vazgeç" ve Android geri ödül vermez.
+  // v0.97: videolar art arda oynamaz; her video tek başına. done() bir onay döndürürse ({ metin, sira, tamam }) pencere
+  // kapanmadan "1/3 izlendi" onayı görünür; oyuncu Tamam'a basar, bir sonraki video için yeniden video düğmesine basar.
+  // İzlenen video hemen sayılır (onay beklenmez). İkinci argüman eski çağrılarla uyum için yok sayılır.
+  var VIDEO_SN = 5, videoAcik = null, videoTamamFn = null;
+  var VIDEO_BILGI = 'Deneme sürümünde reklam yok; burada ödüllü video oynayacak. Video bitince ödülün gelir.';
   function video(done, adet, iptal) {
-    adet = adet || 1;
-    var sira = 1, kalan = VIDEO_SN, son = performance.now(), iv = 0;
-    function yaz() { $('videoSayac').textContent = Math.max(0, Math.ceil(kalan)); $('videoSira').hidden = adet < 2; $('videoSira').textContent = sira + '/' + adet + '. video'; }
+    var kalan = VIDEO_SN, son = performance.now(), iv = 0;
+    $('videoSayac').hidden = false; $('videoTik').hidden = true; $('videoTamam').hidden = true; $('videoVazgec').hidden = false; $('videoSira').hidden = true;
+    $('videoBilgi').textContent = VIDEO_BILGI; videoTamamFn = null;
+    function yaz() { $('videoSayac').textContent = Math.max(0, Math.ceil(kalan)); }
     function bitir() { clearInterval(iv); videoAcik = null; }
     pencereAc('videoKatman'); yaz();
     iv = setInterval(function () {
       var simdi = performance.now(), dt = (simdi - son) / 1000; son = simdi;
       if (document.hidden) return; // görünmezken süre akmaz
       kalan -= Math.min(dt, 0.5);
-      if (kalan <= 0) {
-        if (sira < adet) { sira++; kalan = VIDEO_SN; }
-        else { bitir(); pencereKapat('videoKatman'); done(); return; }
-      }
+      if (kalan <= 0) { bitir(); var onay = done(); if (onay) videoOnay(onay); else pencereKapat('videoKatman'); return; }
       yaz();
     }, 200);
     videoAcik = { iptal: function () { bitir(); pencereKapat('videoKatman'); toast('Video yarıda kaldı, ödül yok', 1800); if (iptal) iptal(); } };
   }
+  function videoOnay(o) {
+    $('videoSayac').hidden = true; $('videoTik').hidden = false; $('videoVazgec').hidden = true;
+    $('videoSira').hidden = !o.sira; $('videoSira').textContent = o.sira || '';
+    $('videoBilgi').textContent = o.metin; videoTamamFn = o.tamam || null;
+    $('videoTamam').hidden = false; $('videoTamam').focus({ preventScroll: true });
+  }
+  function videoTamam() { var fn = videoTamamFn; videoTamamFn = null; pencereKapat('videoKatman'); if (fn) fn(); }
   $('videoVazgec').addEventListener('click', function () { if (videoAcik) videoAcik.iptal(); });
+  $('videoTamam').addEventListener('click', videoTamam);
 
   // ---------- kutu (v0.96, Törehan onayı): Market'te art arda 3 video (günde 2), günlük girişin 7. günü ----------
   // Açılış: kutu sallanır, kapak açılır, içinden çıkan yükselir; dokunmak hemen açar. Büyüme yok.
@@ -602,12 +612,12 @@
       var it = EK.item(s.id);
       $('kutuCikan').innerHTML = '<img src="' + resim(it) + '" alt="">';
       $('kutuNadir').textContent = EK.NADIRLIK[s.nadir] + ' · ' + EK.TURLER[it.tur]; $('kutuNadir').className = 'n-yazi n-' + s.nadir;
-      $('kutuMetin').textContent = s.yinelenen ? it.ad + ' sende vardı: +' + s.ates + ' ateşböceği' : 'Yeni: ' + it.ad;
+      $('kutuMetin').textContent = s.yinelenen ? it.ad + ' sende vardı: +' + s.ates + ' kıvılcım' : 'Yeni: ' + it.ad;
       $('kutuGiy').hidden = !!s.yinelenen; $('kutuGiy').dataset.urun = it.id;
     } else {
       $('kutuCikan').innerHTML = '<i class="ikon-ates" aria-hidden="true"></i><b>+' + s.ates + '</b>';
-      $('kutuNadir').textContent = 'Ateşböceği'; $('kutuNadir').className = 'n-yazi n-ates';
-      $('kutuMetin').textContent = '+' + s.ates + ' ateşböceği cüzdana eklendi';
+      $('kutuNadir').textContent = 'Kıvılcım'; $('kutuNadir').className = 'n-yazi n-ates';
+      $('kutuMetin').textContent = '+' + s.ates + ' kıvılcım cüzdana eklendi';
     }
     $('kutuTamam').hidden = false;
     if (G.sfx) G.sfx.firefly();
@@ -638,7 +648,7 @@
       if (!gd.hazir && i === gd.gun) durum = 'yarin';
       // v0.90: her gün ipe asılı bir etiket (hafif eğik); alınanda yeşil damga, bugünkü sarı ve parlak, 7. gün hediye
       var egim = [-2.5, 2, -1.5, 2.5, -2, 1.5, -1][i % 7];
-      h += '<div class="gun ' + durum + (i === 6 ? ' buyuk-gun' : '') + '" style="--e:' + egim + 'deg" aria-label="' + (i + 1) + '. gün, ' + (i === 6 ? 'kutu' : gd.takvim[i] + ' ateşböceği') +
+      h += '<div class="gun ' + durum + (i === 6 ? ' buyuk-gun' : '') + '" style="--e:' + egim + 'deg" aria-label="' + (i + 1) + '. gün, ' + (i === 6 ? 'kutu' : gd.takvim[i] + ' kıvılcım') +
         (durum === 'alindi' ? ', alındı' : durum === 'bugun' ? ', bugün' : durum === 'yarin' ? ', yarın' : '') + '"><small>' + (i + 1) + '. gün</small>' +
         (i === 6 ? '<span class="kutu-cizim mini" aria-hidden="true"><i class="kc-kapak"></i><i class="kc-govde"></i></span>' : '<i class="ikon-ates" aria-hidden="true"></i>') + '<b>' + (i === 6 ? 'Kutu' : gd.takvim[i]) + '</b>' +
         (durum === 'alindi' ? '<span class="gun-damga" aria-hidden="true">' + IK.svg('tik') + '</span>' : durum === 'bugun' ? '<em aria-hidden="true">BUGÜN</em>' : durum === 'yarin' ? '<em aria-hidden="true">YARIN</em>' : '') + '</div>';
@@ -655,7 +665,7 @@
   function home2() { $('toplamAtes').textContent = G.cuzdan().ates; }
   function girisAl(kat) {
     var r = G.girisAl(kat);
-    if (r) { if (G.sfx) G.sfx.firefly(); toast('+' + r + ' ateşböceği'); }
+    if (r) { if (G.sfx) G.sfx.firefly(); toast('+' + r + ' kıvılcım'); }
     closeGiris();
   }
   $('girisAlBtn').addEventListener('click', function () {
@@ -670,6 +680,8 @@
   // Ürüne dokunmak ürün kartını açar: büyük önizleme, nadirlik, fiyat; Al ya da (sende varsa) Giy. Rastgele kutu yok.
   var dolapTur = 'karakter', dolapMod = 'market', urunId = null, urunRaf = 0;
   function openDolap() { renderMarket(); show('ekDolap'); $('ekDolap').scrollTop = 0; G.vitrinGordu(); $('marketNokta').hidden = true; }
+  // alt menüdeki Market noktası (v0.97): bugün Market'e girilmedi ve görülmemiş yeni ürün var; Market'e girmek siler
+  function marketNoktaYaz(id) { $('marketNokta').hidden = !G.vitrinYeni() || (id || current) === 'ekDolap'; }
   function urunDurum(it) {
     var EK = window.KuyuEkonomi, has = sahipMi(it.id), on = save().dolap.kusan[it.tur] === it.id, f = G.fiyat(it.id);
     if (on) return { metin: 'KUŞANILDI', sinif: 'sende' };
@@ -680,28 +692,41 @@
     if (!G.satista(it.id)) return { metin: 'HAFTANIN ÜRÜNÜ OLUNCA', sinif: 'kilit' };
     return { metin: '<i class="ikon-ates" aria-hidden="true"></i>' + f + (f < it.fiyat ? ' <s>' + it.fiyat + '</s>' : ''), sinif: G.cuzdan().ates >= f ? 'al' : 'yetmez', fiyat: f };
   }
+  // v0.97: resim nadirlik renginde mini çerçevede; köşedeki taş sayısı nadirliği renksiz de söyler (Nadir 1, Destansı 2, Efsane 3).
+  // Yeni gelen ürünün köşesinde "yeni" rozeti (ürün sayfası açılınca silinir).
+  var TAS = { baslangic: 0, sira: 0, nadir: 1, destansi: 2, efsane: 3 };
+  function yeniRozet(id) { return '<i class="yeni-rozet"' + (id ? ' id="' + id + '"' : '') + ' aria-hidden="true">' + IK.svg('yeni') + '</i>'; }
+  function cerceve(it, nad) { var t = ''; for (var i = 0; i < (TAS[nad] || 0); i++) t += '<i></i>'; return '<span class="m-cerceve"><img src="' + resim(it) + '" alt="">' + (t ? '<span class="m-taslar" aria-hidden="true">' + t + '</span>' : '') + '</span>'; }
   function urunKart(it, ek) {
-    var EK = window.KuyuEkonomi, nad = EK.nadirlik(it), d = urunDurum(it);
-    return '<button type="button" class="m-urun n-' + nad + (d.sinif === 'kilit' ? ' kilit' : '') + '" data-urun="' + it.id + '" aria-label="' + it.ad + ', ' + EK.NADIRLIK[nad] + ', ' + d.metin.replace(/<[^>]+>/g, '') + '">' +
-      '<span class="m-nad">' + EK.NADIRLIK[nad].toLocaleUpperCase('tr-TR') + '</span>' + (ek || '') + '<img src="' + resim(it) + '" alt=""><b>' + it.ad + '</b><span class="m-fiyat ' + d.sinif + '">' + d.metin + '</span></button>';
+    var EK = window.KuyuEkonomi, nad = EK.nadirlik(it), d = urunDurum(it), yeni = G.urunYeni(it.id);
+    return '<button type="button" class="m-urun n-' + nad + (d.sinif === 'kilit' ? ' kilit' : '') + (yeni ? ' yeni' : '') + '" data-urun="' + it.id + '" aria-label="' + it.ad + (yeni ? ', yeni' : '') + ', ' + EK.NADIRLIK[nad] + ', ' + d.metin.replace(/<[^>]+>/g, '') + '">' +
+      (yeni ? yeniRozet() : '') + '<span class="m-nad">' + EK.NADIRLIK[nad].toLocaleUpperCase('tr-TR') + '</span>' + (ek || '') + cerceve(it, nad) + '<b>' + it.ad + '</b><span class="m-fiyat ' + d.sinif + '">' + d.metin + '</span></button>';
   }
-  // v0.96: Market'te kutu ve video ile ateşböceği kartları
+  // v0.96: Market'te kutu ve video ile kıvılcım kartları
   function marketEkstra() {
     var EK = window.KuyuEkonomi, kd = G.kutuDurum(), vd = G.videoAtesDurum();
-    $('mKutuAlt').innerHTML = kd.kalan ? IK.svg('video') + kd.video + ' video izle, aç · bugün ' + kd.kalan + '/' + kd.gunluk : 'Yarın yeni kutu';
-    $('mKutu').classList.toggle('bitti', !kd.kalan); $('mKutu').setAttribute('aria-label', 'Kutu: ' + kd.video + ' video izle, aç; bugün ' + kd.kalan + ' kutu kaldı');
+    var kv = kd.izlenen >= kd.video ? 'Kutun hazır, aç!' : kd.izlenen ? kd.izlenen + '/' + kd.video + ' video izlendi' : kd.video + ' video izle, aç';
+    $('mKutuAlt').innerHTML = kd.kalan ? IK.svg('video') + kv + ' · bugün ' + kd.kalan + '/' + kd.gunluk : 'Yarın yeni kutu';
+    $('mKutu').classList.toggle('bitti', !kd.kalan); $('mKutu').setAttribute('aria-label', 'Kutu: ' + kv + '; bugün ' + kd.kalan + ' kutu kaldı');
     $('mVideoAtesBas').innerHTML = '+' + vd.odul + ' <i class="ikon-ates" aria-hidden="true"></i>';
     $('mVideoAtesAlt').textContent = vd.kalan ? 'Video izle · bugün ' + vd.kalan + '/' + vd.gunluk : 'Yarın yeniden';
     $('mVideoAtes').classList.toggle('bitti', !vd.kalan);
-    $('mKutuOlasilik').textContent = 'Kutudan çıkabilenler: ' + kd.olasilik.map(function (o) { return (o[0] === 'ates' ? 'Ateşböceği (' + kd.ates.join('–') + ')' : EK.NADIRLIK[o[0]]) + ' %' + o[1]; }).join(' · ') + '. Sende olan eşya çıkarsa ateşböceğine döner.';
+    $('mKutuOlasilik').textContent = 'Kutudan çıkabilenler: ' + kd.olasilik.map(function (o) { return (o[0] === 'ates' ? 'Kıvılcım (' + kd.ates.join('–') + ')' : EK.NADIRLIK[o[0]]) + ' %' + o[1]; }).join(' · ') + '. Sende olan eşya çıkarsa kıvılcıma döner.';
   }
   $('mKutu').addEventListener('click', function () {
     var kd = G.kutuDurum(); if (!kd.kalan) { toast('Bugünkü kutular açıldı, yarın yenisi gelir', 2000); return; }
-    video(function () { var r = G.kutuAc(); if (r) kutuGoster(r, 'Kutu'); else renderMarket(); }, kd.video);
+    if (kd.izlenen >= kd.video) { kutuAcMarket(); return; } // videolar izlenmiş (onaydan önce çıkılmış olabilir)
+    // v0.97: her video tek başına; bitince onay, sonraki video için kart yeniden basılır
+    video(function () {
+      var r = G.kutuVideo(); if (!r) return null;
+      if (r.hazir) return { sira: r.izlenen + '/' + r.gerek, metin: 'Videolar tamam. Kutun hazır!', tamam: kutuAcMarket };
+      return { sira: r.izlenen + '/' + r.gerek, metin: 'Video izlendi. Kutu için ' + (r.gerek - r.izlenen) + ' video daha; sıradakine Kutu kartından bas.', tamam: renderMarket };
+    });
   });
+  function kutuAcMarket() { var r = G.kutuAc(); if (r) kutuGoster(r, 'Kutu'); else renderMarket(); }
   $('mVideoAtes').addEventListener('click', function () {
     if (!G.videoAtesDurum().kalan) { toast('Bugünkü videolar izlendi, yarın yeniden', 2000); return; }
-    video(function () { var n = G.videoAtesAl(); if (n) { if (G.sfx) G.sfx.firefly(); toast('+' + n + ' ateşböceği'); } renderMarket(); });
+    video(function () { var n = G.videoAtesAl(); if (n) { if (G.sfx) G.sfx.firefly(); toast('+' + n + ' kıvılcım'); } renderMarket(); });
   });
   function renderMarket() {
     var EK = window.KuyuEkonomi, T = G.tahtalar();
@@ -716,16 +741,18 @@
       $('mHaftalikImg').src = resim(hu); $('mHaftalikAd').textContent = hu.ad;
       $('mHaftalikSure').innerHTML = IK.svg('saat') + T.haftaKalan;
       $('mHaftalikFiyat').innerHTML = dh.metin; $('mHaftalikFiyat').className = 'm-fiyat ' + dh.sinif;
+      $('mHaftalikYeni').hidden = !G.urunYeni(hu.id); $('mHaftalikYeni').innerHTML = IK.svg('yeni'); // v0.97: yeni rozeti
     }
     // günlük vitrin: indirimli ürünün üstünde video şeridi
     var v = G.vitrin();
     $('mVitrinSure').innerHTML = IK.svg('saat') + T.gunKalan;
+    $('mVitrinYeni').hidden = !G.yeniVar('vitrin'); $('mVitrinYeni').innerHTML = IK.svg('yeni'); // başlık: vitrinde görülmemiş yeni ürün varsa
     $('mVitrin').innerHTML = v.urunler.map(function (id) {
       var it = EK.item(id), ind = id === v.indirimli && !sahipMi(id);
       return urunKart(it, ind ? '<span class="m-serit">' + (G.vitrinIndirimde(id) ? '%50 İNDİRİM' : IK.svg('video') + '%50') + '</span>' : '');
     }).join('');
     // kategoriler
-    $('mSekmeler').innerHTML = Object.keys(EK.TURLER).map(function (t) { return '<button type="button" role="tab" data-mtur="' + t + '" aria-selected="' + (t === dolapTur) + '">' + EK.TURLER[t] + '</button>'; }).join('');
+    $('mSekmeler').innerHTML = Object.keys(EK.TURLER).map(function (t) { var y = G.sekmeYeni(t); return '<button type="button" role="tab" data-mtur="' + t + '" aria-selected="' + (t === dolapTur) + '"' + (y ? ' class="yeni" aria-label="' + EK.TURLER[t] + ', yeni ürün var"' : '') + '>' + EK.TURLER[t] + (y ? yeniRozet() : '') + '</button>'; }).join('');
     var NS = { baslangic: 0, sira: 1, nadir: 2, destansi: 3, efsane: 4 };
     $('mIzgara').innerHTML = EK.KATALOG.filter(function (it) { return it.tur === dolapTur && it.fiyat !== 0; })
       .sort(function (a, b) { return (sahipMi(a.id) - sahipMi(b.id)) || (NS[EK.nadirlik(a)] - NS[EK.nadirlik(b)]) || ((a.fiyat || 0) - (b.fiyat || 0)); })
@@ -735,6 +762,7 @@
   function urunAc(id) {
     var EK = window.KuyuEkonomi, it = EK.item(id); if (!it) return;
     urunId = id;
+    if (G.urunYeni(id)) { G.urunGordu(id); if (current === 'ekDolap') renderMarket(); else marketNoktaYaz(); } // v0.97: ürünü görmek bütün rozetlerini siler
     var nad = EK.nadirlik(it), d = urunDurum(it), has = sahipMi(id), on = save().dolap.kusan[it.tur] === id, v = G.vitrin();
     $('urunAd').textContent = it.ad;
     $('urunNadir').textContent = EK.NADIRLIK[nad] + ' · ' + EK.TURLER[it.tur]; $('urunNadir').className = 'n-yazi n-' + nad;
@@ -828,7 +856,7 @@
     if (sahipMi(it.id)) { G.kusan(it.id); resimBellek = {}; toast(it.ad + ' kuşanıldı', 1600); urunKapat(); renderMarket(); marketKutla(it.id); return; }
     var r = G.satinAl(it.id);
     if (r.ok) { resimBellek = {}; if (G.sfx) G.sfx.won(); toast(it.ad + ' alındı ve kuşanıldı'); urunKapat(); renderMarket(); marketKutla(it.id); return; }
-    if (r.neden === 'yetersiz') toast(r.eksik + ' ateşböceği eksik. Bölüm, Günlük ve Haftalık Kuyu, görev ve günlük girişten toplanır.');
+    if (r.neden === 'yetersiz') toast(r.eksik + ' kıvılcım eksik. Bölümlerde ateşböceği topla; Günlük ve Haftalık Kuyu, görev ve günlük giriş de kıvılcım verir.');
     urunAc(it.id);
   });
   $('urunVideo').addEventListener('click', function () {
@@ -838,7 +866,7 @@
   $('urunKapat').addEventListener('click', urunKapat);
   $('urunKatman').addEventListener('click', function (e) { if (e.target === $('urunKatman')) urunKapat(); });
   $('urunKatman').addEventListener('keydown', function (e) { if (e.key === 'Escape') { e.stopPropagation(); urunKapat(); } });
-  $('mSekmeler').addEventListener('click', function (e) { var b = e.target.closest('[data-mtur]'); if (!b) return; dolapTur = b.dataset.mtur; renderMarket(); });
+  $('mSekmeler').addEventListener('click', function (e) { var b = e.target.closest('[data-mtur]'); if (!b) return; dolapTur = b.dataset.mtur; if (G.sekmeYeni(dolapTur)) G.sekmeGordu(dolapTur); renderMarket(); }); // v0.97: sekmeye dokunmak sekme rozetini siler
   ['mVitrin', 'mIzgara'].forEach(function (k) { $(k).addEventListener('click', function (e) { var b = e.target.closest('[data-urun]'); if (b) { salla(b); urunAc(b.dataset.urun); } }); });
   $('mHaftalik').addEventListener('click', function () { if ($('mHaftalik').dataset.urun) { salla($('mHaftalik')); urunAc($('mHaftalik').dataset.urun); } });
   // Önizleme (Market ve Koleksiyon, v0.76): halkada sallanan kahraman; L görünüm, alevGoster alev basamaklarını döndürür
@@ -911,7 +939,7 @@
     else if (it.etkinlik) { b.textContent = 'ETKİNLİK'; b.disabled = true; ac = it.etkinlik + ' olarak açılır; Market\'te satılmaz.'; }
     else if (it.isik) { b.textContent = 'IŞIK ' + it.isik; b.disabled = true; ac = 'Kuyunun ışığı ' + it.isik + '. seviyeye gelince kendiliğinden açılır.'; }
     else if (it.lig != null) { b.textContent = EK.LIG[it.lig].ad.toLocaleUpperCase('tr-TR') + ' LİG'; b.disabled = true; ac = 'Haftalık Kuyu\'da ' + EK.LIG[it.lig].ad + ' ligine ulaşınca açılır.'; }
-    else { b.innerHTML = 'MARKET · <i class="ikon-ates" aria-hidden="true"></i>' + it.fiyat; ac = 'Market\'te ' + it.fiyat + ' ateşböceği.'; }
+    else { b.innerHTML = 'MARKET · <i class="ikon-ates" aria-hidden="true"></i>' + it.fiyat; ac = 'Market\'te ' + it.fiyat + ' kıvılcım.'; }
     $('kolAcilis').textContent = ac;
   }
   $('kolSekmeler').addEventListener('click', function (e) { var b = e.target.closest('[data-kol]'); if (!b) return; kolTur = b.dataset.kol; kolSecili = null; renderKol(); });
@@ -1080,12 +1108,12 @@
     h += '<div class="hr-dip" aria-hidden="true"></div>';
     // karanlık: sıradaki halkanın biraz üstünden tepeye doğru koyulaşır (halkalar dokunulabilir kalır)
     if (hrKonum[sira]) h += '<div class="hr-karanlik" style="height:' + Math.max(0, hrUstten(hrKonum[sira].y) - 54) + 'px" aria-hidden="true"></div>';
-    // v0.96: kilit perdesi. Sıradakinin 6 bölüm üstünden yukarısı tamamen karanlık, kaydırma orada durur; bölüm geçtikçe perde yukarı kayar
+    // v0.96: kilit perdesi. Sıradakinin HR_PERDE bölüm üstünden yukarısı tamamen karanlık; bölüm geçtikçe perde yukarı kayar.
+    // v0.97: perde 12 bölüm üstte; "Karanlık" tabelası duvarda değil, en üste gelince kirişten iple iner (#hrUstTabela)
     var perdeN = sira + HR_PERDE; hrPerdeY = 0;
     if (sira <= G.bolumSayi && hrKonum[perdeN]) {
       hrPerdeY = Math.max(0, hrUstten(hrKonum[perdeN].y) - 70);
       h += '<div class="hr-perde" style="height:' + hrPerdeY + 'px" aria-hidden="true"></div>';
-      h += '<div class="hr-perde-tabela" style="top:' + Math.max(0, hrPerdeY - 46) + 'px">' + IK.svg('kilit') + '<span><b>Karanlık</b><small>Bölüm geçtikçe açılır</small></span></div>';
     }
     h += '<svg class="hr-atis" width="' + W + '" height="' + hrH + '" aria-hidden="true"><line id="hrAtisIp" x1="0" y1="0" x2="0" y2="0"/></svg>';
     h += '<canvas class="hr-cira" id="hrCira" width="128" height="168" aria-hidden="true"></canvas>';
@@ -1108,10 +1136,28 @@
     var k = $('hrKuyu'), t = hrUstten(hrKonum[n].y) - k.clientHeight * 0.55;
     k.scrollTo({ top: Math.max(hrEnUst(), t), behavior: yumusak && !reduceMotion ? 'smooth' : 'auto' });
   }
-  // kaydırma sınırı: perdenin biraz altı ekranın tepesine gelir, daha yukarısı görülmez
-  var HR_PERDE = 6, hrPerdeY = 0;
+  // kaydırma sınırı: perdenin biraz altı ekranın tepesine gelir.
+  // v0.97: sınırın HR_ESNEK px ötesine kadar kaydırılabilir (karanlığa bakılır), bırakınca yumuşakça sınıra geri kayar.
+  // En üste gelince "Karanlık · Bölüm geçtikçe açılır" tabelası kirişin altından iple iner; aşağı inince geri çekilir.
+  var HR_PERDE = 12, HR_ESNEK = 150, hrPerdeY = 0, hrGeriT = 0, hrDokunuyor = false;
   function hrEnUst() { return hrPerdeY ? Math.max(0, hrPerdeY - 120) : 0; }
-  $('hrKuyu').addEventListener('scroll', function () { var m = hrEnUst(); if (m && this.scrollTop < m) this.scrollTop = m; }, { passive: true });
+  function hrUstTabela(ac) { var t = $('hrUstTabela'); if (t && t.classList.contains('iner') !== ac) t.classList.toggle('iner', ac); }
+  function hrGeriKay() {
+    var k = $('hrKuyu'), m = hrEnUst();
+    if (!m || hrDokunuyor || hrUcus || k.scrollTop >= m - 1) return;
+    k.scrollTo({ top: m, behavior: reduceMotion ? 'auto' : 'smooth' });
+  }
+  $('hrKuyu').addEventListener('scroll', function () {
+    var m = hrEnUst();
+    if (!m) { hrUstTabela(false); return; }
+    if (this.scrollTop < m - HR_ESNEK) this.scrollTop = m - HR_ESNEK;
+    hrUstTabela(this.scrollTop <= m + 24);
+    clearTimeout(hrGeriT); hrGeriT = setTimeout(hrGeriKay, 160);
+  }, { passive: true });
+  $('hrKuyu').addEventListener('touchstart', function () { hrDokunuyor = true; clearTimeout(hrGeriT); }, { passive: true });
+  function hrBirak() { hrDokunuyor = false; clearTimeout(hrGeriT); hrGeriT = setTimeout(hrGeriKay, 160); }
+  $('hrKuyu').addEventListener('touchend', hrBirak, { passive: true });
+  $('hrKuyu').addEventListener('touchcancel', hrBirak, { passive: true });
   function hrAtisIp(x1, y1, x2, y2) { var l = $('hrAtisIp'); if (!l) return; l.setAttribute('x1', x1); l.setAttribute('y1', y1); l.setAttribute('x2', x2); l.setAttribute('y2', y2); }
   // Çıra çizimi: seçili karakter ve takılar (G.kahramanCiz); ipinde yavaşça sallanır, atlayınca savrulur
   function hrDongu() {
@@ -1132,14 +1178,24 @@
   }
   function hrDur() { cancelAnimationFrame(hrRaf); hrRaf = 0; hrUcus = null; if (!$('hrKatman').hidden) hrKapat(true); }
   // atlama: ip hedef halkaya uzanır (0,26 sn) → Çıra kavisle atlar (0,52 sn) → ipinde savrulur
-  function hrAtla(a, b, bitti) {
+  // o (v0.97): { ip, uc } süreler (ms), takip: kamera her karede Çıra'yı izler (uzun ve hızlı atlamalar), sessiz: savrulmasın
+  function hrAtla(a, b, bitti, o) {
+    o = o || {};
     if (reduceMotion) { hrCiraKoy(b); hrKaydir(b, false); if (bitti) bitti(); return; }
-    var bas = hrAsili(a), son = hrAsili(b), hx = hrKonum[b].x, hy = hrUstten(hrKonum[b].y) + 12, c = $('hrCira');
-    var IP = 260, UC = 520, t0 = performance.now();
-    hrUcus = { a: a, b: b };
-    hrKaydir(b, true);
+    var bas = hrAsili(a), son = hrAsili(b), hx = hrKonum[b].x, hy = hrUstten(hrKonum[b].y) + 12, c = $('hrCira'), kuyu = $('hrKuyu');
+    var IP = o.ip || 260, UC = o.uc || 520, t0 = performance.now(), ucus = { a: a, b: b };
+    hrUcus = ucus;
+    if (!o.takip) hrKaydir(b, true);
+    // yedek (v0.97): kareler durursa (arka plan, yavaş cihaz) atlama süresinden biraz sonra kendiliğinden biter
+    setTimeout(function () {
+      if (hrUcus !== ucus) return;
+      hrAtisIp(0, 0, 0, 0); hrUcus = null; hrCiraKoy(b);
+      if (o.takip) kuyu.scrollTop = Math.max(hrEnUst(), son.y - kuyu.clientHeight * 0.55); else hrKaydir(b, false);
+      if (bitti) bitti();
+    }, IP + UC + 500);
     (function kare(now) {
-      if (!hrUcus || current !== 'ekHarita' || !document.body.contains(c)) { hrUcus = null; return; }
+      if (hrUcus !== ucus) return;
+      if (current !== 'ekHarita' || !document.body.contains(c)) { hrUcus = null; return; }
       var t = now - t0, el = { x: bas.x + 32, y: bas.y + 34 }; // Çıra'nın eli
       if (t < IP) {
         var e = 1 - Math.pow(1 - t / IP, 3);
@@ -1150,14 +1206,30 @@
         var x = (1 - k) * (1 - k) * bas.x + 2 * (1 - k) * k * cx + k * k * son.x, y = (1 - k) * (1 - k) * bas.y + 2 * (1 - k) * k * cy + k * k * son.y;
         c.style.left = x + 'px'; c.style.top = y + 'px';
         hrAtisIp(hx, hy, x + 32, y + 34);
+        if (o.takip) kuyu.scrollTop = Math.max(hrEnUst(), y - kuyu.clientHeight * 0.55);
       } else {
-        hrAtisIp(0, 0, 0, 0); hrUcus = null; hrCiraKoy(b); hrSavrulT = now;
+        hrAtisIp(0, 0, 0, 0); hrUcus = null; hrCiraKoy(b); if (!o.sessiz) hrSavrulT = now;
+        if (o.takip) kuyu.scrollTop = Math.max(hrEnUst(), son.y - kuyu.clientHeight * 0.55);
         if (bitti) bitti();
         return;
       }
       requestAnimationFrame(kare);
     })(t0);
   }
+  // v0.97: geçilmiş bir bölüme dokununca Çıra önce tek atışla oraya iner ve asılı bekler, bölüm sayfası sonra açılır.
+  // Vazgeçilirse kaldığı (sıradaki) bölüme hızlıca tırmanır: en çok 5 ara halka, toplam ~0,7 sn (oyuncu kaydırmadan önce yetişir).
+  function hrSira() { return Math.min(nextLevel(), G.bolumSayi); }
+  function hrTirman(a, b) {
+    if (b <= a || reduceMotion) { hrCiraKoy(b); hrKaydir(b, false); return; }
+    var adim = b - a, N = Math.min(5, adim), durak = [], cur = a;
+    for (var i = 1; i <= N; i++) durak.push(a + Math.round(adim * i / N));
+    (function sonraki() {
+      if (!durak.length || current !== 'ekHarita') return;
+      var h = durak.shift(), from = cur; cur = h;
+      hrAtla(from, h, sonraki, { ip: 50, uc: 90, takip: true, sessiz: durak.length > 0 });
+    })();
+  }
+  function hrGeriDon() { var s = hrSira(); if (current === 'ekHarita' && !hrUcus && hrCiraN !== s) hrTirman(hrCiraN, s); }
   function openHarita() {
     var s = save(), sira = Math.min(nextLevel(), G.bolumSayi), son = s.haritaSon || 0;
     var bas = son && son < sira ? sira - 1 : sira; // birden çok bölüm geçildiyse yalnız son atlama gösterilir
@@ -1220,11 +1292,18 @@
     var k = $('hrKatman'), n = hrAcikN; hrAcikN = 0; clearTimeout(hrKapT);
     if (k.hidden) return;
     var odak = function () { var b = n && $('hrDuvar').querySelector('.hr-halka[data-n="' + n + '"]'); if (b && current === 'ekHarita') b.focus({ preventScroll: true }); };
-    if (hemen === true || reduceMotion) { k.hidden = true; k.classList.remove('kapaniyor'); odak(); return; }
+    if (hemen === true || reduceMotion) { k.hidden = true; k.classList.remove('kapaniyor'); odak(); if (hemen !== true) hrGeriDon(); return; }
     k.classList.add('kapaniyor');
     hrKapT = setTimeout(function () { k.hidden = true; k.classList.remove('kapaniyor'); $('hrSayfa').style.transform = ''; odak(); }, 220);
+    setTimeout(hrGeriDon, 120); // vazgeçildi: Çıra sıradaki bölüme geri tırmanır (OYNA'da hemen kapanır, tırmanmaz)
   }
-  $('hrDuvar').addEventListener('click', function (e) { var b = e.target.closest('.hr-halka'); if (b && !hrUcus) hrAc(+b.dataset.n); });
+  $('hrDuvar').addEventListener('click', function (e) {
+    var b = e.target.closest('.hr-halka'); if (!b || hrUcus) return;
+    var n = +b.dataset.n;
+    // v0.97: geçilmiş bölüm: Çıra önce oraya iner (tek atış, ~0,5 sn), sayfa sonra açılır
+    if (G.acikMi(n) && n < hrSira() && n !== hrCiraN && !reduceMotion) { hrAtla(hrCiraN, n, function () { hrAc(n); }, { ip: 150, uc: 340, takip: true }); return; }
+    hrAc(n);
+  });
   $('hrKatman').addEventListener('click', function (e) { if (e.target === this) hrKapat(); });
   $('hrListe').addEventListener('click', function () { openLevels(); });
   // aşağı çekerek kapatma (ürün sayfasıyla aynı: 90 px'ten fazla çekilirse kapanır)
@@ -1300,7 +1379,7 @@
   }
   function adHakYaz() {
     var d = G.isimDurum ? G.isimDurum() : null, el = $('adHak'); if (!el || !d) return;
-    el.textContent = d.bedava ? '1 ücretsiz değiştirme hakkın var' : 'Sonraki değişiklik: 2 video ya da ' + d.ates + ' ateşböceği';
+    el.textContent = d.bedava ? '1 ücretsiz değiştirme hakkın var' : 'Sonraki değişiklik: ' + d.video + ' video' + (d.izlenen ? ' (' + d.izlenen + '/' + d.video + ' izlendi)' : '') + ' ya da ' + d.ates + ' kıvılcım';
   }
   $('adForm').addEventListener('submit', function (e) {
     e.preventDefault();
@@ -1309,10 +1388,20 @@
     if (s.profile && s.profile.name === name) { toast('Ad zaten ' + name); return; }
     var d = G.isimDurum();
     if (d.bedava) { G.isimHakki('bedava'); adUygula(name); return; }
-    secimAc('Ad değiştirme', 'Ücretsiz değiştirme hakkını kullandın. Yeni ad için art arda 2 video izle ya da ' + d.ates + ' ateşböceği ver.',
-      IK.svg('video') + '2 video izle', '<i class="ikon-ates" aria-hidden="true"></i> ' + d.ates + ' ateşböceği' + (d.yeter ? '' : ' · yetmiyor'), d.yeter,
-      function () { video(function () { if (G.isimHakki('video')) adUygula(name); }, d.video); },
-      function () { if (G.isimHakki('ates')) adUygula(name); else toast('Ateşböceği yetmiyor'); });
+    if (d.izlenen >= d.video) { if (G.isimHakki('video')) adUygula(name); return; } // videolar izlenmiş
+    // v0.97: videolar tek tek; her biri bitince onay, ikincisinden sonra ad değişir
+    var kalanV = d.video - d.izlenen;
+    secimAc('Ad değiştirme', 'Ücretsiz değiştirme hakkını kullandın. Yeni ad için ' + d.video + ' video izle' + (d.izlenen ? ' (' + d.izlenen + '/' + d.video + ' izlendi)' : '') + ' ya da ' + d.ates + ' kıvılcım ver.',
+      IK.svg('video') + (kalanV < d.video ? 'Video izle · ' + kalanV + ' kaldı' : 'Video izle · 1/' + d.video), '<i class="ikon-ates" aria-hidden="true"></i> ' + d.ates + ' kıvılcım' + (d.yeter ? '' : ' · yetmiyor'), d.yeter,
+      function () {
+        video(function () {
+          var r = G.isimVideo();
+          if (r.hazir) return { sira: r.izlenen + '/' + r.gerek, metin: 'Videolar tamam. Adın değişiyor.', tamam: function () { if (G.isimHakki('video')) adUygula(name); } };
+          adHakYaz();
+          return { sira: r.izlenen + '/' + r.gerek, metin: 'Video izlendi. ' + (r.gerek - r.izlenen) + ' video daha; sıradakine Kaydet ile bas.' };
+        });
+      },
+      function () { if (G.isimHakki('ates')) adUygula(name); else toast('Kıvılcım yetmiyor'); });
   });
   $('tanitimBtn').addEventListener('click', runIntro);
 
@@ -1632,7 +1721,7 @@
   var GERI = { hoook: 'geri' }, cikisT = 0;
   function geriKur() { try { if (!(history.state && history.state.hoook === 'geri')) history.pushState(GERI, ''); } catch (e) {} }
   function geriIsle() {
-    if (pencereAcik('videoKatman')) { if (videoAcik) videoAcik.iptal(); return true; } // v0.96: geri videoyu keser, ödül yok
+    if (pencereAcik('videoKatman')) { if (videoAcik) videoAcik.iptal(); else videoTamam(); return true; } // geri: video sürerken keser (ödül yok), onayda Tamam gibi // v0.96: geri videoyu keser, ödül yok
     if (pencereAcik('kutuKatman')) { if ($('kutuSahne').classList.contains('acik')) kutuKapat(); else kutuAcilsin(); return true; }
     if (pencereAcik('secimKatman')) { pencereKapat('secimKatman'); return true; }
     if (!$('urunKatman').hidden) { urunKapat(); return true; }

@@ -2,7 +2,7 @@
 
 > Eski adı Kuyu (v0.72'ye kadar). Oyunun dünyası hâlâ bir kuyu; mod adları (Günlük Kuyu, Haftalık Kuyu) ve koddaki iç adlar (`window.Kuyu*`, `kuyu.*` kayıt anahtarları, `KUYU1.` yedek kodu) uyumluluk için aynı kaldı.
 
-**Funday Morning Games** · 2D mobil oyun · prototip v0.96
+**Funday Morning Games** · 2D mobil oyun · prototip v0.97
 
 Derin bir kuyunun dibindesin. Telefonu tek elle tut: ekranın soluna ya da sağına dokun, kanca o taraftaki hedefe fırlasın; basılı tut, ipe sarıl; bırak, savrul. Halkadan halkaya, ahşaptan ahşaba tırmanıp kuyudan çık.
 
@@ -135,6 +135,7 @@ Serbest Sonsuz Kuyu kalktı (eski bağlantılar Günlük Kuyu'ya gider; eski rek
 - **Deneme hakkı:** Günlük günde 3, Haftalık haftada 5 (`ekonomi.js` → `HAK`). Her koşu bir hak harcar; "Bir daha dene" ve "Baştan başla" dahil. Meydan okuma bağlantısı hak harcamaz.
 - **Hak yenileme (video):** Hak bitince pencere açılır. Video izleyerek +1 deneme: 1. yenileme 1 video, 2. yenileme 2 video, … 5. yenileme 5 video (`hakVideo`). 5 yenilemeden sonra o gün/hafta başka reklam ve deneme yok; pencere oyuncuyu Hikâye'de sıradaki bölüme yönlendirir. Video yalnız oyuncu seçerse oynar.
 - **Günün hedefi:** (28/11'den beri bitişli, v0.96 maddesine bak) Eski günlerde her gün bir hedef metre (600–1000, tarihten). 1 yıldız hedef, 2 yıldız 1,5 kat, 3 yıldız 2 kat; her yıldız günde bir kez +5 / +5 / +10 ateşböceği (`gunHedef`, `gunYildizKaydet`). Kartta ve sonuç kartında yıldızlar.
+- **Kıvılcım, tek tek video, harita ve Market (v0.97):** Muhammed'in son güncellemeleri (devirden önce): videolar tek tek (her video ayrı, bitince "1/3 izlendi" onayı, izlenenler saklanır; kutu ve ad değiştirme); harita sıradakinin 12 bölüm üstüne kadar görünür, "Karanlık" tabelası en üste gelince kirişten iple iner, sınırın 150 px ötesine kaydırılabilir ve bırakınca geri kayar; haritada geçilmiş bölüme dokununca Çıra önce oraya iner (tek atış), sayfa sonra açılır, vazgeçince en çok 5 ara halkadan ~0,7 sn'de geri tırmanır; ana menüde yalnız OYNA parlak, yan etiketler aynı tonda kırık renkler; Market'te nadirlik mini çerçevesi (köşede 1–3 taş) ve yeni ürün rozeti (ürün, bölüm başlığı, kategori sekmesi; ürünü açmak bütün rozetlerini, sekmeye dokunmak sekmenin rozetini siler); harcanan para birimi Kıvılcım (yolda toplanan ateşböceği ayrı; her ateşböceği sonuçta 1 kıvılcıma döner, fiyat ve ödüller aynı, ekonomi ~145/gün). Telefonda denenecek: `docs/telefon-testi.md` §40.
 - **Kutu, video, ad hakkı, bitişli Günlük (v0.96):** İstişare 7'nin kalan işleri (Muhammed, kutu için Törehan onayı 27/11).
   - **Kutu (Market ve günlük girişin 7. günü):** art arda 3 video ile açılır, günde 2 kutu. Olasılıklar kartın altında yazar: Sıradan %45, Nadir %25, Destansı %8, Efsane %2, ateşböceği %20 (20–60). Yinelenen eşya ateşböceğine döner (15/30/60/120); ışık, lig ve etkinlik eşyası çıkmaz (`ekonomi.js` → `KUTU`, `kutuAc`). Açılış: kutu sallanır, kapak savrulur, içinden çıkan yükselir (büyüme yok). Günlük girişin 7. günü kutudur; ateşböceği de çıkabilir.
   - **Video ile ateşböceği (Market):** video başı +2, günde 5 (bir bölümün kazancından az; `VIDEO_ATES`).
