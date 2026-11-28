@@ -1424,19 +1424,19 @@ body:has(#oyunEkrani:not([hidden])) .hikaye-kart { top: calc(84px + env(safe-are
 .askida .n-efsane .m-cerceve { box-shadow: inset 0 0 0 2.5px var(--nc), 0 0 0 2.5px var(--s-cizgi), 0 0 12px rgba(255,214,90,.55); }
 .askida .m-taslar { position: absolute; right: -5px; bottom: -6px; display: flex; gap: 2px; }
 .askida .m-taslar i { width: 9px; height: 9px; background: var(--nc); border: 2px solid var(--s-cizgi); border-radius: 2px; transform: rotate(45deg); }
-.yeni-rozet { position: absolute; z-index: 3; display: grid; place-items: center; width: 22px; height: 22px; border-radius: 50%; background: var(--s-pembe, #ff5fa0);
+.m-yeni { position: absolute; z-index: 3; display: grid; place-items: center; width: 22px; height: 22px; border-radius: 50%; background: var(--s-pembe, #ff5fa0);
   border: 2.5px solid var(--s-cizgi); box-shadow: 0 2px 0 var(--s-cizgi); pointer-events: none; animation: yeniSalin 1.6s ease-in-out infinite alternate; }
-.yeni-rozet[hidden] { display: none; }
-.yeni-rozet .ik { width: 14px; height: 14px; }
+.m-yeni[hidden] { display: none; }
+.m-yeni .ik { width: 14px; height: 14px; }
 @keyframes yeniSalin { from { transform: rotate(-10deg); } to { transform: rotate(10deg); } }
-.askida .m-urun > .yeni-rozet { top: -9px; left: -9px; }
-.askida .m-haftalik { position: relative; } .askida .m-haftalik > .yeni-rozet { top: -9px; left: -9px; }
+.askida .m-urun > .m-yeni { top: -9px; left: -9px; }
+.askida .m-haftalik { position: relative; } .askida .m-haftalik > .m-yeni { top: -9px; left: -9px; }
 .askida .m-bas h3 { position: relative; display: inline-flex; align-items: center; gap: 6px; }
-.askida .m-bas h3 .yeni-rozet { position: relative; left: auto; top: auto; margin: 0; width: 20px; height: 20px; }
+.askida .m-bas h3 .m-yeni { position: relative; left: auto; top: auto; margin: 0; width: 20px; height: 20px; }
 .askida .kol-sekmeler button { position: relative; overflow: visible; }
-.askida .kol-sekmeler button > .yeni-rozet { top: -9px; right: -7px; width: 18px; height: 18px; }
-.askida .kol-sekmeler button > .yeni-rozet .ik { width: 11px; height: 11px; }
-@media (prefers-reduced-motion: reduce) { .yeni-rozet { animation: none; } }
+.askida .kol-sekmeler button > .m-yeni { top: -9px; right: -7px; width: 18px; height: 18px; }
+.askida .kol-sekmeler button > .m-yeni .ik { width: 11px; height: 11px; }
+@media (prefers-reduced-motion: reduce) { .m-yeni { animation: none; } }
 /* v0.97: ana ekranda renk eşitliği. OYNA tek parlak vurgu (kor turuncusu); yan etiketler aynı açıklık ve doygunlukta kırık
    tonlar (koyu duvara oturur, birbirinden ayrılır, OYNA ile yarışmaz). Yazı, kalın çizgi ve gölge aynı. */
 #ekAna .k-cam { --etiket: hsl(199 40% 42%); } #ekAna .k-mor { --etiket: hsl(262 32% 48%); }

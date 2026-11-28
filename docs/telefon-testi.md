@@ -300,6 +300,12 @@ Hikâye ekranındaki "Yeni Maden", "Yeni Kristal Mağara" ve "Yeni Eski Kule · 
 - [ ] Market: ürün resimlerinin nadirlik çerçevesi ve köşedeki taşlar; yeni ürün rozeti (ürün, "Günlük vitrin" başlığı, kategori sekmesi). Ürünü açınca rozetleri siliniyor mu?
 - [ ] Para: cüzdanda ve fiyatlarda kıvılcım ikonu; bölüm sonunda "N ateşböceği kıvılcıma döndü". Ayrım anlaşılıyor mu?
 
+## 41. Düşüş sınırı (v0.98, 3 dk)
+- [ ] Bir Hikâye bölümünde (ör. Taş Kuyu) bilerek aşağı düş: altta karanlık ve kesik çizgili sınır görünüyor mu? Sınır ekranın altındayken alt kenarda mor parıltı var mı?
+- [ ] Sınıra değince "çok düştün" yazıp sönüyor mu? Artık "su görünmeden yandım" hissi kalıyor mu?
+- [ ] Kristal ve sonrasında (izleyen su) karanlık çizilmiyor, su görünüyor mu?
+- [ ] Oyunda yeni bir halka tanıtılınca kartın "YENİ" etiketi düzgün mü?
+
 ## 5. Genel izlenim (serbest)
 - En sevdiğim an:
 - En çok zorlandığım yer:

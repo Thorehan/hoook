@@ -695,7 +695,7 @@
   // v0.97: resim nadirlik renginde mini çerçevede; köşedeki taş sayısı nadirliği renksiz de söyler (Nadir 1, Destansı 2, Efsane 3).
   // Yeni gelen ürünün köşesinde "yeni" rozeti (ürün sayfası açılınca silinir).
   var TAS = { baslangic: 0, sira: 0, nadir: 1, destansi: 2, efsane: 3 };
-  function yeniRozet(id) { return '<i class="yeni-rozet"' + (id ? ' id="' + id + '"' : '') + ' aria-hidden="true">' + IK.svg('yeni') + '</i>'; }
+  function yeniRozet(id) { return '<i class="m-yeni"' + (id ? ' id="' + id + '"' : '') + ' aria-hidden="true">' + IK.svg('yeni') + '</i>'; }
   function cerceve(it, nad) { var t = ''; for (var i = 0; i < (TAS[nad] || 0); i++) t += '<i></i>'; return '<span class="m-cerceve"><img src="' + resim(it) + '" alt="">' + (t ? '<span class="m-taslar" aria-hidden="true">' + t + '</span>' : '') + '</span>'; }
   function urunKart(it, ek) {
     var EK = window.KuyuEkonomi, nad = EK.nadirlik(it), d = urunDurum(it), yeni = G.urunYeni(it.id);

@@ -881,6 +881,7 @@
         shake = suya ? 4 : 6; buzz(suya ? TIT.su : TIT.dusus); hisSifirla();
         anlar.sonme = { x: sim.p.x, y: sim.p.y, t0: lastT, su: suya, buhar: 0 };
         burst(sim.p.x, sim.p.y, suya ? 10 : 16, suya ? COL.suAcik : (look().govde || COL.kahraman), suya ? 150 : 220, 0.6);
+        if (e.why === 'düşüş') floatText(sim.p.x, sim.p.y - 34, 'çok düştün', '#b9a8ff', 15); // v0.98: düşüş sınırı (su değil)
         deadT = 0;
       } else if (e.type === 'won') { SFX.won(); buzz([20, 60, 30]); winT = 0; burst(sim.p.x, sim.p.y, 20, COL.gok, 200, 0.8, -60); if (e.bitis) { burst(sim.p.x, sim.p.y, 26, '#ffe066', 260, 1, -40); floatText(sim.p.x, sim.p.y - 40, 'Tepedesin!', '#ffe066', 24); } else kovaBasla(); }
     }
@@ -1262,6 +1263,35 @@
     ctx.fillStyle = '#fff3c4'; ctx.beginPath(); ctx.arc(x, y, 2.8, 0, Math.PI * 2); ctx.fill();
     ctx.font = '800 9px "Baloo 2", system-ui, sans-serif'; ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
     ctx.fillStyle = '#ffd36a'; ctx.fillText(String(f.sira), x + 10, y - 9);
+  }
+
+  // Düşüş sınırı (v0.98): Hikâye'de tutunulan en yüksek yerin def.dusus birim altı da Çıra'yı söndürür (engine.js, v0.57).
+  // Önceden çizilmiyordu; oyuncu "su görünmeden yandım" sanıyordu. Sınırın altı karanlık (Taş Kuyu susuz, su değil),
+  // kenarında ince çizgi; ekranın altındayken yaklaştıkça alt kenarda mor uyarı. Su sınırdan yukarıdaysa çizilmez (önce su yakalar).
+  function dususY() { return mode === 'level' && sim.def.dusus && sim.dusTop != null ? sim.dusTop + sim.def.dusus : null; }
+  function drawDusus(t) {
+    var ly = dususY(); if (ly == null) return;
+    if (sim.water != null && sim.water <= ly + 10) return;
+    var alt = cam + viewH / K;
+    if (ly > alt - 4) {
+      var yak = Math.max(0, Math.min(1, 1 - (ly - alt) / 260));
+      if (yak > 0.02) {
+        var eg = ctx.createLinearGradient(0, alt, 0, alt - 80);
+        eg.addColorStop(0, 'rgba(120,90,210,' + (0.42 * yak).toFixed(3) + ')'); eg.addColorStop(1, 'rgba(120,90,210,0)');
+        ctx.fillStyle = eg; ctx.fillRect(0, alt - 80, CFG.W, 80);
+      }
+      if (ly > alt + 20) return;
+    }
+    var g = ctx.createLinearGradient(0, ly - 150, 0, ly + 40);
+    g.addColorStop(0, 'rgba(6,4,16,0)'); g.addColorStop(0.75, 'rgba(6,4,16,0.62)'); g.addColorStop(1, 'rgba(4,3,10,0.93)');
+    ctx.fillStyle = g; ctx.fillRect(0, ly - 150, CFG.W, 190);
+    ctx.fillStyle = 'rgba(4,3,10,0.93)'; ctx.fillRect(0, ly + 40, CFG.W, Math.max(0, alt - ly - 40 + 40));
+    var yakin = sim.status === 'play' ? Math.max(0, Math.min(1, 1 - (ly - sim.p.y) / 220)) : 0, nab = 0.5 + 0.5 * Math.sin(t / 180);
+    ctx.save(); ctx.setLineDash([10, 9]); ctx.lineDashOffset = -t / 60;
+    ctx.strokeStyle = 'rgba(185,168,255,' + (0.28 + 0.5 * yakin * nab).toFixed(3) + ')'; ctx.lineWidth = 2;
+    ctx.beginPath();
+    for (var x = 0; x <= CFG.W; x += 12) { var yy = ly + Math.sin(x / 34 + t / 700) * 2.5; if (x === 0) ctx.moveTo(x, yy); else ctx.lineTo(x, yy); }
+    ctx.stroke(); ctx.restore();
   }
 
   var surunmeDuyuruldu = false;
@@ -1960,6 +1990,7 @@
     if (sim.status !== 'dead') { drawHero(t); drawGrip(); } else drawSonme(t);
     drawAkanlar(t);
     drawParticles(dt);
+    drawDusus(t);
     drawWater(t);
     drawToz(t, 1.25, 6, 1.5, 0.13);
     drawFloaters(dt);
