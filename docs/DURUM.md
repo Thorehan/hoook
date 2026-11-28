@@ -2,24 +2,15 @@
 
 > Her oturumun başında okunur, iş bitince güncellenir. Kısa tutulur (~40 satır).
 
-## Devir kimde: **Törehan**
+## Devir kimde: **Muhammed**
 
-- Devir tarihi: 27/11/2026 · Muhammed → Törehan
-- Devir noktası: v0.96 (yayında, canlıda doğrulandı), geri dönüş etiketleri `geri-donus-v0.94`, `geri-donus-v0.95`. Muhammed döneminin (v0.84–v0.96) her sürümü ayrı commit; `git revert` ile tek tek geri alınabilir.
-- Devir Törehan'dayken Muhammed (ve Mustafa) projede geliştirme yapmaz; yalnız oynar, not alır, istişare eder.
-- **Törehan için başlangıç:** `git pull`, sonra aşağıdaki "Törehan için sıradaki iş". Muhammed döneminin ayrıntısı aşağıda v0.84–v0.96 satırlarında ve `docs/gelistirme-sureci.md` → Yapılanlar.
-- Eski devir: 24/11/2026 Törehan → Muhammed (v0.83, `docs/DEVIR-MUHAMMED.md`).
+- Devir tarihi: 24/11/2026 · Törehan → Muhammed
+- Devir noktası: v0.83 (yayında), etiket `geri-donus-v0.83`. Bu dönemdeki her sürüm ayrı commit; `git revert` ile tek tek geri alınabilir.
+- Devir Muhammed'deyken Törehan (ve Mustafa) projede geliştirme yapmaz; yalnız oynar, not alır, istişare eder. Geri devir `docs/DEVIR-MUHAMMED.md` §8'deki adımlarla.
+- **Muhammed için başlangıç:** `docs/DEVIR-MUHAMMED.md` (kurulum, ilk oturum metni, yapılacaklar listesi §6, arayüz ilkeleri §5).
+- **Kapsam (Törehan, 24/11):** yalnız arayüz Aşama 2–4 (Market, Koleksiyon, Yarışma, Profil, pencereler, açılış ve sonuç kartları). Her aşama sonunda Törehan telefonda dener, onaylar. Online, ekonomi, oynanış çekirdeği, görsel yön ve hikâyede son söz Törehan'da (`DEVIR-MUHAMMED.md` §7).
 
-## Törehan için sıradaki iş (27/11, Muhammed'in devir notu)
-
-1. **Telefonda deneme:** `docs/telefon-testi.md` §27–§39 (v0.84–v0.96) telefonda denenmedi. Önce §39: video sayacı (uygulamadan çıkıp dönünce kaldığı yerden sürmeli, Vazgeç ve geri tuşu ödül vermemeli; tarayıcı önizlemesinde denenemedi), kutu açılışı, bitişli Günlük.
-2. **Bitişli Günlük 28/11'de başlar** (`ekonomi.js` → `GUN_BITIS`): ilk gün canlıda bak; 500 m, yıldız süreleri 75/35 sn bot ölçümünden (temkinli ~46 sn, akışla ~13 sn), insan süreleriyle ayarlanabilir.
-3. **Onay bekleyen ekonomi kararı (v0.96, Muhammed sormadan yaptı):** bitişli günde yıldız ödülü +25/+20/+15 (eskisi +5/+5/+10). Koşu kısaldığı için ortalama gün ~110'a düşüyordu; bu ödülle ~145 (öncesi ~149). Uygun değilse `GUN_BITIS.odul`.
-4. **Haftalık hedefler** kuyuya çizgi olarak değil, rozetlerin altında "Sıradaki: …" satırı olarak (hedef puanla ölçülür, yüksekliğe bağlanamaz). Farklı istenirse karar Törehan'ın.
-5. **İstişare 7'nin bekleyenleri** (`docs/istisare-7-ilerleme.md` §6b): 1000 bölüm ve kuyu paketleri (6. soru), yeni halka adayları (8. soru).
-6. **Not:** online skor tablosu açık; yerelde Günlük/Haftalık denerken puan gerçek tabloya gider (sunucu yalnız açık tahtayı kabul eder). Denerken sayfada `KuyuOnline.gonder` kapatılır (`CLAUDE.md` §3).
-
-## Son durum (v0.96)
+## Son durum (v0.83)
 
 - **v0.96** (27/11/2026, Muhammed; kutu için Törehan onayı): İstişare 7 kalan işler: Market'te kutu (3 video, günde 2, olasılıklar görünür; Törehan onayı 27/11) ve günlük girişin 7. günü kutu; video ile +2 ateşböceği (günde 5); ad değiştirme (1 bedava, sonra 2 video ya da 250 ateşböceği); video sayacı yalnız görünürken akar, vazgeç ödülsüz; Günlük Kuyu 28/11'den bitişli (500 m TEPE çizgisi, yıldız süreden 75/35 sn, ödül 25/20/15, puan 10000 − süre × 10; ortalama gün ~145); Haftalık'ta sıradaki hedef (yıldız, rekor, lig) üst panelde ve geçince kutlama; haritada 6 bölüm yukarısı karanlık perde ve kaydırma kısıtı; alt menüde gerçek ikonlar, simetrik dişli; harita levhası büyüdü; Yarışma sekme geçişi bellekten (titreme yok). Telefonda denenecek: `docs/telefon-testi.md` §39.
 - **v0.95** (26–27/11/2026, Muhammed; Törehan onayı): İstişare 7 Faz 2: Bölümler uzadı (İstişare 7 Faz 2, Törehan onayı 26/11): kısa bölümler üreticide uzatılır (`gen.js` → `kisaUzat`; tarifler aynı): öğret ×1,2, diğerleri ×1,5; ateşböceği, özel halka sayısı ve akış hedefi birlikte artar (yoğunluk aynı, boş tırmanış yok). Bölge sonları (18, 36, 60, 83 ve ikinci yolculuktaki eşleri) iki parça, arada fener; fırlatma yolu ve akıntı ilk parçada. Öğret bölümünde öğretilen halka en az 3 kez; hız ve geçit öğretiminde bir ateşböceği o halkanın ardında. Ölçüm (temkinli %5, insan): öğret 25–47 sn, normal 45–83 sn, final 74–115 sn; ilk yolculuk ~54 → ~80 dk. Tek taraf 0, temkinli bitiremeyen 0, ekonomi ~149/gün (öncesi ~147). En iyi süreler ve bölüm hayaletleri bir kez silindi (`save.hikayeV` 5); madalyalar ve yıldızlar kaldı. Geri dönüş `geri-donus-v0.94`. Telefonda denenecek: `docs/telefon-testi.md` §38.
@@ -96,4 +87,3 @@
 | 11/11/2026 | Törehan → Mustafa | v0.51 | İlk devir; `CLAUDE.md`, bu dosya ve `DEVIR-MUSTAFA.md` eklendi |
 | 17/11/2026 | Mustafa → Törehan | v0.55 | Bölge suyu, ekonomi dengesi ve ışık yolu, Haftalık Kuyu ve lig, meydan okuma, skor tablosu istemcisi (kapalı); yayında, telefonda denenmedi |
 | 24/11/2026 | Törehan → Muhammed | v0.83 | İstişare 3 (his, yeni mekanikler), skor tablosu, Hoook adı, İstişare 4–5 arayüz (Askıda Menü Aşama 1), asılı başlangıç; `DEVIR-MUHAMMED.md` eklendi |
-| 27/11/2026 | Muhammed → Törehan | v0.96 | İstişare 5 arayüz Aşama 2–4 (Askıda Menü), İstişare 6 kısa bölümler (166 bölüm, harita, yıldızlar), İstişare 7 (sıralı ilerleme, uzun bölümler, kutu, bitişli Günlük); yayında, v0.84'ten beri telefonda denenmedi |
